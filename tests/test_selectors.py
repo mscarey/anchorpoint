@@ -3,8 +3,7 @@ import re
 
 import pytest
 
-from anchorpoint import TextQuoteSelector
-from anchorpoint import TextPositionSelector
+from anchorpoint import TextQuoteSelector, TextPositionSelector
 
 
 class TestTextQuoteSelectors:
@@ -40,7 +39,7 @@ class TestTextQuoteSelectors:
 
     def test_failed_suffix(self, make_text):
         up_to_sound = TextQuoteSelector(suffix="sound recordings")
-        assert up_to_sound.as_position(make_text["s102b") is None
+        assert up_to_sound.as_position(make_text["s102b"]) is None
 
     def test_interval_from_just_prefix(self, make_text):
         """
@@ -51,33 +50,33 @@ class TestTextQuoteSelectors:
         If it started with 140, there would be a leading space.
         """
         selector = TextQuoteSelector(prefix="method of operation,")
-        assert selector.as_position(make_text["s102b") == TextPositionSelector(
-            141, len(make_text["s102b")
+        assert selector.as_position(make_text["s102b"]) == TextPositionSelector(
+            141, len(make_text["s102b"])
         )
 
     def test_exact_from_just_suffix(self, make_text):
-        exact = self.in_no_case.select_text(make_text["s102b")
+        exact = self.in_no_case.select_text(make_text["s102b"])
         assert exact == (
             "In no case does copyright protection for an original "
             + "work of authorship extend to any"
         )
 
     def test_exact_from_prefix_and_suffix(self, make_text):
-        exact = self.amendment_selector.select_text(make_text["amendment")
+        exact = self.amendment_selector.select_text(make_text["amendment"])
         assert exact.startswith("nor shall any State deprive")
 
     def test_select_text(self, make_text):
         selector = TextQuoteSelector(
             prefix="in no case", exact="does copyright", suffix="protection"
         )
-        assert selector.select_text(make_text["s102b") == "does copyright"
+        assert selector.select_text(make_text["s102b"]) == "does copyright"
 
     def test_select_text_without_exact(self, make_text):
         selector = TextQuoteSelector(prefix="in no case", suffix="protection")
-        assert selector.select_text(make_text["s102b") == "does copyright"
+        assert selector.select_text(make_text["s102b"]) == "does copyright"
 
-    def test_rebuilding_from_text(self):
-        new_selector = self.amendment_selector.rebuild_from_text(self.amendment)
+    def test_rebuilding_from_text(self, make_text):
+        new_selector = self.amendment_selector.rebuild_from_text(make_text["amendment"])
         assert new_selector.exact.startswith("nor shall any State deprive")
 
     def test_failing_to_rebuild_from_text(self):
@@ -86,7 +85,7 @@ class TestTextQuoteSelectors:
         )
         assert not new_selector
 
-    def test_make_position_selector(self):
+    def test_make_position_selector(self, make_text):
         new_selector = self.amendment_selector.as_position(make_text["amendment"])
         assert new_selector.start == make_text["amendment"].find("nor shall any State")
 
@@ -102,12 +101,12 @@ class TestTextQuoteSelectors:
         assert selector.passage_regex() == r"(nor\ shall\ any\ State)"
 
     def test_selector_escapes_special_characters(self):
-        selector = TextQuoteSelector(suffix="opened the C:\documents folder")
+        selector = TextQuoteSelector(suffix=r"opened the C:\documents folder")
         pattern = selector.passage_regex()
-        match = re.match(pattern, "Lee \n opened the C:\documents folder yesterday")
+        match = re.match(pattern, r"Lee \n opened the C:\documents folder yesterday")
         assert match
 
-    def test_regex_match(self):
+    def test_regex_match(self, make_text):
         """
         Comparable to how TextQuoteSelector.exact_from_ends works.
 
@@ -124,7 +123,7 @@ class TestTextQuoteSelectors:
             == "nor shall any State deprive any person of life, liberty, or property, without due process of law;"
         )
 
-    def test_quote_is_unique(self):
+    def test_quote_is_unique(self, make_text):
         assert self.amendment_selector.is_unique_in(make_text["amendment"])
 
     def test_not_unique_if_absent(self):
@@ -136,7 +135,6 @@ class TestTextQuoteSelectors:
 
 
 class TestTextPositionSelectors:
-
     def test_add_position_selectors(self):
         left = TextPositionSelector(start=5, end=22)
         right = TextPositionSelector(start=12, end=27)

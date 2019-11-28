@@ -1,2 +1,2 @@
-from selectors import TextQuoteSelector
-from selectors import TextPositionSelector
+from anchorpoint import TextQuoteSelector
+from anchorpoint import TextPositionSelector
