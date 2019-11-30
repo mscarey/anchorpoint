@@ -1,2 +1,0 @@
-from anchorpoint import TextQuoteSelector
-from anchorpoint import TextPositionSelector

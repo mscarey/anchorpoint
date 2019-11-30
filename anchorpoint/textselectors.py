@@ -1,8 +1,8 @@
 """
-Selectors for citing exact passages in strings.
+Text substring selectors for anchoring annotations.
 
 Based on parts of the `Web Annotation Data
-Model <https://www.w3.org/TR/annotation-model/>`_
+Model <https://www.w3.org/TR/annotation-model/>`_.
 """
 
 from __future__ import annotations
@@ -18,8 +18,8 @@ class TextQuoteSelector:
     """
     Describes a textual segment by quoting it, or passages before or after it.
 
-    Based on the `Web Annotation Data Model
-    <https://www.w3.org/TR/annotation-model/#text-quote-selector>`_
+    Based on the Web Annotation Data Model `Text Quote Selector
+    <https://www.w3.org/TR/annotation-model/#text-quote-selector>`_ standard
 
     :param exact:
         a copy of the text which is being selected
@@ -46,7 +46,7 @@ class TextQuoteSelector:
             text to search for a match to the selector
 
         :returns:
-            a Python regex match, or None
+            a :py:class:`re.Match`, or None
         """
         pattern = self.passage_regex()
         return re.search(pattern, text, re.IGNORECASE)
@@ -85,12 +85,7 @@ class TextQuoteSelector:
         return TextQuoteSelector(exact=exact, prefix=self.prefix, suffix=self.suffix)
 
     def dump(self):
-        """
-        Serialize the selector.
-
-        Based on the JSON serialization format in the `Web Annotation Data Model
-        <https://www.w3.org/TR/annotation-model/#text-quote-selector>`_
-        """
+        """Serialize the selector."""
         return {
             "type": "TextQuoteSelector",
             "exact": self.exact,
@@ -173,8 +168,8 @@ class TextPositionSelector:
     """
     Describes a textual segment by start and end positions.
 
-    Based on the `Web Annotation Data Model
-    <https://www.w3.org/TR/annotation-model/#text-position-selector>`_
+    Based on the Web Annotation Data Model `Text Position Selector
+    <https://www.w3.org/TR/annotation-model/#text-position-selector>`_ standard
 
     :param start:
         The starting position of the segment of text.
@@ -242,33 +237,22 @@ class TextPositionSelector:
         )
 
     def combine(self, other: TextPositionSelector, text: str):
-        """
-        Make new selector combining ranges of self and other if it will fit in text.
-        """
+        """Make new selector combining ranges of self and other if it will fit in text."""
         for selector in (self, other):
             selector.validate(text)
         return self + other
 
     def dump(self):
-        """
-        Serialize the selector.
-
-        Based on the JSON serialization format in the `Web Annotation Data Model
-        <https://www.w3.org/TR/annotation-model/#text-position-selector>`_
-        """
+        """Serialize the selector."""
         return {"type": "TextPositionSelector", "start": self.start, "end": self.end}
 
     def passage(self, text: str) -> str:
-        """
-        Get the quotation from text identified by start and end positions.
-        """
+        """Get the quotation from text identified by start and end positions."""
         self.validate(text)
         return text[self.start : self.end]
 
     def validate(self, text: str) -> None:
-        """
-        Verify that selector's text positions exist in text.
-        """
+        """Verify that selector's text positions exist in text."""
         if self.end and self.end > len(text):
             raise IndexError(
                 f'Text "{text}" is too short to include '
