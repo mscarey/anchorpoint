@@ -163,7 +163,7 @@ class TestTextPositionSelectors:
         left = TextPositionSelector(start=5, end=12)
         right = TextPositionSelector(start=10, end=27)
         text = "This is 26 characters long"
-        with pytest.raises(ValueError):
+        with pytest.raises(IndexError):
             _ = left.combine(other=right, text=text)
 
     def test_combine_with_text(self):
@@ -185,11 +185,11 @@ class TestTextPositionSelectors:
 
     def test_fail_to_get_passage_from_position(self, make_text):
         selector = TextPositionSelector(start=53, end=9984)
-        with pytest.raises(ValueError):
+        with pytest.raises(IndexError):
             _ = selector.passage(make_text["amendment"])
 
     def test_end_must_be_after_start_position(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(IndexError):
             _ = TextPositionSelector(start=53, end=14)
 
     def test_min_start_position_is_0(self):
@@ -210,3 +210,9 @@ class TestTextPositionSelectors:
         assert quote.exact == "entire passage"
         assert not quote.prefix
         assert not quote.suffix
+
+    def test_fail_to_make_quote_selector(self):
+        passage = "too short"
+        interval = TextPositionSelector(50, 100)
+        with pytest.raises(IndexError):
+            _ = interval.as_quote_selector(passage)

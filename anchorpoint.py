@@ -194,7 +194,7 @@ class TextPositionSelector:
             object.__setattr__(self, "start", 0)
         if self.end:
             if self.end <= self.start:
-                raise ValueError(
+                raise IndexError(
                     "End position must be a positive number "
                     "greater than the start position"
                 )
@@ -270,7 +270,7 @@ class TextPositionSelector:
         Verify that selector's text positions exist in text.
         """
         if self.end and self.end > len(text):
-            raise ValueError(
+            raise IndexError(
                 f'Text "{text}" is too short to include '
                 + f"the interval ({self.start}, {self.end})"
             )
