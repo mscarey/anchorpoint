@@ -41,13 +41,19 @@ class TextQuoteSelector:
     def find_match(self, text: str) -> Optional[re.match]:
         """
         Get the first match for the selector within a string.
+
+        :param text:
+            text to search for a match to the selector
+
+        :returns:
+            a Python regex match, or None
         """
         pattern = self.passage_regex()
         return re.search(pattern, text, re.IGNORECASE)
 
     def select_text(self, text: str) -> Optional[str]:
         """
-        Get quotation between the prefix and suffix in a text.
+        Get the passage matching the selector, minus any whitespace.
 
         :param text:
             the passage where an exact quotation needs to be located.
@@ -63,6 +69,9 @@ class TextQuoteSelector:
     def rebuild_from_text(self, text: str) -> Optional[TextQuoteSelector]:
         """
         Make new selector with the "exact" value found in a given text.
+
+        Used for building a complete selector when :attr:`exact` has not
+        been specified.
 
         :param text:
             the passage where an exact quotation needs to be located
@@ -92,6 +101,12 @@ class TextQuoteSelector:
     def as_position(self, text: str) -> Optional[TextPositionSelector]:
         """
         Get the interval where the selected quote appears in "text".
+
+        :param text:
+            the passage where an exact quotation needs to be located
+
+        :returns:
+            the position selector for the location of the exact quotation
         """
         match = self.find_match(text)
         if match:
@@ -103,6 +118,12 @@ class TextQuoteSelector:
     def is_unique_in(self, text: str) -> bool:
         """
         Test if selector refers to exactly one passage in text.
+
+        :param text:
+            the passage where an exact quotation needs to be located
+
+        :returns:
+            whether the passage appears exactly once
         """
         match = self.find_match(text)
         if match:
@@ -110,7 +131,8 @@ class TextQuoteSelector:
             return not bool(second_match)
         return False
 
-    def passage_regex_without_exact(self):
+    def _passage_regex_without_exact(self) -> str:
+        """Get regex for the passage given the "exact" parameter is missing."""
 
         if not (self.prefix or self.suffix):
             return r"^.*$"
@@ -124,10 +146,10 @@ class TextQuoteSelector:
         return (self.prefix_regex() + r"(.*)" + self.suffix_regex()).strip()
 
     def passage_regex(self):
-        """Get a regex to identify the selected text."""
+        """Get regex to identify the selected text."""
 
         if not self.exact:
-            return self.passage_regex_without_exact()
+            return self._passage_regex_without_exact()
 
         return (
             self.prefix_regex()
@@ -138,9 +160,11 @@ class TextQuoteSelector:
         ).strip()
 
     def prefix_regex(self):
+        """Get regex for the text before any whitespace and the selection."""
         return (re.escape(self.prefix.strip()) + r"\s*") if self.prefix else ""
 
     def suffix_regex(self):
+        """Get regex for the text following the selection and any whitespace."""
         return (r"\s*" + re.escape(self.suffix.strip())) if self.suffix else ""
 
 
@@ -160,7 +184,6 @@ class TextPositionSelector:
     :param end:
         The end position of the segment of text.
         The character is not included within the segment.
-
     """
 
     start: int = 0
@@ -176,12 +199,21 @@ class TextPositionSelector:
                     "greater than the start position"
                 )
 
-    def __add__(self, other: TextPositionSelector) -> Optional[TextPositionSelector]:
+    def __add__(self, other: TextPositionSelector, margin: int = 3) -> Optional[TextPositionSelector]:
         """
         Make a new selector covering the combined ranges of self and other.
+
+        :param other:
+            selector for another text interval
+
+        :param margin:
+            allowable distance between two selectors that can still be added together
+
+        :returns:
+            a selector reflecting the combined range if possible, otherwise None
         """
-        if (not other.end or self.start <= other.end + 3) and (
-            not self.end or other.start <= self.end + 3
+        if (not other.end or self.start <= other.end + margin) and (
+            not self.end or other.start <= self.end + margin
         ):
             return TextPositionSelector(
                 start=min(self.start, other.start), end=max(self.end, other.end)
@@ -191,14 +223,17 @@ class TextPositionSelector:
     def as_quote_selector(self, text: str) -> TextQuoteSelector:
         """
         Make a quote selector, adding prefix and suffix if possible.
+
+        :param text:
+            the passage where an exact quotation needs to be located
         """
         exact = text[self.start : self.end]
-        margin = 0
+        margins = 0
         end = self.end or len(text)
-        while margin < (len(text) - len(exact)):
-            margin += 5
-            prefix = text[max(0, self.start - margin) : self.start]
-            suffix = text[end : min(len(text), end + margin)]
+        while margins < (len(text) - len(exact)):
+            margins += 5
+            prefix = text[max(0, self.start - margins) : self.start]
+            suffix = text[end : min(len(text), end + margins)]
             new_selector = TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
             if new_selector.is_unique_in(text):
                 return new_selector
@@ -211,31 +246,32 @@ class TextPositionSelector:
         Make new selector combining ranges of self and other if it will fit in text.
         """
         for selector in (self, other):
-            if not selector.validate(text):
-                raise ValueError(
-                    f'Text "{text}" is too short to include '
-                    + f"the interval ({selector.start}, {selector.end})"
-                )
+            selector.validate(text)
         return self + other
 
     def dump(self):
+        """
+        Serialize the selector.
+
+        Based on the JSON serialization format in the `Web Annotation Data Model
+        <https://www.w3.org/TR/annotation-model/#text-position-selector>`_
+        """
         return {"type": "TextPositionSelector", "start": self.start, "end": self.end}
 
     def passage(self, text: str) -> str:
         """
         Get the quotation from text identified by start and end positions.
         """
-        if not self.validate(text):
-            raise ValueError(
-                f'Text "{text}" is too short to include '
-                + f"the interval ({self.start}, {self.end})"
-            )
+        self.validate(text)
         return text[self.start : self.end]
 
-    def validate(self, text: str) -> bool:
+    def validate(self, text: str) -> None:
         """
         Verify that selector's text positions exist in text.
         """
         if self.end and self.end > len(text):
-            return False
-        return True
+            raise ValueError(
+                f'Text "{text}" is too short to include '
+                + f"the interval ({self.start}, {self.end})"
+            )
+        return None

@@ -97,7 +97,7 @@ class TestTextQuoteSelectors:
 
     def test_regex_from_selector_with_just_exact(self):
         selector = TextQuoteSelector(exact="nor shall any State")
-        assert selector.passage_regex_without_exact() == r"^.*$"
+        assert selector._passage_regex_without_exact() == r"^.*$"
         assert selector.passage_regex() == r"(nor\ shall\ any\ State)"
 
     def test_selector_escapes_special_characters(self):
