@@ -38,7 +38,7 @@ class TextQuoteSelector:
     prefix: str = ""
     suffix: str = ""
 
-    def find_match(self, text: str) -> Optional[re.match]:
+    def find_match(self, text: str) -> Optional[re.Match]:
         """
         Get the first match for the selector within a string.
 
@@ -46,7 +46,7 @@ class TextQuoteSelector:
             text to search for a match to the selector
 
         :returns:
-            a :py:class:`re.Match`, or None
+            a regular expression match, or None
         """
         pattern = self.passage_regex()
         return re.search(pattern, text, re.IGNORECASE)

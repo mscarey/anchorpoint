@@ -10,7 +10,13 @@ Release v\. |release|.
 
 Anchorpoint is a Python library that supplies text substring selectors
 for anchoring annotations. It includes helper methods for switching
-between positional and contextual selectors.
+between positional and contextual selectors, and it's used for referencing
+judicial opinions and statutes by
+`AuthoritySpoke <https://authorityspoke.readthedocs.io/>`_.
+
+Anchorpoint is licensed under the
+`Atmosphere Software License <https://open-austin.org/atmosphere-license/>`_
+Version 0.2–🛂.
 
 .. toctree::
     :maxdepth: 3
