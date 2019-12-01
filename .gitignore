@@ -5,5 +5,7 @@ __pycache__
 .pytest_cache
 .tox
 .vscode
+build/
+dist/
 docs/_build/
 venv
