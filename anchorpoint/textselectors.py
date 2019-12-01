@@ -1,7 +1,7 @@
 """
 Text substring selectors for anchoring annotations.
 
-Based on parts of the `Web Annotation Data
+Based on parts of the W3C `Web Annotation Data
 Model <https://www.w3.org/TR/annotation-model/>`_.
 """
 

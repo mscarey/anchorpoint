@@ -1,7 +1,8 @@
 __pycache__
-.pytest_cache
+.coverage
 *.egg-info
 .env
+.pytest_cache
 .tox
 .vscode
 docs/_build/
