@@ -1,2 +1,4 @@
 Sphinx
+sphinx_autodoc_typehints
+
 -e .
