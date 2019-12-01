@@ -1,11 +1,12 @@
 import setuptools
+import anchorpoint
 
 with open("readme.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="anchorpoint",
-    version="0.1.0",
+    version=anchorpoint.__version__,
     author="Matt Carey",
     author_email="matt@authorityspoke.com",
     description="Text substring selectors for anchoring annotations",
