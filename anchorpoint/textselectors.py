@@ -198,9 +198,7 @@ class TextPositionSelector(Range):
                     "greater than the start position"
                 )
 
-    def __add__(
-        self, other: TextPositionSelector, margin: int = 3
-    ) -> Optional[TextPositionSelector]:
+    def __add__(self, other: TextPositionSelector) -> Optional[TextPositionSelector]:
         """
         Make a new selector covering the combined ranges of self and other.
 
