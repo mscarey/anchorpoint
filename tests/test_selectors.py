@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from anchorpoint import TextQuoteSelector, TextPositionSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector, TextPositionSet
 
 
 class TestTextQuoteSelectors:
@@ -216,3 +216,15 @@ class TestTextPositionSelectors:
         interval = TextPositionSelector(50, 100)
         with pytest.raises(IndexError):
             _ = interval.as_quote_selector(passage)
+
+
+class TestSelectorSet:
+    def test_make_selector_set(self):
+        quotes = [
+            TextPositionSelector(start=5, end=10),
+            TextPositionSelector(start=20, end=30),
+        ]
+        group = TextPositionSet(quotes)
+        new_group = group + TextPositionSelector(start=2, end=8)
+        assert new_group.ranges()[0].end == 10
+        assert new_group.ranges()[1].start == 20

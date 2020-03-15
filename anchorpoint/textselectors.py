@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from typing import Optional, Tuple
 
-from anchorpoint.utils import ranges
+from anchorpoint.utils.ranges import Range, RangeSet, _InfiniteValue
 
 
 @dataclass(frozen=True)
@@ -166,7 +166,7 @@ class TextQuoteSelector:
 
 
 @dataclass(frozen=True)
-class TextPositionSelector(ranges.Range):
+class TextPositionSelector(Range):
     """
     Describes a textual segment by start and end positions.
 
@@ -184,7 +184,7 @@ class TextPositionSelector(ranges.Range):
     """
 
     start: int = 0
-    end: Optional[int] = ranges._InfiniteValue(negative=False)
+    end: Optional[int] = _InfiniteValue(negative=False)
     include_start: bool = True
     include_end: bool = False
 
@@ -259,3 +259,7 @@ class TextPositionSelector(ranges.Range):
                 + f"the interval ({self.start}, {self.end})"
             )
         return None
+
+
+class TextPositionSet(RangeSet):
+    pass

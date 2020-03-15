@@ -1,4 +1,5 @@
 """
+See https://github.com/Superbird11/ranges
 This file is Copyright 2019 Louis Jacobowitz, used under the following MIT License:
 
 Permission is hereby granted, free of charge, to any person obtaining a
