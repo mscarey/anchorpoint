@@ -12,6 +12,8 @@ from dataclasses import dataclass
 
 from typing import Optional, Tuple
 
+from anchorpoint.utils import ranges
+
 
 @dataclass(frozen=True)
 class TextQuoteSelector:
@@ -164,7 +166,7 @@ class TextQuoteSelector:
 
 
 @dataclass(frozen=True)
-class TextPositionSelector:
+class TextPositionSelector(ranges.Range):
     """
     Describes a textual segment by start and end positions.
 
@@ -182,7 +184,9 @@ class TextPositionSelector:
     """
 
     start: int = 0
-    end: Optional[int] = None
+    end: Optional[int] = ranges._InfiniteValue(negative=False)
+    include_start: bool = True
+    include_end: bool = False
 
     def __post_init__(self):
         if self.start < 0:
@@ -194,7 +198,9 @@ class TextPositionSelector:
                     "greater than the start position"
                 )
 
-    def __add__(self, other: TextPositionSelector, margin: int = 3) -> Optional[TextPositionSelector]:
+    def __add__(
+        self, other: TextPositionSelector, margin: int = 3
+    ) -> Optional[TextPositionSelector]:
         """
         Make a new selector covering the combined ranges of self and other.
 
@@ -207,13 +213,7 @@ class TextPositionSelector:
         :returns:
             a selector reflecting the combined range if possible, otherwise None
         """
-        if (not other.end or self.start <= other.end + margin) and (
-            not self.end or other.start <= self.end + margin
-        ):
-            return TextPositionSelector(
-                start=min(self.start, other.start), end=max(self.end, other.end)
-            )
-        return None
+        return self | other
 
     def as_quote_selector(self, text: str) -> TextQuoteSelector:
         """

@@ -142,17 +142,17 @@ class TestTextPositionSelectors:
         assert new.start == 5
         assert new.end == 27
 
-    def test_add_nearly_overlapping_selectors(self):
+    def test_add_selector_without_endpoint(self):
         left = TextPositionSelector(start=5, end=22)
-        right = TextPositionSelector(start=24, end=27)
+        right = TextPositionSelector(start=20)
         new = left + right
         assert new.start == 5
-        assert new.end == 27
+        assert new.end > 22
 
     def test_adding_nonoverlapping_selectors(self):
         """
         When the selectors aren't near enough to be added,
-        the operation returns the selector on the left side.
+        the operation returns None.
         """
         left = TextPositionSelector(start=5, end=12)
         right = TextPositionSelector(start=24, end=27)

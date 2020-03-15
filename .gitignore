@@ -2,6 +2,7 @@ __pycache__
 .coverage
 *.egg-info
 .env
+.mypy_cache
 .pytest_cache
 .tox
 .vscode
