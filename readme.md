@@ -9,3 +9,5 @@ Anchorpoint supplies TextQuoteSelector and TextPositionSelector classes based on
 ## Related Packages
 
 In Javascript, try the [Text Quote Anchor](https://www.npmjs.com/package/dom-anchor-text-quote) and [Text Position Anchor](https://www.npmjs.com/package/dom-anchor-text-position) packages.
+
+In Python try [python-ranges](https://github.com/Superbird11/ranges), which is the basis for much of the TextPositionSelector class's behavior.
