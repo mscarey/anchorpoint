@@ -1,6 +1,10 @@
 Changelog
 =========
-0.2.0 (dev)
+0.2.1 (2020-05-21)
+------------------
+- add init file to utils directory
+
+0.2.0 (2020-05-21)
 -----------
 - Make TextPositionSelector subclass `Range` from [python-ranges](https://github.com/Superbird11/ranges).
 
