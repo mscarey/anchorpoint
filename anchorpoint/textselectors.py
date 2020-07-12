@@ -10,8 +10,9 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
+from anchorpoint.utils._helper import _is_iterable_non_string
 from anchorpoint.utils.ranges import Range, RangeSet, _InfiniteValue
 
 
@@ -213,6 +214,27 @@ class TextPositionSelector(Range):
         """
         return self | other
 
+    def __sub__(self, value: Union[int, TextPositionSelector]) -> TextPositionSelector:
+        if not isinstance(value, int):
+            return super().__sub__(value)
+        if self.start - value < 0:
+            raise ValueError(
+                f"Subtracting {value} from ({self.start}, {self.end}) "
+                "would result in a negative start position."
+            )
+
+        if self.end is None:
+            new_end = None
+        else:
+            new_end = self.end - value
+
+        return TextPositionSelector(
+            start=self.start - value,
+            end=new_end,
+            include_start=self.include_start,
+            include_end=self.include_end,
+        )
+
     def as_quote_selector(self, text: str) -> TextQuoteSelector:
         """
         Make a quote selector, adding prefix and suffix if possible.
@@ -260,4 +282,24 @@ class TextPositionSelector(Range):
 
 
 class TextPositionSet(RangeSet):
-    pass
+    def __init__(self, *args):
+        """
+        Constructs a new TextPositionSet containing the given sub-ranges.
+        """
+        # flatten args
+        temp_list = []
+        for arg in args:
+            if _is_iterable_non_string(arg):
+                temp_list.extend(TextPositionSelector(x) for x in arg)
+            else:
+                temp_list.append(TextPositionSelector(arg))
+        # assign own Ranges
+        self._ranges = RangeSet._merge_ranges(temp_list)
+
+    def __sub__(
+        self, value: Union[int, TextPositionSelector, TextPositionSet]
+    ) -> TextPositionSet:
+        """Decrease all startpoints and endpoints by the given amount."""
+        if not isinstance(value, int):
+            return super().__sub__(value)
+        return TextPositionSet([text_range - value for text_range in self])
