@@ -41,6 +41,31 @@ class TextQuoteSelector:
     prefix: str = ""
     suffix: str = ""
 
+    @staticmethod
+    def split_anchor_text(text: str) -> Tuple[str, ...]:
+        """
+        Break up shorthand text selector format into three fields.
+        Tries to break up the  string into :attr:`~TextQuoteSelector.prefix`,
+        :attr:`~TextQuoteSelector.exact`,
+        and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+        :param text: a string or dict representing a text passage
+        :returns: a tuple of the three values
+        """
+
+        if text.count("|") == 0:
+            return ("", text, "")
+        elif text.count("|") == 2:
+            return tuple([*text.split("|")])
+        raise ValueError(
+            "If the 'text' field includes | pipe separators, it must contain exactly "
+            "two, separating the string into 'prefix', 'exact', and 'suffix'."
+        )
+
+    @classmethod
+    def from_text(cls, text: str) -> TextQuoteSelector:
+        split_text = cls.split_anchor_text(text)
+        return cls(prefix=split_text[0], exact=split_text[1], suffix=split_text[2])
+
     def find_match(self, text: str) -> Optional[re.Match]:
         """
         Get the first match for the selector within a string.
@@ -166,7 +191,6 @@ class TextQuoteSelector:
         return (r"\s*" + re.escape(self.suffix.strip())) if self.suffix else ""
 
 
-@dataclass(frozen=True)
 class TextPositionSelector(Range):
     """
     Describes a textual segment by start and end positions.
@@ -184,20 +208,10 @@ class TextPositionSelector(Range):
         The character is not included within the segment.
     """
 
-    start: int = 0
-    end: Optional[int] = _InfiniteValue(negative=False)
-    include_start: bool = True
-    include_end: bool = False
-
-    def __post_init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if self.start < 0:
-            object.__setattr__(self, "start", 0)
-        if self.end:
-            if self.end <= self.start:
-                raise IndexError(
-                    "End position must be a positive number "
-                    "greater than the start position"
-                )
+            raise IndexError("Start position for text range cannot be negative.")
 
     def __add__(self, other: TextPositionSelector) -> Optional[TextPositionSelector]:
         """
@@ -289,7 +303,9 @@ class TextPositionSet(RangeSet):
         # flatten args
         temp_list = []
         for arg in args:
-            if _is_iterable_non_string(arg):
+            if isinstance(arg, TextPositionSelector):
+                temp_list.extend(arg)
+            elif _is_iterable_non_string(arg):
                 temp_list.extend(TextPositionSelector(x) for x in arg)
             else:
                 temp_list.append(TextPositionSelector(arg))

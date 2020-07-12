@@ -3,11 +3,7 @@ import re
 
 import pytest
 
-from anchorpoint.textselectors import (
-    TextQuoteSelector,
-    TextPositionSelector,
-    TextPositionSet,
-)
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 
 
 class TestTextQuoteSelectors:
@@ -32,6 +28,26 @@ class TestTextQuoteSelectors:
     def test_convert_selector_to_json(self):
         copyright_dict = self.preexisting_material.dump()
         assert '"exact": "protection for a work' in json.dumps(copyright_dict)
+
+    def test_create_from_text(self):
+        method = TextQuoteSelector.from_text(
+            "process, system,|method of operation|, concept, principle"
+        )
+        assert method.prefix == "process, system,"
+        assert method.exact == "method of operation"
+        assert method.suffix == ", concept, principle"
+
+    def test_create_from_text_exact_only(self):
+        method = TextQuoteSelector.from_text("method of operation")
+        assert not method.prefix
+        assert method.exact == "method of operation"
+        assert not method.suffix
+
+    def test_create_from_text_invalid_number_of_pipes(self):
+        with pytest.raises(ValueError):
+            _ = TextQuoteSelector.from_text(
+                "process, system,|method of operation|, concept,|principle"
+            )
 
     def test_failed_prefix(self, make_text):
         """
@@ -193,12 +209,12 @@ class TestTextPositionSelectors:
             _ = selector.passage(make_text["amendment"])
 
     def test_end_must_be_after_start_position(self):
-        with pytest.raises(IndexError):
+        with pytest.raises(ValueError):
             _ = TextPositionSelector(start=53, end=14)
 
     def test_min_start_position_is_0(self):
-        selector = TextPositionSelector(start=-3, end=84)
-        assert selector.start == 0
+        with pytest.raises(IndexError):
+            _ = TextPositionSelector(start=-3, end=84)
 
     def test_convert_position_to_quote(self, make_text):
         selector = TextPositionSelector(start=53, end=84)
@@ -227,24 +243,3 @@ class TestTextPositionSelectors:
         assert less.start == 0
         assert less.end == 10
 
-
-class TestSelectorSet:
-    def test_make_selector_set(self):
-        quotes = [
-            TextPositionSelector(start=5, end=10),
-            TextPositionSelector(start=20, end=30),
-        ]
-        group = TextPositionSet(quotes)
-        new_group = group + TextPositionSelector(start=2, end=8)
-        assert new_group.ranges()[0].end == 10
-        assert new_group.ranges()[1].start == 20
-
-    def test_subtract_from_selector_set(self):
-        quotes = [
-            TextPositionSelector(start=5, end=10),
-            TextPositionSelector(start=20, end=30),
-        ]
-        group = TextPositionSet(quotes)
-        new_group = group - 5
-        assert new_group.ranges()[0].start == 0
-        assert new_group.ranges()[0].end == 5
