@@ -32,3 +32,8 @@ class TestSelectorSet:
         group = TextPositionSet(quotes)
         with pytest.raises(ValueError):
             _ = group - 10
+
+    def test_make_set_from_one_selector(self):
+        quote = TextPositionSelector(start=5, end=10)
+        group = TextPositionSet(quote)
+        assert group.ranges()[0].start == 5

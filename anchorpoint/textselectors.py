@@ -304,7 +304,7 @@ class TextPositionSet(RangeSet):
         temp_list = []
         for arg in args:
             if isinstance(arg, TextPositionSelector):
-                temp_list.extend(arg)
+                temp_list.append(arg)
             elif _is_iterable_non_string(arg):
                 temp_list.extend(TextPositionSelector(x) for x in arg)
             else:
