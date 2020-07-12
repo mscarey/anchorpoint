@@ -524,6 +524,13 @@ def test_range_docstring():
     assert(float('inf') not in r)
 
 
+@pytest.mark.xfail
+def test_infinite_range_as_index():
+    r = Range("[9, inf]")
+    text = "unwanted text string"
+    assert text[r.start : r.end] == "text string"
+
+
 #######################################################################################################
 # Tests for RangeSet
 #######################################################################################################
