@@ -1,5 +1,10 @@
 Changelog
 =========
+dev
+------------------
+- add TextQuoteSelector.from_text shortcut
+- add ability to subtract an integer from all values in a TextPositionSet
+
 0.2.1 (2020-05-21)
 ------------------
 - add init file to utils directory
