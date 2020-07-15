@@ -37,3 +37,8 @@ class TestSelectorSet:
         quote = TextPositionSelector(start=5, end=10)
         group = TextPositionSet(quote)
         assert group.ranges()[0].start == 5
+
+    def test_string_for_set(self):
+        quote = TextPositionSelector(start=5, end=10)
+        group = TextPositionSet(quote)
+        assert str(group).startswith("TextPositionSet([TextPositionSelector")

@@ -213,6 +213,9 @@ class TextPositionSelector(Range):
         if self.start < 0:
             raise IndexError("Start position for text range cannot be negative.")
 
+    def __repr__(self):
+        return super().__repr__().replace("Range", "TextPositionSelector")
+
     def __add__(self, other: TextPositionSelector) -> Optional[TextPositionSelector]:
         """
         Make a new selector covering the combined ranges of self and other.
@@ -311,6 +314,9 @@ class TextPositionSet(RangeSet):
                 temp_list.append(TextPositionSelector(arg))
         # assign own Ranges
         self._ranges = RangeSet._merge_ranges(temp_list)
+
+    def __str__(self):
+        return f"TextPositionSet({self.ranges()})"
 
     def __sub__(
         self, value: Union[int, TextPositionSelector, TextPositionSet]
