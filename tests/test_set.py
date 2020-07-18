@@ -7,7 +7,7 @@ from anchorpoint.textselectors import (
 import pytest
 
 
-class TestSelectorSet:
+class TestMakeSelectorSet:
     def test_make_selector_set(self):
         quotes = [
             TextPositionSelector(start=5, end=10),
@@ -18,6 +18,12 @@ class TestSelectorSet:
         assert new_group.ranges()[0].end == 10
         assert new_group.ranges()[1].start == 20
 
+    def test_make_selector_set_with_selector_from_string(self):
+        group = TextPositionSet("[5, 10)")
+        assert group.ranges()[0].start == 5
+
+
+class TestCombineSelectorSet:
     def test_subtract_from_selector_set(self):
         quotes = [
             TextPositionSelector(start=5, end=10),

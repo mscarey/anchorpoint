@@ -217,7 +217,7 @@ class Range:
             # removed: construct from iterable representing start/end
             else:
                 raise ValueError(
-                    f"cannot construct a new Range from an object of type '{type(rng)}'"
+                    f"cannot construct a new {self.__class__.__name__} from an object of type '{type(rng)}'"
                 )
         else:
             # case 4 or 5: construct from positional args or kwargs
