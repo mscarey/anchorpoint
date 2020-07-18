@@ -3,7 +3,11 @@ import re
 
 import pytest
 
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+from anchorpoint.textselectors import (
+    TextPositionSet,
+    TextQuoteSelector,
+    TextPositionSelector,
+)
 
 
 class TestTextQuoteSelectors:
@@ -237,7 +241,14 @@ class TestTextPositionSelectors:
         with pytest.raises(IndexError):
             _ = interval.as_quote_selector(passage)
 
-    def test_subtract_from_position_selector(self):
+    def test_subtract_selector_from_position_selector(self):
+        selector = TextPositionSelector(5, 25)
+        to_subtract = TextPositionSelector(15, 20)
+        less = selector - to_subtract
+        assert isinstance(less, TextPositionSet)
+        assert less.ranges()[0].end == 15
+
+    def test_subtract_int_from_position_selector(self):
         selector = TextPositionSelector(5, 15)
         less = selector - 5
         assert less.start == 0

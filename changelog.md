@@ -4,6 +4,7 @@ dev
 ------------------
 - add TextQuoteSelector.from_text shortcut
 - add ability to subtract an integer from all values in a TextPositionSet
+- include marshmallow schema for serializing
 
 0.2.1 (2020-05-21)
 ------------------

@@ -34,4 +34,26 @@ class TestLoadSelector:
         data = "eats,|shoots,|and leaves|"
         schema = SelectorSchema()
         with pytest.raises(ValidationError):
-            result = schema.load(data)
+            _ = schema.load(data)
+
+
+class TestDumpSelector:
+    def test_dump_quote_selector(self):
+        data = "eats,|shoots,|and leaves"
+        schema = SelectorSchema()
+        loaded = schema.load(data)
+        dumped = schema.dump(loaded)
+        assert dumped["prefix"] == "eats,"
+        assert dumped["suffix"] == "and leaves"
+
+    def test_dump_position_selector(self):
+        schema = SelectorSchema()
+        data = {"start": 0, "end": 12}
+        loaded = schema.load(data)
+        dumped = schema.dump(loaded)
+        assert dumped == {
+            "start": 0,
+            "end": 12,
+            "include_start": True,
+            "include_end": False,
+        }
