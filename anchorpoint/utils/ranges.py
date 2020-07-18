@@ -371,7 +371,7 @@ class Range:
         # convert other range to a workable format
         try:
             if not isinstance(rng, Range):
-                rng = Range(rng)
+                rng = self.__class__(rng)
         except ValueError:
             raise TypeError("Cannot diff a Range with a non-Range")
         # completely disjoint
@@ -384,13 +384,13 @@ class Range:
             return None
         # fully contained (in the other direction)
         elif rng in self:
-            lower = Range(
+            lower = self.__class__(
                 start=self.start,
                 end=rng.start,
                 include_start=self.include_start,
                 include_end=not rng.include_start,
             )
-            upper = Range(
+            upper = self.__class__(
                 start=rng.end,
                 end=self.end,
                 include_start=not rng.include_end,
@@ -405,7 +405,7 @@ class Range:
                 return RangeSet(lower, upper)
         # lower portion of this range
         elif self < rng:
-            new_rng = Range(
+            new_rng = self.__class__(
                 start=self.start,
                 end=rng.start,
                 include_start=self.include_start,
@@ -414,7 +414,7 @@ class Range:
             return None if new_rng.isempty() else new_rng
         # higher portion of this range
         else:  # self > rng:
-            new_rng = Range(
+            new_rng = self.__class__(
                 start=rng.end,
                 end=self.end,
                 include_start=not rng.include_end,
