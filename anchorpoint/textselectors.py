@@ -240,8 +240,8 @@ class TextPositionSelector(Range):
                 "would result in a negative start position."
             )
 
-        if self.end is None:
-            new_end = None
+        if str(self.end) == "inf":
+            new_end = self.end
         else:
             new_end = self.end - value
 

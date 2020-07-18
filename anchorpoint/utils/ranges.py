@@ -153,6 +153,8 @@ class Range:
         # process kwargs
         start = kwargs.get("start", _InfiniteValue(negative=True))
         end = kwargs.get("end", _InfiniteValue(negative=False))
+        if end is None:
+            end = _InfiniteValue(negative=False)
         include_start = kwargs.get("include_start", True)
         include_end = kwargs.get("include_end", False)
         self.include_start = include_start

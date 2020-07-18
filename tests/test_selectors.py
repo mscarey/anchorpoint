@@ -243,3 +243,14 @@ class TestTextPositionSelectors:
         assert less.start == 0
         assert less.end == 10
 
+    def test_subtract_from_position_selector_without_end(self):
+        selector = TextPositionSelector(start=15)
+        less = selector - 10
+        assert less.start == 5
+        assert str(less.end) == "inf"
+
+    def test_subtract_from_position_selector_with_None_as_end(self):
+        selector = TextPositionSelector(start=15, end=None)
+        less = selector - 10
+        assert less.start == 5
+        assert str(less.end) == "inf"
