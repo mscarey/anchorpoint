@@ -1,44 +1,23 @@
+"""Schema for serializing text selectors."""
+
 from typing import Dict, List, Tuple, Union
 
 from marshmallow import Schema, fields, post_load, pre_load
 from marshmallow import ValidationError
 
-from anchorpoint.textselectors import (
-    TextQuoteSelector,
-    TextPositionSelector,
-    TextPositionSet,
-)
-
-
-def split_anchor_text(text: str) -> Tuple[str, ...]:
-    """
-    Break up shorthand text selector format into three fields.
-
-    Tries to break up the  string into :attr:`~TextQuoteSelector.prefix`,
-    :attr:`~TextQuoteSelector.exact`,
-    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
-
-    :param text: a string or dict representing a text passage
-
-    :returns: a tuple of the three values
-    """
-
-    if text.count("|") == 0:
-        return ("", text, "")
-    elif text.count("|") == 2:
-        return tuple([*text.split("|")])
-    raise ValidationError(
-        "If the 'text' field is included, it must be either a dict "
-        + "with one or more of 'prefix', 'exact', and 'suffix' "
-        + "a string containing no | pipe "
-        + "separator, or a string containing two pipe separators to divide "
-        + "the string into 'prefix', 'exact', and 'suffix'."
-    )
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 
 
 class SelectorSchema(Schema):
+    r"""
+    Schema for loading a TextQuoteSelector or TextPositionSelector.
 
-    __model__ = TextQuoteSelector
+    Generates a :class:`~anchorpoint.textselectors.TextQuoteSelector`
+    if the input data contains any of the fields "exact", "prefix",
+    or "suffix", and returns a
+    :class:`~anchorpoint.textselectors.TextPositionSelector` otherwise.
+
+    """
     exact = fields.Str(missing=None)
     prefix = fields.Str(missing=None)
     suffix = fields.Str(missing=None)
@@ -53,12 +32,23 @@ class SelectorSchema(Schema):
     ) -> Dict[str, str]:
         """
         Convert input from shorthand format to normal selector format.
+
+
+        .. code-block:: python
+
+            >>> schema = SelectorSchema()
+            >>> schema.expand_anchor_shorthand("eats,|shoots,|and leaves")
+            {'exact': 'shoots,', 'prefix': 'eats,', 'suffix': 'and leaves'}
         """
         if isinstance(data, str):
             data = {"text": data}
         text = data.get("text")
         if text:
-            data["prefix"], data["exact"], data["suffix"] = split_anchor_text(text)
+            (
+                data["prefix"],
+                data["exact"],
+                data["suffix"],
+            ) = TextQuoteSelector.split_anchor_text(text)
             del data["text"]
         return data
 

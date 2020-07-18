@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from typing import Optional, Tuple, Union
 
 from anchorpoint.utils._helper import _is_iterable_non_string
-from anchorpoint.utils.ranges import Range, RangeSet, _InfiniteValue
+from anchorpoint.utils.ranges import Range, RangeSet
 
 
 @dataclass(frozen=True)
@@ -45,9 +45,11 @@ class TextQuoteSelector:
     def split_anchor_text(text: str) -> Tuple[str, ...]:
         """
         Break up shorthand text selector format into three fields.
+
         Tries to break up the  string into :attr:`~TextQuoteSelector.prefix`,
         :attr:`~TextQuoteSelector.exact`,
-        and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+        and :attr:`~TextQuoteSelector.suffix`, by splitting on exactly two pipe characters.
+
         :param text: a string or dict representing a text passage
         :returns: a tuple of the three values
         """

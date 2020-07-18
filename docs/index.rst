@@ -15,8 +15,7 @@ judicial opinions and statutes by
 `AuthoritySpoke <https://authorityspoke.readthedocs.io/>`_.
 
 Anchorpoint is licensed under the
-`Atmosphere Software License <https://open-austin.org/atmosphere-license/>`_
-Version 0.2–🛂.
+`Atmosphere Software License <https://open-austin.org/atmosphere-license/>`_.
 
 .. toctree::
     :maxdepth: 3
@@ -28,6 +27,7 @@ API Reference
     :maxdepth: 1
 
     api
+    serializers
 
 Indices and tables
 ==================
