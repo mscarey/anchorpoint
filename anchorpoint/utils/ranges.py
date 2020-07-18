@@ -678,7 +678,10 @@ class Range:
                 return self._above_start(item) and self._below_end(item)
             except TypeError:
                 try:
-                    rng_item = Range(item)
+                    if isinstance(item, Range):
+                        rng_item = item
+                    else:
+                        rng_item = Range(item)
                     return rng_item.start in self and rng_item.end in self
                 except ValueError:
                     pass
@@ -867,7 +870,8 @@ class RangeSet(Iterable):
         # elif _is_iterable_non_string(rng):
         #     raise ValueError("argument is iterable and not range-like. Use .difference_update() instead")
         # make sure rng is a Range
-        rng = Range(rng)
+        if not isinstance(rng, Range):
+            rng = Range(rng)
         # remove rng from our ranges until we no longer need to
         current_node = self._ranges.first
         while current_node:
@@ -904,7 +908,7 @@ class RangeSet(Iterable):
         RangeSet is not modified in the process.
         """
         new_rng_set = self.copy()
-        new_rng_set.difference_update(RangeSet(rng_set))
+        new_rng_set.difference_update(self.__class__(rng_set))
         return new_rng_set
 
     def difference_update(self, rng_set):
@@ -1063,7 +1067,7 @@ class RangeSet(Iterable):
         """
         returns a shallow copy of this RangeSet
         """
-        return RangeSet(self)
+        return self.__class__(self)
 
     @staticmethod
     def _merge_ranges(ranges):
@@ -1091,8 +1095,8 @@ class RangeSet(Iterable):
                 node = node.next
         return ranges
 
-    @staticmethod
-    def _to_rangeset(other):
+    @classmethod
+    def _to_rangeset(cls, other):
         """
         Helper method.
         Converts the given argument to a RangeSet. This mainly exists to increase performance
@@ -1101,7 +1105,7 @@ class RangeSet(Iterable):
         """
         if not isinstance(other, RangeSet):
             try:
-                other = RangeSet(other)
+                other = cls(other)
             except ValueError:
                 raise ValueError(f"Cannot convert {type(other)} to a RangeSet")
         return other

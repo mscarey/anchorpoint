@@ -252,6 +252,78 @@ class TextPositionSelector(Range):
             include_end=self.include_end,
         )
 
+    def difference(self, rng):
+        """
+        Returns a range containing all elements of this range that are not
+        within the other range, or `None` if this range is entirely consumed
+        by the other range.
+
+        If the other range is empty, or if this Range is entirely disjoint
+        with it, then returns this Range (not a copy of this Range).
+
+        If the other range is entirely consumed by this range, then returns
+        a RangeSet containing `(lower_part, higher_part)`.
+
+        If the given range is actually a RangeSet, then returns a RangeSet
+        no matter what.
+        """
+        # if a RangeSet, then return the intersection of one of those with this instead.
+        if isinstance(rng, RangeSet):
+            return TextPositionSet(self).difference(rng)
+        # convert other range to a workable format
+        try:
+            if not isinstance(rng, Range):
+                rng = TextPositionSelector(rng)
+        except ValueError:
+            raise TypeError("Cannot diff a Range with a non-Range")
+        # completely disjoint
+        if rng.isempty():
+            return self
+        elif self.isdisjoint(rng):
+            return self
+        # fully contained
+        elif self in rng or self == rng:
+            return None
+        # fully contained (in the other direction)
+        elif rng in self:
+            lower = self.__class__(
+                start=self.start,
+                end=rng.start,
+                include_start=self.include_start,
+                include_end=not rng.include_start,
+            )
+            upper = self.__class__(
+                start=rng.end,
+                end=self.end,
+                include_start=not rng.include_end,
+                include_end=self.include_end,
+            )
+            # exclude empty ranges
+            if lower.isempty():
+                return upper
+            elif upper.isempty():
+                return lower
+            else:
+                return TextPositionSet(lower, upper)
+        # lower portion of this range
+        elif self < rng:
+            new_rng = self.__class__(
+                start=self.start,
+                end=rng.start,
+                include_start=self.include_start,
+                include_end=not rng.include_start,
+            )
+            return None if new_rng.isempty() else new_rng
+        # higher portion of this range
+        else:  # self > rng:
+            new_rng = self.__class__(
+                start=rng.end,
+                end=self.end,
+                include_start=not rng.include_end,
+                include_end=self.include_end,
+            )
+            return None if new_rng.isempty() else new_rng
+
     def as_quote_selector(self, text: str) -> TextQuoteSelector:
         """
         Make a quote selector, adding prefix and suffix if possible.
@@ -313,7 +385,7 @@ class TextPositionSet(RangeSet):
             else:
                 temp_list.append(TextPositionSelector(arg))
         # assign own Ranges
-        self._ranges = RangeSet._merge_ranges(temp_list)
+        self._ranges = self.__class__._merge_ranges(temp_list)
 
     def __str__(self):
         return f"TextPositionSet({self.ranges()})"
