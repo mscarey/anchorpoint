@@ -8,6 +8,7 @@ from anchorpoint.textselectors import (
     TextQuoteSelector,
     TextPositionSelector,
 )
+from marshmallow import ValidationError
 
 
 class TestTextQuoteSelectors:
@@ -48,7 +49,7 @@ class TestTextQuoteSelectors:
         assert not method.suffix
 
     def test_create_from_text_invalid_number_of_pipes(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             _ = TextQuoteSelector.from_text(
                 "process, system,|method of operation|, concept,|principle"
             )

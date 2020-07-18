@@ -14,6 +14,7 @@ from typing import Optional, Tuple, Union
 
 from anchorpoint.utils._helper import _is_iterable_non_string
 from anchorpoint.utils.ranges import Range, RangeSet
+from marshmallow import ValidationError
 
 
 @dataclass(frozen=True)
@@ -58,7 +59,7 @@ class TextQuoteSelector:
             return ("", text, "")
         elif text.count("|") == 2:
             return tuple([*text.split("|")])
-        raise ValueError(
+        raise ValidationError(
             "If the 'text' field includes | pipe separators, it must contain exactly "
             "two, separating the string into 'prefix', 'exact', and 'suffix'."
         )
