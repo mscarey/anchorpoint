@@ -222,11 +222,22 @@ class TestTextPositionSelectors:
             _ = TextPositionSelector(start=-3, end=84)
 
     def test_convert_position_to_quote(self, make_text):
-        selector = TextPositionSelector(start=53, end=84)
-        quote = selector.as_quote_selector(make_text["amendment"])
-        assert quote.exact == "and subject to the jurisdiction"
-        assert quote.prefix.strip().endswith("ates")
-        assert quote.suffix.strip().startswith("ther")
+        selector = TextPositionSelector(start=72, end=84)
+        quote = selector.unique_quote_selector(make_text["amendment"])
+        assert quote.exact == "jurisdiction"
+        assert quote.prefix.strip().endswith("the")
+        assert quote.suffix.strip().startswith("the")
+
+    def test_convert_position_with_inf_to_quote(self, make_text):
+        """Test that position selector with no upper bound can be made into a quote selector."""
+        selector = TextPositionSelector("[53, inf)")
+        quote = selector.as_quote_selector(
+            make_text["amendment"], left_margin=14, right_margin=10
+        )
+        assert quote.prefix.strip() == "United States"
+
+        # Suffix remains blank because there's nothing beyond the end of the passage.
+        assert not quote.suffix
 
     def test_make_quote_selector_from_entire_text(self):
         passage = "entire passage"

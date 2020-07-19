@@ -266,23 +266,50 @@ class TextPositionSelector(Range):
             result = TextPositionSet(result)
         return result
 
-    def as_quote_selector(self, text: str) -> TextQuoteSelector:
+    def as_quote_selector(
+        self, text: str, left_margin: int = 0, right_margin: int = 0
+    ) -> TextQuoteSelector:
         """
-        Make a quote selector, adding prefix and suffix if possible.
+        Make a quote selector, creating prefix and suffix from specified lengths of text.
+
+        :param text:
+            the passage where an exact quotation needs to be located
+
+        :param left_margin:
+            number of characters to look backward to create :attr:`TextQuoteSelector.prefix`
+
+        :param right_margin:
+            number of characters to look forward to create :attr:`TextQuoteSelector.suffix`
+        """
+        if isinstance(self.end, int):
+            end = self.end
+        else:
+            end = len(text)
+
+        exact = text[self.start : end]
+
+        prefix = text[max(0, self.start - left_margin) : self.start]
+        suffix = text[end : min(len(text), end + right_margin)]
+
+        new_selector = TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
+        return new_selector
+
+    def unique_quote_selector(self, text: str) -> TextQuoteSelector:
+        """
+        Add text to prefix and suffix as needed to make selector unique in the source text.
 
         :param text:
             the passage where an exact quotation needs to be located
         """
         exact = text[self.start : self.end]
         margins = 0
-        end = self.end or len(text)
         while margins < (len(text) - len(exact)):
-            margins += 5
-            prefix = text[max(0, self.start - margins) : self.start]
-            suffix = text[end : min(len(text), end + margins)]
-            new_selector = TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
+            new_selector = self.as_quote_selector(
+                text=text, left_margin=margins, right_margin=margins
+            )
             if new_selector.is_unique_in(text):
                 return new_selector
+            margins += 5
         return TextQuoteSelector(
             exact=exact, prefix=text[: self.start], suffix=text[self.end :]
         )

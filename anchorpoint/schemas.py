@@ -4,7 +4,6 @@ from typing import Dict, List, Tuple, Union
 
 from marshmallow import Schema, fields, post_load, pre_load
 
-
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 
 
