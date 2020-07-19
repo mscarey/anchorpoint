@@ -281,6 +281,12 @@ class TextPositionSelector(Range):
         :param right_margin:
             number of characters to look forward to create :attr:`TextQuoteSelector.suffix`
         """
+        if self.start >= len(text):
+            raise IndexError(
+                f"String of length {len(text)} is not long enough "
+                f"to include any of the range ({self.start}, {self.end})"
+            )
+
         if isinstance(self.end, int):
             end = self.end
         else:

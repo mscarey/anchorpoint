@@ -247,6 +247,13 @@ class TestTextPositionSelectors:
         assert not quote.prefix
         assert not quote.suffix
 
+    def test_default_to_full_text_for_unique_string(self):
+        passage = "abcdeabcdeabcdeabcde"
+        interval = TextPositionSelector(0, 5)
+        quote = interval.unique_quote_selector(passage)
+        assert quote.exact == "abcde"
+        assert quote.suffix == "abcdeabcdeabcde"
+
     def test_fail_to_make_quote_selector(self):
         passage = "too short"
         interval = TextPositionSelector(50, 100)
