@@ -55,7 +55,7 @@ class TestCombineSelectorSet:
         ]
         group = TextPositionSet(quotes)
         with pytest.raises(IndexError):
-            new_group = group + -15
+            _ = group + -15
 
     def test_subtract_too_much_from_selector_set(self):
         quotes = [
@@ -76,7 +76,45 @@ class TestCombineSelectorSet:
         group = TextPositionSet(quote)
         assert str(group).startswith("TextPositionSet([TextPositionSelector")
 
-    def test_subtract_set(self, make_text):
+    def test_add_non_overlapping_sets(self):
+        left = TextPositionSet(TextPositionSelector(start=40, end=60))
+        right = TextPositionSet(TextPositionSelector(start=20, end=40))
+        new = left + right
+        assert isinstance(new, TextPositionSet)
+        assert isinstance(new.ranges()[0], TextPositionSelector)
+        assert len(new.ranges()) == 2
+        assert new.ranges()[0].start == 20
+
+    def test_add_overlapping_sets(self):
+        left = TextPositionSet(TextPositionSelector(start=40, end=60))
+        right = TextPositionSet(TextPositionSelector(start=50, end=80))
+        new = left + right
+        assert isinstance(new, TextPositionSet)
+        new_ranges = new.ranges()
+        assert isinstance(new_ranges[0], TextPositionSelector)
+        assert len(new_ranges()) == 1
+        assert new_ranges[0].start == 40
+        assert new_ranges[0].end == 80
+
+    def test_add_selector_to_set(self):
+        left = TextPositionSet(TextPositionSelector(start=40, end=60))
+        right = TextPositionSelector(start=20, end=40)
+        new = left + right
+        assert isinstance(new, TextPositionSet)
+        assert isinstance(new.ranges()[0], TextPositionSelector)
+        assert len(new.ranges()) == 2
+        assert new.ranges()[0].start == 20
+
+    def test_add_set_to_selector(self):
+        left = TextPositionSelector(start=40, end=60)
+        right = TextPositionSet(TextPositionSelector(start=20, end=40))
+        new = left + right
+        assert isinstance(new, TextPositionSet)
+        assert isinstance(new.ranges()[0], TextPositionSelector)
+        assert len(new.ranges()) == 2
+        assert new.ranges()[0].start == 20
+
+    def test_subtract_set_from_set(self, make_text):
         s102b = make_text["s102b"]
         selector = TextQuoteSelector(suffix=", procedure")
         position = selector.as_position(s102b)

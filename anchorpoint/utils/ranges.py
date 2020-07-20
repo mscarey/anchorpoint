@@ -284,7 +284,7 @@ class Range:
         # convert other range to a format we can really work with
         try:
             if not isinstance(rng, Range):
-                rng = Range(rng)
+                rng = self.__class__(rng)
         except ValueError:
             raise TypeError("Cannot merge a Range with a non-Range")
         # do the ranges overlap?
@@ -300,7 +300,7 @@ class Range:
             key=lambda x: (x[0], not x[1]),
         )
         new_end = max((rng_a.end, rng_a.include_end), (rng_b.end, rng_b.include_end))
-        return Range(
+        return self.__class__(
             start=new_start[0],
             end=new_end[0],
             include_start=new_start[1],
@@ -957,7 +957,7 @@ class RangeSet(Iterable):
         # convert to RangeSet
         rng_set = RangeSet._to_rangeset(rng_set)
         # simply merge lists
-        return RangeSet(self._ranges + rng_set._ranges)
+        return self.__class__(self._ranges + rng_set._ranges)
 
     def update(self, rng_set):
         """

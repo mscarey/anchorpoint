@@ -403,7 +403,7 @@ class TextPositionSet(RangeSet):
             a selector reflecting the combined range if possible, otherwise None
         """
         if not isinstance(value, int):
-            return super().__add__(value)
+            return self | value
         return TextPositionSet([text_range + value for text_range in self])
 
     def __sub__(

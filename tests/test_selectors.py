@@ -159,45 +159,7 @@ class TestTextQuoteSelectors:
         assert not selector.is_unique_in("aaaAAAaA")
 
 
-class TestTextPositionSelectors:
-    def test_add_position_selectors(self):
-        left = TextPositionSelector(start=5, end=22)
-        right = TextPositionSelector(start=12, end=27)
-        new = left + right
-        assert new.start == 5
-        assert new.end == 27
-
-    def test_add_selector_without_endpoint(self):
-        left = TextPositionSelector(start=5, end=22)
-        right = TextPositionSelector(start=20)
-        new = left + right
-        assert new.start == 5
-        assert new.end > 22
-
-    def test_adding_nonoverlapping_selectors(self):
-        """
-        When the selectors aren't near enough to be added,
-        the operation returns None.
-        """
-        left = TextPositionSelector(start=5, end=12)
-        right = TextPositionSelector(start=24, end=27)
-        new = left + right
-        assert new is None
-
-    def test_fail_combining_with_short_text(self):
-        left = TextPositionSelector(start=5, end=12)
-        right = TextPositionSelector(start=10, end=27)
-        text = "This is 26 characters long"
-        with pytest.raises(IndexError):
-            _ = left.combine(other=right, text=text)
-
-    def test_combine_with_text(self):
-        left = TextPositionSelector(start=5, end=12)
-        right = TextPositionSelector(start=10, end=26)
-        text = "This is 26 characters long"
-        new = left.combine(other=right, text=text)
-        assert new.end == 26
-
+class TestCreateTextPositionSelectors:
     def test_dump_position_selector(self):
         selector = TextPositionSelector(start=5, end=12)
         dumped = selector.dump()
@@ -260,11 +222,53 @@ class TestTextPositionSelectors:
         with pytest.raises(IndexError):
             _ = interval.as_quote_selector(passage)
 
+
+class TestCombineTextPositionSelectors:
+    def test_add_position_selectors(self):
+        left = TextPositionSelector(start=5, end=22)
+        right = TextPositionSelector(start=12, end=27)
+        new = left + right
+        assert isinstance(new, TextPositionSelector)
+        assert new.start == 5
+        assert new.end == 27
+
+    def test_add_selector_without_endpoint(self):
+        left = TextPositionSelector(start=5, end=22)
+        right = TextPositionSelector(start=20)
+        new = left + right
+        assert new.start == 5
+        assert new.end > 22
+
+    def test_adding_nonoverlapping_selectors(self):
+        """
+        When the selectors aren't near enough to be added,
+        the operation returns None.
+        """
+        left = TextPositionSelector(start=5, end=12)
+        right = TextPositionSelector(start=24, end=27)
+        new = left + right
+        assert new is None
+
+    def test_fail_combining_with_short_text(self):
+        left = TextPositionSelector(start=5, end=12)
+        right = TextPositionSelector(start=10, end=27)
+        text = "This is 26 characters long"
+        with pytest.raises(IndexError):
+            _ = left.combine(other=right, text=text)
+
+    def test_combine_with_text(self):
+        left = TextPositionSelector(start=5, end=12)
+        right = TextPositionSelector(start=10, end=26)
+        text = "This is 26 characters long"
+        new = left.combine(other=right, text=text)
+        assert new.end == 26
+
     def test_subtract_selector_from_position_selector(self):
         selector = TextPositionSelector(5, 25)
         to_subtract = TextPositionSelector(15, 20)
         less = selector - to_subtract
         assert isinstance(less, TextPositionSet)
+        assert isinstance(less.ranges()[0], TextPositionSelector)
         assert less.ranges()[0].end == 15
 
     def test_subtract_int_from_position_selector(self):
