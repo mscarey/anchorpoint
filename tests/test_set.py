@@ -22,6 +22,10 @@ class TestMakeSelectorSet:
         group = TextPositionSet("[5, 10)")
         assert group.ranges()[0].start == 5
 
+    def test_selector_set_repr(self):
+        group = TextPositionSet("[5, 10)")
+        assert repr(group).startswith("TextPositionSet")
+
 
 class TestCombineSelectorSet:
     def test_subtract_int_from_selector_set(self):

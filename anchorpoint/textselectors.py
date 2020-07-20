@@ -383,6 +383,9 @@ class TextPositionSet(RangeSet):
         # assign own Ranges
         self._ranges = self.__class__._merge_ranges(temp_list)
 
+    def __repr__(self):
+        return super().__repr__().replace("RangeSet", self.__class__.__name__)
+
     def __str__(self):
         return f"TextPositionSet({self.ranges()})"
 
