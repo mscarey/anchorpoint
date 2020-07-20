@@ -77,7 +77,7 @@ class TestCombineSelectorSet:
         assert str(group).startswith("TextPositionSet([TextPositionSelector")
 
     def test_add_non_overlapping_sets(self):
-        left = TextPositionSet(TextPositionSelector(start=40, end=60))
+        left = TextPositionSet(TextPositionSelector(start=50, end=60))
         right = TextPositionSet(TextPositionSelector(start=20, end=40))
         new = left + right
         assert isinstance(new, TextPositionSet)
@@ -92,12 +92,12 @@ class TestCombineSelectorSet:
         assert isinstance(new, TextPositionSet)
         new_ranges = new.ranges()
         assert isinstance(new_ranges[0], TextPositionSelector)
-        assert len(new_ranges()) == 1
+        assert len(new_ranges) == 1
         assert new_ranges[0].start == 40
         assert new_ranges[0].end == 80
 
     def test_add_selector_to_set(self):
-        left = TextPositionSet(TextPositionSelector(start=40, end=60))
+        left = TextPositionSet(TextPositionSelector(start=50, end=60))
         right = TextPositionSelector(start=20, end=40)
         new = left + right
         assert isinstance(new, TextPositionSet)
@@ -107,7 +107,7 @@ class TestCombineSelectorSet:
 
     def test_add_set_to_selector(self):
         left = TextPositionSelector(start=40, end=60)
-        right = TextPositionSet(TextPositionSelector(start=20, end=40))
+        right = TextPositionSet(TextPositionSelector(start=20, end=35))
         new = left + right
         assert isinstance(new, TextPositionSet)
         assert isinstance(new.ranges()[0], TextPositionSelector)
