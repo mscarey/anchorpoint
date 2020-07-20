@@ -24,7 +24,7 @@ class TestMakeSelectorSet:
 
 
 class TestCombineSelectorSet:
-    def test_subtract_from_selector_set(self):
+    def test_subtract_int_from_selector_set(self):
         quotes = [
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
@@ -34,13 +34,32 @@ class TestCombineSelectorSet:
         assert new_group.ranges()[0].start == 0
         assert new_group.ranges()[0].end == 5
 
+    def test_add_int_to_selector_set(self):
+        quotes = [
+            TextPositionSelector(start=5, end=10),
+            TextPositionSelector(start=20, end=30),
+        ]
+        group = TextPositionSet(quotes)
+        new_group = group + 5
+        assert new_group.ranges()[0].start == 10
+        assert new_group.ranges()[0].end == 15
+
+    def test_error_add_negative_int_to_selector_set(self):
+        quotes = [
+            TextPositionSelector(start=5, end=10),
+            TextPositionSelector(start=20, end=30),
+        ]
+        group = TextPositionSet(quotes)
+        with pytest.raises(IndexError):
+            new_group = group + -15
+
     def test_subtract_too_much_from_selector_set(self):
         quotes = [
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
         group = TextPositionSet(quotes)
-        with pytest.raises(ValueError):
+        with pytest.raises(IndexError):
             _ = group - 10
 
     def test_make_set_from_one_selector(self):

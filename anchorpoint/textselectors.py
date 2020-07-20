@@ -219,7 +219,9 @@ class TextPositionSelector(Range):
     def __repr__(self):
         return super().__repr__().replace("Range", "TextPositionSelector")
 
-    def __add__(self, other: TextPositionSelector) -> Optional[TextPositionSelector]:
+    def __add__(
+        self, value: TextPositionSelector
+    ) -> Optional[Union[TextPositionSelector, TextPositionSet]]:
         """
         Make a new selector covering the combined ranges of self and other.
 
@@ -232,13 +234,32 @@ class TextPositionSelector(Range):
         :returns:
             a selector reflecting the combined range if possible, otherwise None
         """
-        return self | other
+        if not isinstance(value, int):
+            return self | value
+
+        if self.start + value < 0:
+            raise IndexError(
+                f"Adding {value} to ({self.start}, {self.end}) "
+                "would result in a negative start position."
+            )
+
+        if str(self.end) == "inf":
+            new_end = self.end
+        else:
+            new_end = self.end + value
+
+        return TextPositionSelector(
+            start=self.start + value,
+            end=new_end,
+            include_start=self.include_start,
+            include_end=self.include_end,
+        )
 
     def __sub__(self, value: Union[int, TextPositionSelector]) -> TextPositionSelector:
         if not isinstance(value, int):
             return super().__sub__(value)
         if self.start - value < 0:
-            raise ValueError(
+            raise IndexError(
                 f"Subtracting {value} from ({self.start}, {self.end}) "
                 "would result in a negative start position."
             )
@@ -364,6 +385,25 @@ class TextPositionSet(RangeSet):
 
     def __str__(self):
         return f"TextPositionSet({self.ranges()})"
+
+    def __add__(
+        self, value: Union[int, TextPositionSelector, TextPositionSet]
+    ) -> TextPositionSet:
+        """
+        Make a new selector covering the combined ranges of self and other.
+
+        :param other:
+            selector for another text interval
+
+        :param margin:
+            allowable distance between two selectors that can still be added together
+
+        :returns:
+            a selector reflecting the combined range if possible, otherwise None
+        """
+        if not isinstance(value, int):
+            return super().__add__(value)
+        return TextPositionSet([text_range + value for text_range in self])
 
     def __sub__(
         self, value: Union[int, TextPositionSelector, TextPositionSet]
