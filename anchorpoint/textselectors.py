@@ -393,13 +393,11 @@ class TextPositionSet(RangeSet):
         self, value: Union[int, TextPositionSelector, TextPositionSet]
     ) -> TextPositionSet:
         """
-        Make a new selector covering the combined ranges of self and other.
+        Increase all startpoints and endpoints by the given amount.
 
-        :param other:
-            selector for another text interval
-
-        :param margin:
-            allowable distance between two selectors that can still be added together
+        :param value:
+            selector for another text interval, or integet to add to every
+            start and end value in self's position selectors
 
         :returns:
             a selector reflecting the combined range if possible, otherwise None
