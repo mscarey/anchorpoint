@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from anchorpoint.utils._helper import _is_iterable_non_string
 from anchorpoint.utils.ranges import Range, RangeSet
@@ -412,3 +412,7 @@ class TextPositionSet(RangeSet):
         if not isinstance(value, int):
             return super().__sub__(value)
         return TextPositionSet([text_range - value for text_range in self])
+
+    def as_quotes(self, text: str) -> List[TextQuoteSelector]:
+        quotes = [selector.unique_quote_selector(text) for selector in self.ranges()]
+        return quotes

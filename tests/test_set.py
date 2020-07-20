@@ -89,3 +89,11 @@ class TestCombineSelectorSet:
 
         assert isinstance(new_set, TextPositionSet)
         assert isinstance(new_set.ranges()[0], TextPositionSelector)
+
+    def test_make_quote_selectors_from_set(self, make_text):
+        quote = TextQuoteSelector(exact="United States", suffix=" and subject")
+        position = quote.as_position(make_text["amendment"])
+        position_set = TextPositionSet(position)
+        new_quotes = position_set.as_quotes(make_text["amendment"])
+        assert new_quotes[0].exact == "United States"
+        assert new_quotes[0].prefix.strip().endswith("in the")
