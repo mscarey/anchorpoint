@@ -17,6 +17,12 @@ from anchorpoint.utils.ranges import Range, RangeSet
 from marshmallow import ValidationError
 
 
+class TextSelectionError(Exception):
+    """Exception for failing to select text as described by user."""
+
+    pass
+
+
 @dataclass(frozen=True)
 class TextQuoteSelector:
     """
@@ -124,7 +130,7 @@ class TextQuoteSelector:
             "suffix": self.suffix,
         }
 
-    def as_position(self, text: str) -> Optional[TextPositionSelector]:
+    def as_position(self, text: str) -> TextPositionSelector:
         """
         Get the interval where the selected quote appears in "text".
 
@@ -139,7 +145,9 @@ class TextQuoteSelector:
             # Getting indices from match group 1 (in the parentheses),
             # not match 0 which includes prefix and suffix
             return TextPositionSelector(match.start(1), match.end(1))
-        return None
+        raise TextSelectionError(
+            f'Unable to find pattern "{self.passage_regex()}" in text: "{text}"'
+        )
 
     def is_unique_in(self, text: str) -> bool:
         """

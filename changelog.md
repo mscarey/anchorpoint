@@ -1,5 +1,9 @@
 Changelog
 =========
+0.3.2 (2020-07-22)
+------------------
+- fix bug where adding selectors converted them to parent class
+- add TextSelectionError exception
 
 0.3.1 (2020-07-19)
 ------------------

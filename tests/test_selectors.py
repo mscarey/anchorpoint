@@ -7,6 +7,7 @@ from anchorpoint.textselectors import (
     TextPositionSet,
     TextQuoteSelector,
     TextPositionSelector,
+    TextSelectionError,
 )
 from marshmallow import ValidationError
 
@@ -60,11 +61,13 @@ class TestTextQuoteSelectors:
         the cited subsection, so searching for the interval will fail.
         """
         after_sound = TextQuoteSelector(prefix="sound recordings")
-        assert after_sound.as_position(make_text["s102b"]) is None
+        with pytest.raises(TextSelectionError):
+            _ = after_sound.as_position(make_text["s102b"])
 
     def test_failed_suffix(self, make_text):
         up_to_sound = TextQuoteSelector(suffix="sound recordings")
-        assert up_to_sound.as_position(make_text["s102b"]) is None
+        with pytest.raises(TextSelectionError):
+            _ = up_to_sound.as_position(make_text["s102b"])
 
     def test_interval_from_just_prefix(self, make_text):
         """
@@ -115,10 +118,10 @@ class TestTextQuoteSelectors:
         assert new_selector.start == make_text["amendment"].find("nor shall any State")
 
     def test_failing_to_make_position_selector(self):
-        new_selector = self.amendment_selector.as_position(
-            "does not contain selected passages"
-        )
-        assert not new_selector
+        with pytest.raises(TextSelectionError):
+            _ = self.amendment_selector.as_position(
+                "does not contain selected passages"
+            )
 
     def test_regex_from_selector_with_just_exact(self):
         selector = TextQuoteSelector(exact="nor shall any State")
