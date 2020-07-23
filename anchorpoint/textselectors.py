@@ -172,7 +172,7 @@ class TextQuoteSelector:
             return r"^.*$"
 
         if not self.prefix:
-            return r"^(.*)" + self.suffix_regex()
+            return r"^(.*?)" + self.suffix_regex()
 
         if not self.suffix:
             return self.prefix_regex() + r"(.*)$"

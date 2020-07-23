@@ -98,12 +98,19 @@ class TestTextQuoteSelectors:
         selected_text = selector.select_text(make_text["s102b"])
         assert not selected_text.endswith(" ")
 
-    def test_strip_whitespace_when_converting_to_position(self, make_text):
+    def test_no_trailing_whitespace_when_selecting_from_suffix(self, make_text):
         """Test that to_position strips whitespace, like select_text does."""
         selector = TextQuoteSelector(exact="", prefix="", suffix="idea, procedure,")
         position = selector.as_position(make_text["s102b"])
         selected_text = position.passage(make_text["s102b"])
         assert not selected_text.endswith(" ")
+
+    def test_no_leading_whitespace_when_selecting_from_prefix(self, make_text):
+        """Test that to_position strips whitespace, like select_text does."""
+        selector = TextQuoteSelector(prefix="described, explained,")
+        position = selector.as_position(make_text["s102b"])
+        selected_text = position.passage(make_text["s102b"])
+        assert not selected_text.startswith(" ")
 
     def test_select_text(self, make_text):
         selector = TextQuoteSelector(
