@@ -93,6 +93,18 @@ class TestTextQuoteSelectors:
         exact = self.amendment_selector.select_text(make_text["amendment"])
         assert exact.startswith("nor shall any State deprive")
 
+    def test_strip_whitespace_when_selecting(self, make_text):
+        selector = TextQuoteSelector(exact="", prefix="", suffix="idea, procedure,")
+        selected_text = selector.select_text(make_text["s102b"])
+        assert not selected_text.endswith(" ")
+
+    def test_strip_whitespace_when_converting_to_position(self, make_text):
+        """Test that to_position strips whitespace, like select_text does."""
+        selector = TextQuoteSelector(exact="", prefix="", suffix="idea, procedure,")
+        position = selector.as_position(make_text["s102b"])
+        selected_text = position.passage(make_text["s102b"])
+        assert not selected_text.endswith(" ")
+
     def test_select_text(self, make_text):
         selector = TextQuoteSelector(
             prefix="in no case", exact="does copyright", suffix="protection"
