@@ -1,5 +1,9 @@
 Changelog
 =========
+0.3.3 (2020-07-28)
+-----------------
+- fix bug: leading whitespace when selecting from prefix
+
 0.3.2 (2020-07-22)
 ------------------
 - fix bug where adding selectors converted them to parent class
