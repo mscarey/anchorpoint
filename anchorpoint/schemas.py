@@ -17,6 +17,8 @@ class SelectorSchema(Schema):
     :class:`~anchorpoint.textselectors.TextPositionSelector` otherwise.
 
     """
+    __model__ = TextQuoteSelector
+
     exact = fields.Str(missing=None)
     prefix = fields.Str(missing=None)
     suffix = fields.Str(missing=None)
