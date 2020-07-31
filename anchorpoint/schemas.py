@@ -1,6 +1,6 @@
 """Schema for serializing text selectors."""
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 from marshmallow import Schema, fields, post_load, pre_load
 
@@ -53,22 +53,36 @@ class SelectorSchema(Schema):
             del data["text"]
         return data
 
+    def convert_bool_to_dict(self, data: bool) -> Dict[str, int]:
+        """Interpret True as a TextPositionSelector including the whole section."""
+
+        if data is True:
+            return {"start": 0}
+        return {"start": 0, "end": 0}
+
     @pre_load
     def preprocess_data(
         self, data: Union[str, Dict[str, Union[str, Dict, List]]], **kwargs
     ) -> Dict[str, Union[str, List]]:
-        data = self.expand_anchor_shorthand(data)
+        if isinstance(data, bool):
+            data = self.convert_bool_to_dict(data)
+        if data:
+            data = self.expand_anchor_shorthand(data)
 
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(
+        self, data, **kwargs
+    ) -> Optional[Union[TextPositionSelector, TextQuoteSelector]]:
         if data.get("exact") or data.get("prefix") or data.get("suffix"):
             model = TextQuoteSelector
             for unwanted in ("start", "end", "include_start", "include_end"):
                 data.pop(unwanted, None)
         else:
             model = TextPositionSelector
+            if data.get("start") == data.get("end"):
+                return None
             for unwanted in ("exact", "prefix", "suffix"):
                 data.pop(unwanted, None)
         return model(**data)

@@ -36,6 +36,18 @@ class TestLoadSelector:
         with pytest.raises(ValidationError):
             _ = schema.load(data)
 
+    def test_load_true_as_selector(self):
+        schema = SelectorSchema()
+        result = schema.load(True)
+        assert isinstance(result, TextPositionSelector)
+        assert result.start == 0
+        assert result.end > 9999
+
+    def test_load_false_as_selector(self):
+        schema = SelectorSchema()
+        result = schema.load(False)
+        assert result is None
+
 
 class TestDumpSelector:
     def test_dump_quote_selector(self):
