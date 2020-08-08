@@ -10,8 +10,9 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
+from anchorpoint.textsequences import TextPassage, TextSequence
 from anchorpoint.utils._helper import _is_iterable_non_string
 from anchorpoint.utils.ranges import Range, RangeSet
 from marshmallow import ValidationError
@@ -425,3 +426,35 @@ class TextPositionSet(RangeSet):
     def as_quotes(self, text: str) -> List[TextQuoteSelector]:
         quotes = [selector.unique_quote_selector(text) for selector in self.ranges()]
         return quotes
+
+    def as_text_sequence(self, text: str, include_nones: bool = True) -> TextSequence:
+        """
+        List the phrases in the Enactment selected by TextPositionSelectors.
+
+        :param passage:
+            A passage to select text from
+
+        :param include_nones:
+            Whether the list of phrases should include `None` to indicate a block of
+            unselected text
+        """
+        selected: List[Union[None, TextPassage]] = []
+
+        selection_ranges = self.ranges()
+
+        if selection_ranges:
+            if include_nones and selection_ranges[0].start > 0:
+                selected.append(None)
+            for passage in selection_ranges:
+                end_value = None if passage.end > 999999 else passage.end
+                selected.append(TextPassage(text[passage.start : end_value]))
+                if include_nones and passage.end and (passage.end < len(text)):
+                    selected.append(None)
+        elif include_nones and (not selected or selected[-1] is not None):
+            selected.append(None)
+        return TextSequence(selected)
+
+    def as_string(self, text: str) -> str:
+        """Return a string representing the selected parts of `text`."""
+        text_sequence = self.as_text_sequence(text)
+        return str(text_sequence)

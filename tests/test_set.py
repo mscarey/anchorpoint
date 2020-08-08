@@ -1,3 +1,4 @@
+from anchorpoint.schemas import TextPositionSetFactory
 from anchorpoint.textselectors import (
     TextPositionSelector,
     TextPositionSet,
@@ -139,3 +140,31 @@ class TestCombineSelectorSet:
         new_quotes = position_set.as_quotes(make_text["amendment"])
         assert new_quotes[0].exact == "United States"
         assert new_quotes[0].prefix.strip().endswith("in the")
+
+
+class TestCompareSelectorSet:
+    def test_full_passage_implies_selections(self, make_text):
+        passage = make_text["s102b"]
+        factory = TextPositionSetFactory(passage=passage)
+        selector_set = factory.from_quote_selectors(
+            [
+                TextQuoteSelector(exact="In no case does copyright protection"),
+                TextQuoteSelector(exact="extend to any idea"),
+            ]
+        )
+        full_passage = TextPositionSet([TextPositionSelector(0, 200)])
+        assert full_passage > selector_set
+
+
+class TestTextFromSelectorSet:
+    def test_get_text_selection_from_set(self, make_text):
+        passage = make_text["s102b"]
+        factory = TextPositionSetFactory(passage=passage)
+        selector_set = factory.from_quote_selectors(
+            [
+                TextQuoteSelector(exact="In no case does copyright protection"),
+                TextQuoteSelector(exact="extend to any idea"),
+            ]
+        )
+        result = selector_set.as_string(text=passage)
+        assert result == "In no case does copyright protection…extend to any idea…"
