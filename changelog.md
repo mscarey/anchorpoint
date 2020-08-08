@@ -3,6 +3,7 @@ Changelog
 0.4.0 (2020-08-08)
 -----------------
 - TextPositionSet can output a TextSequence
+- create TextSequence addition method
 
 0.3.3 (2020-07-28)
 -----------------

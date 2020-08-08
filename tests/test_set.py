@@ -23,6 +23,23 @@ class TestMakeSelectorSet:
         group = TextPositionSet("[5, 10)")
         assert group.ranges()[0].start == 5
 
+    def test_make_selector_set_from_position_selector(self):
+        factory = TextPositionSetFactory(passage="Here is some great text.")
+        position_set = factory.from_selection(TextPositionSelector(start=5, end=10))
+        assert position_set.ranges()[0].start == 5
+
+    def test_make_selector_set_from_True(self):
+        passage = "Here is some great text."
+        factory = TextPositionSetFactory(passage=passage)
+        position_set = factory.from_selection(True)
+        assert position_set.as_string(text=passage) == "Here is some great text."
+
+    def test_make_selector_set_from_False(self):
+        passage = "Here is some great text."
+        factory = TextPositionSetFactory(passage=passage)
+        position_set = factory.from_selection(False)
+        assert position_set.as_string(text=passage) == ""
+
     def test_selector_set_repr(self):
         group = TextPositionSet("[5, 10)")
         assert repr(group).startswith("TextPositionSet")
