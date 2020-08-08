@@ -1,5 +1,9 @@
 Changelog
 =========
+0.4.0 (2020-08-08)
+-----------------
+- TextPositionSet can output a TextSequence
+
 0.3.3 (2020-07-28)
 -----------------
 - fix bug: leading whitespace when selecting from prefix

@@ -1,5 +1,5 @@
 from tests.conftest import make_text
-from typing import Type
+from typing import Text, Type
 import pytest
 
 from anchorpoint.textselectors import (
@@ -125,6 +125,51 @@ class TestCompareTextSequence:
         words = TextPassage("words")
         with pytest.raises(TypeError):
             TextSequence(["words", "more words"]).means(words)
+
+
+class TestAddTextSequence:
+    def test_handle_Nones_at_beginning_and_end(self):
+        handcrafted_sequence = TextSequence(
+            passages=[
+                TextPassage("In no case does copyright protection"),
+                None,
+                TextPassage("extend to any idea"),
+                None,
+            ]
+        )
+        second_sequence = TextSequence(
+            passages=[None, TextPassage("embodied in such work.")]
+        )
+        new_sequence = handcrafted_sequence + second_sequence
+        assert new_sequence[1] is None
+        assert new_sequence[2] is not None
+
+        assert (
+            str(new_sequence)
+            == "In no case does copyright protection…extend to any idea…embodied in such work."
+        )
+
+    def test_add_without_Nones(self):
+        sequence = TextSequence(passages=[TextPassage("This is a full section."),])
+        second_sequence = TextSequence(
+            passages=[TextPassage("This is the full immediately following section.")]
+        )
+        new_sequence = sequence + second_sequence
+        len(new_sequence) == 2
+        assert (
+            str(new_sequence)
+            == "This is a full section. This is the full immediately following section."
+        )
+
+    def test_add_tempty_TextSequences(self):
+        left = TextSequence(passages=[TextPassage("Some Text.")])
+        right = TextSequence([])
+        assert left + right == left
+
+    def test_add_to_empty_TextSequences(self):
+        left = TextSequence()
+        right = TextSequence(passages=[TextPassage("Some Text.")])
+        assert left + right == right
 
 
 class TestTextSequenceString:

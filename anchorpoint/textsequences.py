@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Text, Union
 
 
 class TextPassage:
@@ -51,8 +51,8 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
         to be part of the TextSequence.
     """
 
-    def __init__(self, passages=Sequence[TextPassage]):
-        self.passages = passages
+    def __init__(self, passages: Sequence[TextPassage] = None):
+        self.passages = passages or []
 
     def __len__(self):
         return len(self.passages)
@@ -94,6 +94,19 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
         if self.means(other):
             return False
         return self >= other
+
+    def __add__(self, other: TextSequence) -> TextSequence:
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"Cannot add class {self.__class__.__name__} to any other object type."
+            )
+        if not other.passages:
+            return self
+        if not self.passages:
+            return other
+        if other.passages[0] is self.passages[-1] is None:
+            return TextSequence(self.passages[:-1] + other.passages)
+        return TextSequence(self.passages + other.passages)
 
     def strip(self) -> TextSequence:
         result = self.passages.copy()
