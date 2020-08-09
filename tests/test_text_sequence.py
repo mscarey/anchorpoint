@@ -32,6 +32,34 @@ class TestCompareTextPassage:
             words.means(TextSequence(["words", "more words"]))
 
 
+class TestCreateTextSequence:
+    def test_no_extra_None_when_creating_sequence_from_position_selector(self):
+        """Test zero indexing bug, length not same as index of last character."""
+        passage = "A short passage."
+        factory = TextPositionSetFactory(passage=passage)
+        selector_set = factory.from_selection(
+            TextPositionSelector(start=0, end=15, include_end=True)
+        )
+        sequence = selector_set.as_text_sequence(passage)
+        assert len(sequence) == 1
+        assert str(sequence) == "A short passage."
+
+    def test_select_after_start_of_passage(self):
+        selector_set = TextPositionSet(TextPositionSelector(start=5, end=10),)
+        sequence = selector_set.as_text_sequence("Some text.")
+        assert str(sequence) == "…text."
+
+    def test_correct_end_index_when_creating_sequence_from_True(self):
+        """Test zero indexing bug, length not same as index of last character."""
+        passage = "A short passage."
+        factory = TextPositionSetFactory(passage=passage)
+        selector_set = factory.from_selection(True)
+        ranges = selector_set.ranges()
+        assert ranges[0].start == 0
+        assert ranges[0].end == 16
+        assert ranges[0].include_end is False
+
+
 class TestCompareTextSequence:
     def test_same_meaning_regardless_of_leading_ellipsis(self, make_text):
         passage = make_text["s102b"]
@@ -170,6 +198,11 @@ class TestAddTextSequence:
         left = TextSequence()
         right = TextSequence(passages=[TextPassage("Some Text.")])
         assert left + right == right
+
+    def test_add_sequence_and_None(self):
+        left = TextSequence(passages=[TextPassage("Some Text.")])
+        with pytest.raises(TypeError):
+            left + None
 
 
 class TestTextSequenceString:

@@ -446,9 +446,13 @@ class TextPositionSet(RangeSet):
             if include_nones and selection_ranges[0].start > 0:
                 selected.append(None)
             for passage in selection_ranges:
-                end_value = None if passage.end > 999999 else passage.end
+                end_value = (
+                    None
+                    if passage.end > 999999
+                    else passage.end + int(passage.include_end)
+                )
                 selected.append(TextPassage(text[passage.start : end_value]))
-                if include_nones and passage.end and (passage.end < len(text)):
+                if include_nones and end_value and (end_value < len(text)):
                     selected.append(None)
         elif include_nones and (not selected or selected[-1] is not None):
             selected.append(None)
