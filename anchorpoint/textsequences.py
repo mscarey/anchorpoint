@@ -10,6 +10,9 @@ class TextPassage:
     :param passage:
     """
 
+    def __repr__(self):
+        return f'TextPassage("{self.text}")'
+
     def __init__(self, text: str):
         self.text = text
 
@@ -53,6 +56,9 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
 
     def __init__(self, passages: Sequence[TextPassage] = None):
         self.passages = passages or []
+
+    def __repr__(self):
+        return f"TextSequence({self.passages})"
 
     def __len__(self):
         return len(self.passages)

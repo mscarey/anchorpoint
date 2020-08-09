@@ -48,6 +48,7 @@ class TestCreateTextSequence:
         selector_set = TextPositionSet(TextPositionSelector(start=5, end=10),)
         sequence = selector_set.as_text_sequence("Some text.")
         assert str(sequence) == "…text."
+        assert repr(sequence) == 'TextSequence([None, TextPassage("text.")])'
 
     def test_correct_end_index_when_creating_sequence_from_True(self):
         """Test zero indexing bug, length not same as index of last character."""
