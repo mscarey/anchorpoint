@@ -118,10 +118,11 @@ class TextPositionSetFactory:
             selection = [selection]
         elif isinstance(selection, TextPositionSelector):
             selection = TextPositionSet(selection)
-        if isinstance(selection, Sequence) and all(
-            isinstance(item, TextQuoteSelector) for item in selection
-        ):
-            selection = self.from_quote_selectors(quotes=selection)
+        if isinstance(selection, Sequence):
+            if all(isinstance(item, str) for item in selection):
+                selection = [TextQuoteSelector(exact=item) for item in selection]
+            if all(isinstance(item, TextQuoteSelector) for item in selection):
+                selection = self.from_quote_selectors(quotes=selection)
         if not isinstance(selection, TextPositionSet):
             selection = TextPositionSet(selection)
         return selection

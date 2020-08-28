@@ -28,6 +28,12 @@ class TestMakeSelectorSet:
         position_set = factory.from_selection(TextPositionSelector(start=5, end=10))
         assert position_set.ranges()[0].start == 5
 
+    def test_make_selector_set_from_list_of_strings(self):
+        factory = TextPositionSetFactory(passage="Here is some great text.")
+        position_set = factory.from_selection(["Here is some", "text."])
+        assert position_set.ranges()[0].start == 0
+        assert position_set.ranges()[0].end == 12
+
     def test_make_selector_set_from_True(self):
         passage = "Here is some great text."
         factory = TextPositionSetFactory(passage=passage)
