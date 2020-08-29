@@ -88,7 +88,7 @@ class TestCombineSelectorSet:
         ]
         group = TextPositionSet(quotes)
         with pytest.raises(IndexError):
-            _ = group - 10
+            _ = group - 40
 
     def test_make_set_from_one_selector(self):
         quote = TextPositionSelector(start=5, end=10)

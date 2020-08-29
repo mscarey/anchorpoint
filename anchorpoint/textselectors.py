@@ -267,19 +267,20 @@ class TextPositionSelector(Range):
     def __sub__(self, value: Union[int, TextPositionSelector]) -> TextPositionSelector:
         if not isinstance(value, int):
             return super().__sub__(value)
-        if self.start - value < 0:
-            raise IndexError(
-                f"Subtracting {value} from ({self.start}, {self.end}) "
-                "would result in a negative start position."
-            )
+        new_start = max(0, self.start - value)
 
         if str(self.end) == "inf":
             new_end = self.end
         else:
             new_end = self.end - value
+            if new_end < 0:
+                raise IndexError(
+                    f"Subtracting {value} from ({self.start}, {self.end}) "
+                    "would result in a negative end position."
+                )
 
         return TextPositionSelector(
-            start=self.start - value,
+            start=new_start,
             end=new_end,
             include_start=self.include_start,
             include_end=self.include_end,

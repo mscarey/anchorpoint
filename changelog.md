@@ -1,5 +1,10 @@
 Changelog
 =========
+0.4.1 (2020-08-29)
+------------------
+- TextPositionSetFactory will accept list of strings
+- subtracting more than start value is no longer IndexError, but more than end value is
+
 0.4.0 (2020-08-08)
 -----------------
 - TextPositionSet can output a TextSequence
