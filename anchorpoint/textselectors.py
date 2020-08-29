@@ -456,7 +456,7 @@ class TextPositionSet(RangeSet):
                     selected.append(TextPassage(text[passage.start : end_value]))
                 if include_nones and end_value and (end_value < len(text)):
                     selected.append(None)
-        elif include_nones and (not selected or selected[-1] is not None):
+        elif text and include_nones and (not selected or selected[-1] is not None):
             selected.append(None)
         return TextSequence(selected)
 

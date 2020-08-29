@@ -48,8 +48,14 @@ class TestCreateTextSequence:
         sequence = TextSequence()
         assert str(sequence) == ""
 
-    def test_select_from_no_context(self):
-        selector_set = TextPositionSet(TextPositionSelector(start=5, end=10),)
+    def test_select_from_no_content(self):
+        selector_set = TextPositionSet([TextPositionSelector(start=5, end=10),])
+        sequence = selector_set.as_text_sequence("")
+        assert len(sequence) == 0
+        assert str(sequence) == ""
+
+    def test_select_nothing_from_no_content(self):
+        selector_set = TextPositionSet()
         sequence = selector_set.as_text_sequence("")
         assert len(sequence) == 0
         assert str(sequence) == ""

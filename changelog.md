@@ -4,6 +4,7 @@ Changelog
 ------------------
 - TextPositionSetFactory will accept list of strings
 - subtracting more than start value is no longer IndexError, but more than end value is
+- TextSequence quoting from empty string doesn't start with None
 
 0.4.0 (2020-08-08)
 -----------------
