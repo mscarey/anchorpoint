@@ -44,6 +44,21 @@ class TestCreateTextSequence:
         assert len(sequence) == 1
         assert str(sequence) == "A short passage."
 
+    def test_blank_text_sequence_string(self):
+        sequence = TextSequence()
+        assert str(sequence) == ""
+
+    def test_select_from_no_context(self):
+        selector_set = TextPositionSet(TextPositionSelector(start=5, end=10),)
+        sequence = selector_set.as_text_sequence("")
+        assert len(sequence) == 0
+        assert str(sequence) == ""
+
+    def test_select_from_start_of_passage(self):
+        selector_set = TextPositionSet(TextPositionSelector(start=0, end=4),)
+        sequence = selector_set.as_text_sequence("Some text.")
+        assert str(sequence) == "Some…"
+
     def test_select_after_start_of_passage(self):
         selector_set = TextPositionSet(TextPositionSelector(start=5, end=10),)
         sequence = selector_set.as_text_sequence("Some text.")
