@@ -178,6 +178,24 @@ class TestCompareSelectorSet:
         full_passage = TextPositionSet([TextPositionSelector(0, 200)])
         assert full_passage > selector_set
 
+    def test_add_blank_margin(self):
+        selector_set = TextPositionSet(
+            [TextPositionSelector(0, 4), TextPositionSelector(5, 10)]
+        )
+        passage = "Some text."
+        assert selector_set.as_string(text=passage) == "Some…text."
+        result = selector_set.add_margin(text=passage, margin_width=1)
+        assert result.as_string(text=passage) == "Some text."
+
+    def test_add_margin_with_characters(self):
+        selector_set = TextPositionSet(
+            [TextPositionSelector(0, 7), TextPositionSelector(11, 21)]
+        )
+        passage = 'a quote.") Therefore,'
+        assert selector_set.as_string(text=passage) == "a quote…Therefore,"
+        result = selector_set.add_margin(text=passage, margin_width=4)
+        assert result.as_string(text=passage) == 'a quote.") Therefore,'
+
 
 class TestTextFromSelectorSet:
     def test_get_text_selection_from_set(self, make_text):

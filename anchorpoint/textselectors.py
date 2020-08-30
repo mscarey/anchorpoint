@@ -264,6 +264,20 @@ class TextPositionSelector(Range):
             include_end=self.include_end,
         )
 
+    @property
+    def real_start(self) -> int:
+        """Start value following Python convention of including first character."""
+        if not self.include_start:
+            return self.start + 1
+        return self.start
+
+    @property
+    def real_end(self) -> int:
+        """Start value following Python convention of excluding first character."""
+        if self.include_end:
+            return self.end + 1
+        return self.end
+
     def __sub__(self, value: Union[int, TextPositionSelector]) -> TextPositionSelector:
         if not isinstance(value, int):
             return super().__sub__(value)
@@ -464,3 +478,25 @@ class TextPositionSet(RangeSet):
         """Return a string representing the selected parts of `text`."""
         text_sequence = self.as_text_sequence(text)
         return str(text_sequence)
+
+    def add_margin(
+        self,
+        text: str,
+        margin_width: int = 3,
+        margin_characters: str = """,."' ;[]()""",
+    ) -> TextPositionSet:
+        if margin_width < 1:
+            raise ValueError("margin_width must be a positive integer")
+        margin_selectors = TextPositionSet()
+        for left in self.ranges():
+            for right in self.ranges():
+                if left.real_end < right.real_start <= left.real_end + margin_width:
+                    if all(
+                        letter in margin_characters
+                        for letter in text[left.real_end : right.real_start]
+                    ):
+                        margin_selectors += TextPositionSelector(
+                            start=left.real_end, end=right.real_start
+                        )
+        return self + margin_selectors
+
