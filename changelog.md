@@ -1,5 +1,10 @@
 Changelog
 =========
+0.4.2 (2020-08-30)
+------------------
+- create TextPositionSelector .real_start and .real_end
+- create TextPositionSet.add_margin
+
 0.4.1 (2020-08-29)
 ------------------
 - TextPositionSetFactory will accept list of strings
