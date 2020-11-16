@@ -7,7 +7,8 @@ class TextPassage:
     """
     A contiguous passage of text.
 
-    :param passage:
+    :param text:
+        the text content of the contiguous passage
     """
 
     def __repr__(self):
@@ -44,7 +45,8 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
     """
     Sequential passages of text that need not be consecutive.
 
-    Unlike a Legislice Enactment, a TextSequence does not preserve the tree structure
+    Unlike a `Legislice <https://legislice.readthedocs.io/>`__ Enactment, a
+    TextSequence does not preserve the tree structure
     of the quoted document.
 
     :param passages:
@@ -102,6 +104,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
         return self >= other
 
     def __add__(self, other: TextSequence) -> TextSequence:
+        """Combine TextSequences by merging their selected :class:`TextPassage`\s."""
         if not isinstance(other, self.__class__):
             raise TypeError(
                 f"Cannot add class {self.__class__.__name__} to any other object type."
@@ -115,6 +118,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
         return TextSequence(self.passages + other.passages)
 
     def strip(self) -> TextSequence:
+        """Remove symbols representing missing text from the beginning and end."""
         result = self.passages.copy()
         if result and result[0] is None:
             result = result[1:]
@@ -123,6 +127,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
         return TextSequence(result)
 
     def means(self, other: TextSequence) -> bool:
+        """Test if all the passages in self and other correspond with each other."""
         if not isinstance(other, self.__class__):
             raise TypeError(
                 f"Cannot compare {self.__class__.__name__} and {other.__class__.__name__} for same meaning."

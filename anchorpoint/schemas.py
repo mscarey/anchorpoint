@@ -13,7 +13,8 @@ from anchorpoint.textselectors import (
 
 class SelectorSchema(Schema):
     r"""
-    Schema for loading a TextQuoteSelector or TextPositionSelector.
+    Schema for loading a :class:`~anchorpoint.textselectors.TextQuoteSelector` or
+    :class:`~anchorpoint.textselectors.TextPositionSelector`.
 
     Generates a :class:`~anchorpoint.textselectors.TextQuoteSelector`
     if the input data contains any of the fields "exact", "prefix",
@@ -93,6 +94,8 @@ class SelectorSchema(Schema):
 
 
 class TextPositionSetFactory:
+    """Factory for constructing :class:`~anchorpoint.textselectors.TextPositionSet`\s from text passages and various kinds of selector."""
+
     def __init__(self, passage: str) -> None:
         self.passage = passage
 
