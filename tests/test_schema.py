@@ -66,6 +66,32 @@ class TestDumpSelector:
         assert dumped == {
             "start": 0,
             "end": 12,
-            "include_start": True,
-            "include_end": False,
+        }
+
+    def test_ordered_position_selector_fields(self):
+        """Test that "start" is before "end"."""
+        schema = SelectorSchema()
+        data = {"start": 0, "end": 12}
+        loaded = schema.load(data)
+        dumped = schema.dump(loaded)
+        assert list(dumped.keys())[0] == "start"
+
+    def test_dump_position_selector_with_include_start(self):
+        schema = SelectorSchema()
+        data = {"start": 5, "end": 12, "include_start": False}
+        loaded = schema.load(data)
+        dumped = schema.dump(loaded)
+        assert dumped == {
+            "start": 6,
+            "end": 12,
+        }
+
+    def test_dump_position_selector_with_include_end(self):
+        schema = SelectorSchema()
+        data = {"start": 0, "end": 12, "include_end": True}
+        loaded = schema.load(data)
+        dumped = schema.dump(loaded)
+        assert dumped == {
+            "start": 0,
+            "end": 13,
         }

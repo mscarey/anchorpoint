@@ -30,6 +30,14 @@ API Reference
     api/sequences
     api/serializers
 
+History
+-------------
+.. toctree::
+    :maxdepth: 1
+    
+    history/history
+
+
 Indices and tables
 ==================
 

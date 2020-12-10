@@ -1,5 +1,9 @@
-Changelog
-=========
+dev
+------------------
+- TextPositionSelector serializer dumps .real_start and .real_end
+- TextPositionSelector serializer omits "include_start" and "include_end"
+- TextPositionSelector serializer orders fields so "start" comes before "end"
+
 0.4.2 (2020-08-30)
 ------------------
 - create TextPositionSelector .real_start and .real_end
@@ -12,12 +16,12 @@ Changelog
 - TextSequence quoting from empty string doesn't start with None
 
 0.4.0 (2020-08-08)
------------------
+------------------
 - TextPositionSet can output a TextSequence
 - create TextSequence addition method
 
 0.3.3 (2020-07-28)
------------------
+------------------
 - fix bug: leading whitespace when selecting from prefix
 
 0.3.2 (2020-07-22)
@@ -43,7 +47,7 @@ Changelog
 - add init file to utils directory
 
 0.2.0 (2020-05-21)
------------
+------------------
 - Make TextPositionSelector subclass `Range` from [python-ranges](https://github.com/Superbird11/ranges).
 
 0.1.1 (2019-12-01)
