@@ -2,7 +2,7 @@
 
 from typing import Dict, List, Optional, Sequence, Union
 
-from marshmallow import Schema, fields, post_load, pre_load
+from marshmallow import Schema, fields, pre_dump, post_load, pre_load
 
 from anchorpoint.textselectors import (
     TextQuoteSelector,
@@ -30,8 +30,18 @@ class SelectorSchema(Schema):
 
     start = fields.Int()
     end = fields.Int(optional=True)
-    include_start = fields.Bool(missing=True)
-    include_end = fields.Bool(missing=False)
+    include_start = fields.Bool(missing=True, load_only=True)
+    include_end = fields.Bool(missing=False, load_only=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_dump
+    def get_real_start_and_end(self, obj, many=False):
+        if isinstance(obj, TextPositionSelector):
+            obj.start = obj.real_start
+            obj.end = obj.real_end
+        return obj
 
     def expand_anchor_shorthand(
         self, data: Union[str, Dict[str, str]]
@@ -94,7 +104,7 @@ class SelectorSchema(Schema):
 
 
 class TextPositionSetFactory:
-    """Factory for constructing :class:`~anchorpoint.textselectors.TextPositionSet`\s from text passages and various kinds of selector."""
+    r"""Factory for constructing :class:`~anchorpoint.textselectors.TextPositionSet` from text passages and various kinds of selector."""
 
     def __init__(self, passage: str) -> None:
         self.passage = passage
