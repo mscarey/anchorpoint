@@ -3,6 +3,7 @@ dev
 - TextPositionSelector serializer dumps .real_start and .real_end
 - TextPositionSelector serializer omits "include_start" and "include_end"
 - TextPositionSelector serializer orders fields so "start" comes before "end"
+- Disallow zero-length TextPositionSelectors
 
 0.4.2 (2020-08-30)
 ------------------

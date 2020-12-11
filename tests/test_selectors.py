@@ -247,6 +247,10 @@ class TestCreateTextPositionSelectors:
         with pytest.raises(IndexError):
             TextPositionSelector(5, 5)
 
+    def test_zero_length_string_selector_not_allowed(self):
+        with pytest.raises(IndexError):
+            TextPositionSelector("[0,0)")
+
 
 class TestCombineTextPositionSelectors:
     def test_add_position_selectors(self):
