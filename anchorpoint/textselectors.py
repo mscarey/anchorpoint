@@ -224,6 +224,8 @@ class TextPositionSelector(Range):
         super().__init__(*args, **kwargs)
         if self.start < 0:
             raise IndexError("Start position for text range cannot be negative.")
+        if self.end and self.start >= self.end:
+            raise IndexError("Selected end position must be after the start position.")
 
     def __repr__(self):
         return super().__repr__().replace("Range", "TextPositionSelector")

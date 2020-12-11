@@ -243,6 +243,10 @@ class TestCreateTextPositionSelectors:
         with pytest.raises(IndexError):
             _ = interval.as_quote_selector(passage)
 
+    def test_zero_length_selector_not_allowed(self):
+        with pytest.raises(IndexError):
+            TextPositionSelector(5, 5)
+
 
 class TestCombineTextPositionSelectors:
     def test_add_position_selectors(self):
