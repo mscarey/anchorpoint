@@ -1,4 +1,4 @@
-dev
+0.4.3 (2020-12-11)
 ------------------
 - TextPositionSelector serializer dumps .real_start and .real_end
 - TextPositionSelector serializer omits "include_start" and "include_end"
