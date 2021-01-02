@@ -29,7 +29,7 @@ class SelectorSchema(Schema):
     suffix = fields.Str(missing=None)
 
     start = fields.Int()
-    end = fields.Int(optional=True)
+    end = fields.Int(missing=None)
     include_start = fields.Bool(missing=True, load_only=True)
     include_end = fields.Bool(missing=False, load_only=True)
 

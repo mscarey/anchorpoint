@@ -1,3 +1,8 @@
+dev
+------------------
+- provide "missing" instead of "optional" argument for SelectorSchema.end
+
+
 0.4.3 (2020-12-11)
 ------------------
 - TextPositionSelector serializer dumps .real_start and .real_end
