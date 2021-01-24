@@ -91,16 +91,16 @@ class SelectorSchema(Schema):
         self, data, **kwargs
     ) -> Optional[Union[TextPositionSelector, TextQuoteSelector]]:
         if data.get("exact") or data.get("prefix") or data.get("suffix"):
-            model = TextQuoteSelector
             for unwanted in ("start", "end", "include_start", "include_end"):
                 data.pop(unwanted, None)
-        else:
-            model = TextPositionSelector
-            if data.get("start") == data.get("end"):
-                return None
-            for unwanted in ("exact", "prefix", "suffix"):
-                data.pop(unwanted, None)
-        return model(**data)
+            return TextQuoteSelector(**data)
+
+        if data.get("start") == data.get("end"):
+            return None
+
+        for unwanted in ("exact", "prefix", "suffix"):
+            data.pop(unwanted, None)
+        return TextPositionSelector(**data)
 
 
 class TextPositionSetFactory:
@@ -117,6 +117,7 @@ class TextPositionSetFactory:
             TextPositionSelector,
             TextQuoteSelector,
             Sequence[TextQuoteSelector],
+            Sequence[str],
         ],
     ) -> TextPositionSet:
         """Construct TextPositionSet for a provided text passage, from any type of selector."""
@@ -132,13 +133,24 @@ class TextPositionSetFactory:
         elif isinstance(selection, TextPositionSelector):
             selection = TextPositionSet(selection)
         if isinstance(selection, Sequence):
-            if all(isinstance(item, str) for item in selection):
-                selection = [TextQuoteSelector(exact=item) for item in selection]
-            if all(isinstance(item, TextQuoteSelector) for item in selection):
-                selection = self.from_quote_selectors(quotes=selection)
+            return self.from_exact_strings(selection)
         if not isinstance(selection, TextPositionSet):
             selection = TextPositionSet(selection)
         return selection
+
+    def from_exact_strings(
+        self, selection: Sequence[Union[str, TextQuoteSelector]]
+    ) -> TextPositionSet:
+        """
+        Construct TextPositionSet from a list of strings representing exact quotations.
+
+        First converts the sequence to TextQuoteSelectors, and then to TextPositionSelectors.
+        """
+        selectors = [
+            TextQuoteSelector(exact=item) if isinstance(item, str) else item
+            for item in selection
+        ]
+        return self.from_quote_selectors(quotes=selectors)
 
     def from_quote_selectors(
         self, quotes: Sequence[TextQuoteSelector]

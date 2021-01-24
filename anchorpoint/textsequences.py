@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence, Text, Union
+from typing import Optional, Sequence, Union
 
 
 class TextPassage:
@@ -104,7 +104,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
         return self >= other
 
     def __add__(self, other: TextSequence) -> TextSequence:
-        """Combine TextSequences by merging their selected :class:`TextPassage`\s."""
+        r"""Combine TextSequences by merging their selected :class:`TextPassage`\s."""
         if not isinstance(other, self.__class__):
             raise TypeError(
                 f"Cannot add class {self.__class__.__name__} to any other object type."

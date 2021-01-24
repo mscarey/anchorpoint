@@ -1,7 +1,7 @@
 dev
 ------------------
 - provide "missing" instead of "optional" argument for SelectorSchema.end
-
+- add TextPositionSetFactory.from_exact_strings
 
 0.4.3 (2020-12-11)
 ------------------

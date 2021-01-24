@@ -501,4 +501,3 @@ class TextPositionSet(RangeSet):
                             start=left.real_end, end=right.real_start
                         )
         return self + margin_selectors
-
