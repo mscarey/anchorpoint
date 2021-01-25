@@ -1,4 +1,4 @@
-dev
+0.4.4 (2020-01-25)
 ------------------
 - provide "missing" instead of "optional" argument for marshmallow schema
 - add TextPositionSetFactory.from_exact_strings
