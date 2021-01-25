@@ -268,6 +268,12 @@ class TestCombineTextPositionSelectors:
         assert new.start == 5
         assert new.end > 22
 
+    def test_add_infinite_selector(self):
+        left = TextPositionSelector("(5, inf]")
+        new = left + 5
+        assert new.start == 10
+        assert new.end > 22
+
     def test_adding_nonoverlapping_selectors(self):
         """
         When the selectors aren't near enough to be added,

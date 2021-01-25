@@ -9,7 +9,31 @@ import pytest
 
 
 class TestMakeSelectorSet:
-    def test_make_selector_set(self):
+    def test_make_selector_set_from_different_selectors(self):
+        quotes = [
+            TextPositionSelector(start=0, end=7),
+            TextQuoteSelector(exact="great"),
+        ]
+        factory = TextPositionSetFactory(passage="Here is some great text.")
+        selector_set = factory.from_selection(quotes)
+        assert selector_set.ranges()[0].end == 7
+        assert selector_set.ranges()[1].start == 13
+
+    def test_make_selector_set_from_exact_strings(self):
+        quotes = ["some", "text"]
+        factory = TextPositionSetFactory(passage="Here is some great text.")
+        selector_set = factory.from_exact_strings(quotes)
+        assert selector_set.ranges()[0].start == 8
+        assert selector_set.ranges()[1].start == 19
+
+    def test_make_selector_set_from_one_string(self):
+        quote = "Here is some"
+        factory = TextPositionSetFactory(passage="Here is some great text.")
+        selector_set = factory.from_selection(quote)
+        assert selector_set.ranges()[0].start == 0
+        assert selector_set.ranges()[0].end == 12
+
+    def test_make_selector_set_from_factory(self):
         quotes = [
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
@@ -186,6 +210,14 @@ class TestCompareSelectorSet:
         assert selector_set.as_string(text=passage) == "Some…text."
         result = selector_set.add_margin(text=passage, margin_width=1)
         assert result.as_string(text=passage) == "Some text."
+
+    def test_cannot_add_negative_margin(self):
+        passage = "Some text."
+        selector_set = TextPositionSet(
+            [TextPositionSelector(0, 4), TextPositionSelector(5, 10)]
+        )
+        with pytest.raises(ValueError):
+            selector_set.add_margin(text=passage, margin_width=-1)
 
     def test_add_margin_with_characters(self):
         selector_set = TextPositionSet(

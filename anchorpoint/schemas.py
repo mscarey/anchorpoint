@@ -112,6 +112,11 @@ class TextPositionSetFactory:
     def __init__(self, passage: str) -> None:
         self.passage = passage
 
+    def from_bool(self, selection: bool) -> TextPositionSet:
+        if selection is True:
+            return TextPositionSet(TextPositionSelector(0, len(self.passage)))
+        return TextPositionSet()
+
     def from_selection(
         self,
         selection: Union[
@@ -119,15 +124,10 @@ class TextPositionSetFactory:
             str,
             TextPositionSelector,
             TextQuoteSelector,
-            Sequence[TextQuoteSelector],
-            Sequence[str],
+            Sequence[Union[str, TextQuoteSelector, TextPositionSelector]],
         ],
     ) -> TextPositionSet:
         """Construct TextPositionSet for a provided text passage, from any type of selector."""
-        if selection is True:
-            return TextPositionSet(TextPositionSelector(0, len(self.passage)))
-        elif selection is False:
-            return TextPositionSet()
         if isinstance(selection, str):
             schema = SelectorSchema()
             data = schema.expand_anchor_shorthand(selection)
@@ -136,26 +136,39 @@ class TextPositionSetFactory:
             selection = [selection]
         elif isinstance(selection, TextPositionSelector):
             return TextPositionSet(selection)
-        if isinstance(selection, Sequence):
-            return self.from_exact_strings(selection)
-        return TextPositionSet(selection)
+        if isinstance(selection, bool):
+            return self.from_bool(selection)
+        return self.from_selection_sequence(selection)
 
-    def from_exact_strings(
-        self, selection: Sequence[Union[str, TextQuoteSelector]]
+    def from_selection_sequence(
+        self, selections: Sequence[Union[str, TextQuoteSelector, TextPositionSelector]]
     ) -> TextPositionSet:
         """
-        Construct TextPositionSet from a list of strings representing exact quotations.
+        Construct TextPositionSet from one or more of: strings, Quote Selectors, and Position Selectors.
+
+        First converts strings to TextQuoteSelectors, and then to TextPositionSelectors.
+        """
+        positions = []
+        for selection in selections:
+            if isinstance(selection, str):
+                selection = TextQuoteSelector(exact=selection)
+            if isinstance(selection, TextQuoteSelector):
+                selection = selection.as_position(self.passage)
+            positions.append(selection)
+        return TextPositionSet(positions)
+
+    def from_exact_strings(self, selection: Sequence[str]) -> TextPositionSet:
+        """
+        Construct TextPositionSet from a sequence of strings representing exact quotations.
 
         First converts the sequence to TextQuoteSelectors, and then to TextPositionSelectors.
         """
-        selectors = [
-            TextQuoteSelector(exact=item) if isinstance(item, str) else item
-            for item in selection
-        ]
+        selectors = [TextQuoteSelector(exact=item) for item in selection]
         return self.from_quote_selectors(quotes=selectors)
 
     def from_quote_selectors(
         self, quotes: Sequence[TextQuoteSelector]
     ) -> TextPositionSet:
+        """Construct TextPositionSet from a sequence of TextQuoteSelectors."""
         position_selectors = [quote.as_position(self.passage) for quote in quotes]
         return TextPositionSet(position_selectors)

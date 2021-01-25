@@ -1,7 +1,9 @@
 dev
 ------------------
-- provide "missing" instead of "optional" argument for SelectorSchema.end
+- provide "missing" instead of "optional" argument for marshmallow schema
 - add TextPositionSetFactory.from_exact_strings
+- SelectorSchema.expand_anchor_shorthand takes only a string argument
+- TextPositionSetFactory.from_selection will accept a Sequence of mixed types
 
 0.4.3 (2020-12-11)
 ------------------
