@@ -21,6 +21,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "Development Status :: 4 - Beta",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     include_package_data=True,
 )

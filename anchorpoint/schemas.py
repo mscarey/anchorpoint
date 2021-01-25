@@ -1,6 +1,6 @@
 """Schema for serializing text selectors."""
 
-from typing import Dict, List, Optional, Sequence, Union
+from typing import Dict, List, Mapping, Optional, Sequence, TypedDict, Union
 
 from marshmallow import Schema, fields, pre_dump, post_load, pre_load
 
@@ -9,6 +9,15 @@ from anchorpoint.textselectors import (
     TextPositionSelector,
     TextPositionSet,
 )
+
+
+class PositionSelectorDict(TypedDict, total=False):
+    """Dict representing TextPositionSelector, to be loaded with SelectorSchema."""
+
+    start: int
+    end: Optional[int]
+    include_start: bool
+    include_end: bool
 
 
 class SelectorSchema(Schema):
@@ -43,9 +52,7 @@ class SelectorSchema(Schema):
             obj.end = obj.real_end
         return obj
 
-    def expand_anchor_shorthand(
-        self, data: Union[str, Dict[str, str]]
-    ) -> Dict[str, str]:
+    def expand_anchor_shorthand(self, data: str) -> Mapping[str, str]:
         """
         Convert input from shorthand format to normal selector format.
 
@@ -56,17 +63,15 @@ class SelectorSchema(Schema):
             >>> schema.expand_anchor_shorthand("eats,|shoots,|and leaves")
             {'exact': 'shoots,', 'prefix': 'eats,', 'suffix': 'and leaves'}
         """
-        if isinstance(data, str):
-            data = {"text": data}
-        text = data.get("text")
+        result = {"text": data}
+        text = result.pop("text", None)
         if text:
             (
-                data["prefix"],
-                data["exact"],
-                data["suffix"],
+                result["prefix"],
+                result["exact"],
+                result["suffix"],
             ) = TextQuoteSelector.split_anchor_text(text)
-            del data["text"]
-        return data
+        return result
 
     def convert_bool_to_dict(self, data: bool) -> Dict[str, int]:
         """Interpret True as a TextPositionSelector including the whole section."""
@@ -77,12 +82,12 @@ class SelectorSchema(Schema):
 
     @pre_load
     def preprocess_data(
-        self, data: Union[str, Dict[str, Union[str, Dict, List]]], **kwargs
-    ) -> Dict[str, Union[str, List]]:
+        self, data: Union[str, Mapping[str, Union[str, bool, int]]], **kwargs
+    ) -> Mapping[str, Union[str, bool, int]]:
         if isinstance(data, bool):
-            data = self.convert_bool_to_dict(data)
-        if data:
-            data = self.expand_anchor_shorthand(data)
+            return self.convert_bool_to_dict(data)
+        if isinstance(data, str):
+            return self.expand_anchor_shorthand(data)
 
         return data
 
@@ -131,12 +136,10 @@ class TextPositionSetFactory:
         if isinstance(selection, TextQuoteSelector):
             selection = [selection]
         elif isinstance(selection, TextPositionSelector):
-            selection = TextPositionSet(selection)
+            return TextPositionSet(selection)
         if isinstance(selection, Sequence):
             return self.from_exact_strings(selection)
-        if not isinstance(selection, TextPositionSet):
-            selection = TextPositionSet(selection)
-        return selection
+        return TextPositionSet(selection)
 
     def from_exact_strings(
         self, selection: Sequence[Union[str, TextQuoteSelector]]

@@ -56,7 +56,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
         to be part of the TextSequence.
     """
 
-    def __init__(self, passages: Sequence[TextPassage] = None):
+    def __init__(self, passages: Sequence[Optional[TextPassage]] = None):
         self.passages = passages or []
 
     def __repr__(self):
