@@ -1,5 +1,3 @@
-from tests.conftest import make_text
-from typing import Text, Type
 import pytest
 
 from anchorpoint.textselectors import (
@@ -49,7 +47,7 @@ class TestCreateTextSequence:
         assert str(sequence) == ""
 
     def test_select_from_no_content(self):
-        selector_set = TextPositionSet([TextPositionSelector(start=5, end=10),])
+        selector_set = TextPositionSet([TextPositionSelector(start=5, end=10)])
         sequence = selector_set.as_text_sequence("")
         assert len(sequence) == 0
         assert str(sequence) == ""
@@ -103,6 +101,29 @@ class TestCompareTextSequence:
         )
         assert passages_as_sequence.means(handcrafted_sequence)
         assert not passages_as_sequence > handcrafted_sequence
+
+    def test_same_meaning_comparing_text_to_none(self):
+        first_sequence = TextSequence(
+            passages=[
+                None,
+                TextPassage("In no case does copyright protection"),
+                None,
+                TextPassage("extend to any idea"),
+                None,
+            ]
+        )
+        second_sequence = TextSequence(
+            passages=[
+                None,
+                TextPassage("In no case does copyright protection"),
+                TextPassage("of a college memoir"),
+                TextPassage("extend to any idea"),
+                None,
+            ]
+        )
+
+        assert not first_sequence.means(second_sequence)
+        assert second_sequence > first_sequence
 
     def test_one_sequence_means_another(self, make_text):
         passage = make_text["s102b"]
@@ -200,7 +221,7 @@ class TestAddTextSequence:
         )
 
     def test_add_without_Nones(self):
-        sequence = TextSequence(passages=[TextPassage("This is a full section."),])
+        sequence = TextSequence(passages=[TextPassage("This is a full section.")])
         second_sequence = TextSequence(
             passages=[TextPassage("This is the full immediately following section.")]
         )

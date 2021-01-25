@@ -1,6 +1,6 @@
 """Schema for serializing text selectors."""
 
-from typing import Dict, List, Mapping, Optional, Sequence, TypedDict, Union
+from typing import Dict, Mapping, Optional, Sequence, TypedDict, Union
 
 from marshmallow import Schema, fields, pre_dump, post_load, pre_load
 
@@ -52,10 +52,9 @@ class SelectorSchema(Schema):
             obj.end = obj.real_end
         return obj
 
-    def expand_anchor_shorthand(self, data: str) -> Mapping[str, str]:
+    def expand_anchor_shorthand(self, text: str) -> Mapping[str, str]:
         """
         Convert input from shorthand format to normal selector format.
-
 
         .. code-block:: python
 
@@ -63,14 +62,12 @@ class SelectorSchema(Schema):
             >>> schema.expand_anchor_shorthand("eats,|shoots,|and leaves")
             {'exact': 'shoots,', 'prefix': 'eats,', 'suffix': 'and leaves'}
         """
-        result = {"text": data}
-        text = result.pop("text", None)
-        if text:
-            (
-                result["prefix"],
-                result["exact"],
-                result["suffix"],
-            ) = TextQuoteSelector.split_anchor_text(text)
+        result = {}
+        (
+            result["prefix"],
+            result["exact"],
+            result["suffix"],
+        ) = TextQuoteSelector.split_anchor_text(text)
         return result
 
     def convert_bool_to_dict(self, data: bool) -> Dict[str, int]:
@@ -82,13 +79,14 @@ class SelectorSchema(Schema):
 
     @pre_load
     def preprocess_data(
-        self, data: Union[str, Mapping[str, Union[str, bool, int]]], **kwargs
+        self, data: Union[str, bool, Mapping[str, Union[str, bool, int]]], **kwargs
     ) -> Mapping[str, Union[str, bool, int]]:
         if isinstance(data, bool):
             return self.convert_bool_to_dict(data)
         if isinstance(data, str):
             return self.expand_anchor_shorthand(data)
-
+        if "text" in data.keys() and isinstance(data["text"], str):
+            return self.expand_anchor_shorthand(data["text"])
         return data
 
     @post_load
@@ -132,7 +130,8 @@ class TextPositionSetFactory:
             return TextPositionSet()
         if isinstance(selection, str):
             schema = SelectorSchema()
-            selection = schema.load(selection)
+            data = schema.expand_anchor_shorthand(selection)
+            selection = schema.load(data)
         if isinstance(selection, TextQuoteSelector):
             selection = [selection]
         elif isinstance(selection, TextPositionSelector):

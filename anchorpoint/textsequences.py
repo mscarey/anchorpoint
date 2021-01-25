@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union
 
 
 class TextPassage:
@@ -56,7 +56,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
         to be part of the TextSequence.
     """
 
-    def __init__(self, passages: Sequence[Optional[TextPassage]] = None):
+    def __init__(self, passages: List[Optional[TextPassage]] = None):
         self.passages = passages or []
 
     def __repr__(self):
@@ -139,6 +139,6 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
 
         zipped = zip(self_passages, other_passages)
         return all(
-            (pair[0] is None and pair[1] is None) or pair[0].means(pair[1])
+            pair[0].means(pair[1]) if pair[0] is not None else pair[1] is None
             for pair in zipped
         )
