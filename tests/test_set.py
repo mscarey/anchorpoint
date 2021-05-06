@@ -180,6 +180,28 @@ class TestCombineSelectorSet:
         assert isinstance(new_set, TextPositionSet)
         assert isinstance(new_set.ranges()[0], TextPositionSelector)
 
+    def test_intersection_of_set_and_selector(self, make_text):
+        s102b = make_text["s102b"]
+        selector = TextQuoteSelector(suffix=", procedure")
+        position = selector.as_position(s102b)
+        selector_set = TextPositionSet(position)
+        selector = TextPositionSelector(start=70, end=100)
+        combined = selector_set & selector
+        assert combined.ranges()[0].start == 70
+        assert combined.ranges()[0].end == 90
+        assert isinstance(combined, TextPositionSet)
+
+    def test_union_of_set_and_selector(self, make_text):
+        s102b = make_text["s102b"]
+        selector = TextQuoteSelector(suffix=", procedure")
+        position = selector.as_position(s102b)
+        selector_set = TextPositionSet(position)
+        selector = TextPositionSelector(start=70, end=100)
+        combined = selector_set | selector
+        assert combined.ranges()[0].start == 0
+        assert combined.ranges()[0].end == 100
+        assert isinstance(combined, TextPositionSet)
+
     def test_make_quote_selectors_from_set(self, make_text):
         quote = TextQuoteSelector(exact="United States", suffix=" and subject")
         position = quote.as_position(make_text["amendment"])

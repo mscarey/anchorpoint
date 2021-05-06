@@ -2,6 +2,7 @@ dev
 ------------------
 - add TextPositionSelector.from_text constructor
 - Range constructor interprets None as 0
+- Fix bug: union with TextPositionSet should return TextPositionSet
 
 0.4.4 (2020-01-25)
 ------------------

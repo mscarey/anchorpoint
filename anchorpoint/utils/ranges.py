@@ -935,7 +935,7 @@ class RangeSet(Iterable):
         RangeSet.
         """
         # convert to a RangeSet
-        rng_set = RangeSet._to_rangeset(rng_set)
+        rng_set = self.__class__._to_rangeset(rng_set)
         # do O(n^2) difference algorithm
         # TODO rewrite to increase efficiency by short-circuiting
         intersections = [
@@ -944,7 +944,7 @@ class RangeSet(Iterable):
         intersections = [
             rng for rng in intersections if rng is not None and not rng.isempty()
         ]
-        return RangeSet(intersections)
+        return self.__class__(intersections)
 
     def intersection_update(self, rng_set):
         """
