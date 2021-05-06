@@ -160,8 +160,6 @@ class Range:
         if end is None:
             end = InfiniteValue(negative=False)
 
-        if end is None:
-            end = InfiniteValue(negative=False)
         include_start = kwargs.get("include_start", True)
         include_end = kwargs.get("include_end", False)
         self.include_start = include_start
