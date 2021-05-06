@@ -25,7 +25,7 @@ import re
 from collections.abc import Iterable
 from anchorpoint.utils._helper import (
     _LinkedList,
-    _InfiniteValue,
+    InfiniteValue,
     _is_iterable_non_string,
 )
 
@@ -151,10 +151,10 @@ class Range:
         keywords `include_start` and `include_end` to `True` or `False`.
         """
         # process kwargs
-        start = kwargs.get("start", _InfiniteValue(negative=True))
-        end = kwargs.get("end", _InfiniteValue(negative=False))
+        start = kwargs.get("start", InfiniteValue(negative=True))
+        end = kwargs.get("end", InfiniteValue(negative=False))
         if end is None:
-            end = _InfiniteValue(negative=False)
+            end = InfiniteValue(negative=False)
         include_start = kwargs.get("include_start", True)
         include_end = kwargs.get("include_end", False)
         self.include_start = include_start

@@ -19,6 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+from sys import maxsize
 
 from collections.abc import Iterable
 from numbers import Number
@@ -39,7 +40,7 @@ def _is_iterable_non_string(arg):
     )
 
 
-class _InfiniteValue(Number):
+class InfiniteValue(Number):
     """
     A class representing positive or negative infinity, mainly as a stand-in for float's version
     of infinity, able to represent an infinite value for other types.
@@ -76,7 +77,7 @@ class _InfiniteValue(Number):
         """ for consistency, infinity is equal to itself """
         if isinstance(other, float):
             return self.floatvalue == other
-        elif isinstance(other, _InfiniteValue):
+        elif isinstance(other, InfiniteValue):
             return self.negative == other.negative
         else:
             return False
@@ -124,7 +125,7 @@ class _InfiniteValue(Number):
         return divmod(other, self.floatvalue)
 
     def __neg__(self):
-        return _InfiniteValue(negative=not self.negative)
+        return InfiniteValue(negative=not self.negative)
 
     def __int__(self):
         return int(self.floatvalue)
@@ -142,6 +143,9 @@ class _InfiniteValue(Number):
     def __hash__(self):
         """ pretend to be float infinity """
         return hash(self.floatvalue)
+
+    def __index__(self) -> int:
+        return maxsize
 
 
 class _LinkedList(Iterable):

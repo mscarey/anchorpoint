@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union
 
 from anchorpoint.textsequences import TextPassage, TextSequence
-from anchorpoint.utils._helper import _is_iterable_non_string
+from anchorpoint.utils._helper import _is_iterable_non_string, InfiniteValue
 from anchorpoint.utils.ranges import Range, RangeSet
 from marshmallow import ValidationError
 
@@ -405,7 +405,11 @@ class TextPositionSelector(Range):
 
     def validate(self, text: str) -> None:
         """Verify that selector's text positions exist in text."""
-        if self.end and self.end > len(text):
+        if (
+            self.end
+            and not isinstance(self.end, InfiniteValue)
+            and self.end > len(text)
+        ):
             raise IndexError(
                 f'Text "{text}" is too short to include '
                 + f"the interval ({self.start}, {self.end})"

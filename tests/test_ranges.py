@@ -186,7 +186,7 @@ def test_range_constructor_valid(start, end, include_start, include_end, isempty
         ((1, datetime.date(3, 2, 1)), {}),
         (("1", datetime.date(3, 2, 1)), {}),
         # non-compatible types w.r.t. default arguments
-        # note: this is no longer a valid concern, since _InfiniteValue was implemented
+        # note: this is no longer a valid concern, since InfiniteValue was implemented
         # ((), {"start": datetime.timedelta(3)}),
         # ((), {"start": "-inf"}),
         # ((), {"end": datetime.date(3, 2, 1)}),
