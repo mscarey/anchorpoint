@@ -266,6 +266,27 @@ class TextPositionSelector(Range):
             include_end=self.include_end,
         )
 
+    @classmethod
+    def from_text(
+        cls,
+        text: str,
+        start: Union[int, str] = 0,
+        end: Optional[Union[int, str]] = None,
+    ) -> TextPositionSelector:
+        if isinstance(start, str):
+            start_index = text.find(start)
+            if start_index == -1:
+                raise TextSelectionError(f"String {start} not found in text.")
+            start = start_index
+
+        if isinstance(end, str):
+            end_index = text.find(end)
+            if end_index == -1:
+                raise TextSelectionError(f"String {end} not found in text.")
+            end = end_index + len(end)
+
+        return cls(start=start, end=end)
+
     @property
     def real_start(self) -> int:
         """Start value following Python convention of including first character."""

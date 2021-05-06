@@ -251,6 +251,30 @@ class TestCreateTextPositionSelectors:
         with pytest.raises(IndexError):
             TextPositionSelector("[0,0)")
 
+    def test_create_selector_from_phrase_and_number(self):
+        text = "Here is some great text to excerpt."
+        result = TextPositionSelector.from_text(text=text, start="some", end=23)
+        assert result.start == 8
+        assert result.end == 23
+        assert result.passage(text) == "some great text"
+
+    def test_create_selector_from_phrases(self):
+        text = "Here is some great text to excerpt."
+        result = TextPositionSelector.from_text(text=text, start="some", end="text")
+        assert result.start == 8
+        assert result.end == 23
+        assert result.passage(text) == "some great text"
+
+    def test_wrong_start_phrase_selector(self):
+        text = "Here is some great text to excerpt."
+        with pytest.raises(TextSelectionError):
+            TextPositionSelector.from_text(text=text, start="snipe", end=23)
+
+    def test_wrong_end_phrase_selector(self):
+        text = "Here is some great text to excerpt."
+        with pytest.raises(TextSelectionError):
+            TextPositionSelector.from_text(text=text, start=8, end="wild goose")
+
 
 class TestCombineTextPositionSelectors:
     def test_add_position_selectors(self):
