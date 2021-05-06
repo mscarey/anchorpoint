@@ -1,6 +1,7 @@
 dev
 ------------------
 - add TextPositionSelector.from_text constructor
+- Range constructor interprets None as 0
 
 0.4.4 (2020-01-25)
 ------------------

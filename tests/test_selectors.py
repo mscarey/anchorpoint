@@ -183,6 +183,14 @@ class TestTextQuoteSelectors:
 class TestCreateTextPositionSelectors:
     great_text = "Here is some great text to excerpt."
 
+    def test_make_selector_with_none_at_start(self):
+        selector = TextPositionSelector(start=None, end=12)
+        assert selector.start == 0
+
+    def test_make_selector_with_none_at_end(self):
+        selector = TextPositionSelector(start=5, end=None)
+        assert selector.end > 9999
+
     def test_dump_position_selector(self):
         selector = TextPositionSelector(start=5, end=12)
         dumped = selector.dump()
