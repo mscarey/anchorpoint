@@ -20,6 +20,31 @@ class PositionSelectorDict(TypedDict, total=False):
     include_end: bool
 
 
+class PositionSelectorSchema(Schema):
+    r"""Schema for :class:`~anchorpoint.textselectors.TextPositionSelector`."""
+    __model__ = TextPositionSelector
+
+    start = fields.Int()
+    end = fields.Int(missing=None)
+    include_start = fields.Bool(missing=True, load_only=True)
+    include_end = fields.Bool(missing=False, load_only=True)
+
+    class Meta:
+        ordered = True
+
+    @pre_dump
+    def get_real_start_and_end(self, obj, many=False):
+        if isinstance(obj, TextPositionSelector):
+            obj.start = obj.real_start
+            obj.end = obj.real_end
+        return obj
+
+    @post_load
+    def make_object(self, data: PositionSelectorDict, **kwargs) -> TextPositionSelector:
+
+        return TextPositionSelector(**data)
+
+
 class SelectorSchema(Schema):
     r"""
     Schema for loading a :class:`~anchorpoint.textselectors.TextQuoteSelector` or
@@ -110,9 +135,11 @@ class TextPositionSetFactory:
     r"""Factory for constructing :class:`~anchorpoint.textselectors.TextPositionSet` from text passages and various kinds of selector."""
 
     def __init__(self, passage: str) -> None:
+        """Store text passage that will be used to generate text selections."""
         self.passage = passage
 
     def from_bool(self, selection: bool) -> TextPositionSet:
+        """Select either the whole passage or none of it."""
         if selection is True:
             return TextPositionSet(TextPositionSelector(0, len(self.passage)))
         return TextPositionSet()

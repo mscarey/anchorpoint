@@ -2,7 +2,8 @@ dev
 ------------------
 - add TextPositionSelector.from_text constructor
 - Range constructor interprets None as 0
-- Fix bug: union with TextPositionSet should return TextPositionSet
+- fix bug: union with TextPositionSet should return TextPositionSet
+- add PositionSelectorSchema, for when a selector can't be a TextQuoteSelector
 
 0.4.4 (2020-01-25)
 ------------------
@@ -16,7 +17,7 @@ dev
 - TextPositionSelector serializer dumps .real_start and .real_end
 - TextPositionSelector serializer omits "include_start" and "include_end"
 - TextPositionSelector serializer orders fields so "start" comes before "end"
-- Disallow zero-length TextPositionSelectors
+- disallow zero-length TextPositionSelectors
 
 0.4.2 (2020-08-30)
 ------------------

@@ -2,7 +2,7 @@ from anchorpoint.textselectors import TextPositionSelector
 from marshmallow import ValidationError
 import pytest
 
-from anchorpoint.schemas import SelectorSchema
+from anchorpoint.schemas import SelectorSchema, PositionSelectorSchema
 
 
 class TestLoadSelector:
@@ -47,6 +47,22 @@ class TestLoadSelector:
         schema = SelectorSchema()
         result = schema.load(False)
         assert result is None
+
+
+class TestPositionSelector:
+    def test_schema_loads_position_selector(self):
+        schema = PositionSelectorSchema()
+        data = {"start": 0, "end": 12}
+        result = schema.load(data)
+        assert isinstance(result, TextPositionSelector)
+
+    def test_ordered_position_selector_fields(self):
+        """Test that "start" is before "end"."""
+        schema = PositionSelectorSchema()
+        data = {"start": 0, "end": 12}
+        loaded = schema.load(data)
+        dumped = schema.dump(loaded)
+        assert list(dumped.keys())[0] == "start"
 
 
 class TestDumpSelector:
