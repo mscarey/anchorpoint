@@ -418,6 +418,12 @@ class TextPositionSelector(Range):
 
 
 class TextPositionSet(RangeSet):
+    """
+    A set of TextPositionSelectors.
+
+    Implements the interface of Python :py:class:`set`\s.
+    """
+
     def __init__(self, *args):
         """
         Constructs a new TextPositionSet containing the given sub-ranges.

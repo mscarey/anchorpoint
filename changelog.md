@@ -1,11 +1,11 @@
-dev
+0.5.0 (2021-05-07)
 ------------------
 - add TextPositionSelector.from_text constructor
 - Range constructor interprets None as 0
 - fix bug: union with TextPositionSet should return TextPositionSet
 - add PositionSelectorSchema, for when a selector can't be a TextQuoteSelector
 
-0.4.4 (2020-01-25)
+0.4.4 (2021-01-25)
 ------------------
 - provide "missing" instead of "optional" argument for marshmallow schema
 - add TextPositionSetFactory.from_exact_strings

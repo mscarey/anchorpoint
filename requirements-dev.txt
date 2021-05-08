@@ -1,8 +1,11 @@
 black
+build
 coverage
 coveralls
 flake8
 mypy
 pytest
 pytest-cov
+setuptools
 Sphinx
+wheel

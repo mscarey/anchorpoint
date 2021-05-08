@@ -1,4 +1,4 @@
-from anchorpoint.textselectors import TextQuoteSelector
-from anchorpoint.textselectors import TextPositionSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+from anchorpoint.textselectors import TextPositionSet
 
-__version__ = "0.4.4"
+__version__ = "0.5.0"
