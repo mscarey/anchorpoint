@@ -50,7 +50,7 @@ class TestTextQuoteSelectors:
         assert not method.suffix
 
     def test_create_from_text_invalid_number_of_pipes(self):
-        with pytest.raises(ValidationError):
+        with pytest.raises(TextSelectionError):
             _ = TextQuoteSelector.from_text(
                 "process, system,|method of operation|, concept,|principle"
             )

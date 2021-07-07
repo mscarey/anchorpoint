@@ -1,8 +1,7 @@
-from anchorpoint.textselectors import TextPositionSelector
-from marshmallow import ValidationError
 import pytest
 
 from anchorpoint.schemas import SelectorSchema, PositionSelectorSchema
+from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
 
 
 class TestLoadSelector:
@@ -33,7 +32,7 @@ class TestLoadSelector:
     def test_selector_from_string_split_wrongly(self):
         data = "eats,|shoots,|and leaves|"
         schema = SelectorSchema()
-        with pytest.raises(ValidationError):
+        with pytest.raises(TextSelectionError):
             _ = schema.load(data)
 
     def test_load_true_as_selector(self):
