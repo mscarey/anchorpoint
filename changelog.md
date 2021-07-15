@@ -1,3 +1,7 @@
+0.5.1 (2021-05-15)
+------------------
+- improper shorthand for selector raises TextSelectionError
+
 0.5.0 (2021-05-07)
 ------------------
 - add TextPositionSelector.from_text constructor
