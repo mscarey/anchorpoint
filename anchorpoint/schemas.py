@@ -25,9 +25,9 @@ class PositionSelectorSchema(Schema):
     __model__ = TextPositionSelector
 
     start = fields.Int()
-    end = fields.Int(missing=None)
-    include_start = fields.Bool(missing=True, load_only=True)
-    include_end = fields.Bool(missing=False, load_only=True)
+    end = fields.Int(load_default=None)
+    include_start = fields.Bool(load_default=True, load_only=True)
+    include_end = fields.Bool(load_default=False, load_only=True)
 
     class Meta:
         ordered = True
@@ -58,14 +58,14 @@ class SelectorSchema(Schema):
     """
     __model__ = TextQuoteSelector
 
-    exact = fields.Str(missing=None)
-    prefix = fields.Str(missing=None)
-    suffix = fields.Str(missing=None)
+    exact = fields.Str(load_default=None)
+    prefix = fields.Str(load_default=None)
+    suffix = fields.Str(load_default=None)
 
     start = fields.Int()
-    end = fields.Int(missing=None)
-    include_start = fields.Bool(missing=True, load_only=True)
-    include_end = fields.Bool(missing=False, load_only=True)
+    end = fields.Int(load_default=None)
+    include_start = fields.Bool(load_default=True, load_only=True)
+    include_end = fields.Bool(load_default=False, load_only=True)
 
     class Meta:
         ordered = True

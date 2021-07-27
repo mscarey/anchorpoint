@@ -471,8 +471,7 @@ class TextPositionSet(RangeSet):
         return TextPositionSet([text_range - value for text_range in self])
 
     def as_quotes(self, text: str) -> List[TextQuoteSelector]:
-        quotes = [selector.unique_quote_selector(text) for selector in self.ranges()]
-        return quotes
+        return [selector.unique_quote_selector(text) for selector in self.ranges()]
 
     def as_text_sequence(self, text: str, include_nones: bool = True) -> TextSequence:
         """
