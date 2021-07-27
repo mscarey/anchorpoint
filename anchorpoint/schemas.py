@@ -181,6 +181,8 @@ class TextPositionSetFactory:
                 selection = TextQuoteSelector(exact=selection)
             if isinstance(selection, TextQuoteSelector):
                 selection = selection.as_position(self.passage)
+            elif not isinstance(selection, TextPositionSelector):
+                selection = TextPositionSelector(*selection)
             positions.append(selection)
         return TextPositionSet(positions)
 
