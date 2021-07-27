@@ -1,3 +1,8 @@
+dev
+------------------
+- TextPositionSet can be made from list of tuples
+- long passage in exception is truncated
+
 0.5.1 (2021-05-15)
 ------------------
 - improper shorthand for selector raises TextSelectionError

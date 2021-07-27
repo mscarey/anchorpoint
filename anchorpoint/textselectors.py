@@ -145,8 +145,9 @@ class TextQuoteSelector:
             # Getting indices from match group 1 (in the parentheses),
             # not match 0 which includes prefix and suffix
             return TextPositionSelector(match.start(1), match.end(1))
+        text_sample = text[:100] + "..." if len(text) > 100 else text
         raise TextSelectionError(
-            f'Unable to find pattern "{self.passage_regex()}" in text: "{text}"'
+            f'Unable to find pattern "{self.passage_regex()}" in text: "{text_sample}"'
         )
 
     def is_unique_in(self, text: str) -> bool:

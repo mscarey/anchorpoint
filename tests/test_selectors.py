@@ -179,6 +179,14 @@ class TestTextQuoteSelectors:
         selector = TextQuoteSelector(exact="a")
         assert not selector.is_unique_in("aaaAAAaA")
 
+    def test_long_passage_truncated_in_exception(self, make_text):
+        selector = TextQuoteSelector(exact="things left unsaid")
+        with pytest.raises(TextSelectionError) as exc_info:
+            selector.as_position(make_text["s102b"])
+
+        exception_raised = exc_info.value
+        assert exception_raised.args[0].endswith('idea, procedur..."')
+
 
 class TestCreateTextPositionSelectors:
     great_text = "Here is some great text to excerpt."
