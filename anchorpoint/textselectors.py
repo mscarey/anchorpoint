@@ -417,7 +417,7 @@ class TextPositionSelector(Range):
 
 
 class TextPositionSet(RangeSet):
-    """
+    r"""
     A set of TextPositionSelectors.
 
     Implements the interface of Python :py:class:`set`\s.
