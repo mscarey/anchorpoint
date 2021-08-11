@@ -21,6 +21,13 @@ Anchorpoint is licensed under the
     :maxdepth: 3
     :caption: Contents:
 
+Development Updates
+-------------------
+.. toctree::
+    :maxdepth: 1
+
+    history/releases
+
 API Reference
 -------------
 .. toctree::
@@ -29,13 +36,6 @@ API Reference
     api/selectors
     api/sequences
     api/serializers
-
-History
--------------
-.. toctree::
-    :maxdepth: 1
-    
-    history/history
 
 
 Indices and tables
