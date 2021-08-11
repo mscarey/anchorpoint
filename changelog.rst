@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.5.3 (2021-08-11)
+------------------
+- change readme to .rst
+- use setup.py instead of setup.cfg
+
 0.5.2 (2021-08-02)
 ------------------
 - TextPositionSet can be made from list of tuples

@@ -31,7 +31,8 @@ by `AuthoritySpoke`_ for referencing judicial opinions.
 
 Anchorpoint relies on `python-ranges`_ to perform set operations on spans of text.
 
-## Related Packages
+Related Packages
+~~~~~~~~~~~~~~~~
 
 In Javascript, try the `Text Quote Anchor`_ and `Text Position Anchor`_ packages.
 
