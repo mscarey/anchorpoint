@@ -1,3 +1,2 @@
-include readme.md
-include license.txt
-include requirements-dev.txt
+include license.md
+include README.rst
