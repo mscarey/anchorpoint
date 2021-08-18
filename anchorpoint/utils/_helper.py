@@ -51,14 +51,14 @@ class InfiniteValue(Number):
         self.floatvalue = float("-inf" if self.negative else "inf")
 
     def __lt__(self, other):
-        """ -infinity is always less """
+        """-infinity is always less"""
         if isinstance(other, float):
             return self.floatvalue < other
         else:
             return self.negative and not self == other
 
     def __gt__(self, other):
-        """ +infinity is always more """
+        """+infinity is always more"""
         if isinstance(other, float):
             return self.floatvalue > other
         else:
@@ -74,7 +74,7 @@ class InfiniteValue(Number):
         return not self == other
 
     def __eq__(self, other):
-        """ for consistency, infinity is equal to itself """
+        """for consistency, infinity is equal to itself"""
         if isinstance(other, float):
             return self.floatvalue == other
         elif isinstance(other, InfiniteValue):
@@ -137,15 +137,18 @@ class InfiniteValue(Number):
         return str(self.floatvalue)
 
     def __repr__(self):
-        """ pretend to be float infinity """
+        """pretend to be float infinity"""
         return repr(self.floatvalue)
 
     def __hash__(self):
-        """ pretend to be float infinity """
+        """pretend to be float infinity"""
         return hash(self.floatvalue)
 
     def __index__(self) -> int:
         return maxsize
+
+
+Inf = InfiniteValue()
 
 
 class _LinkedList(Iterable):
@@ -351,7 +354,7 @@ class _LinkedList(Iterable):
         self.node_at(index).value = value
 
     def find_node(self, value):
-        """ Returns the node that contains the given value """
+        """Returns the node that contains the given value"""
         cur = self.first
         while cur:
             if cur.value == value:
