@@ -486,7 +486,7 @@ class Range:
         )
 
     def copy(self):
-        """ Returns a copy of this object, identical to calling `Range(self)` """
+        """Returns a copy of this object, identical to calling `Range(self)`"""
         return Range(self)
 
     def length(self):
@@ -707,7 +707,7 @@ class Range:
 
     def __repr__(self):
         return (
-            f"Range{'[' if self.include_start else '('}{repr(self.start)}, "
+            f"{self.__class__.__name__}{'[' if self.include_start else '('}{repr(self.start)}, "
             f"{repr(self.end)}{']' if self.include_end else ')'}"
         )
 
@@ -1200,48 +1200,48 @@ class RangeSet(Iterable):
         return not self == other
 
     def __and__(self, other):
-        """ returns (self & other), identical to self.intersection(other) """
+        """returns (self & other), identical to self.intersection(other)"""
         return self.intersection(other)
 
     def __or__(self, other):
-        """ returns (self | other), identical to self.union(other) """
+        """returns (self | other), identical to self.union(other)"""
         return self.union(other)
 
     def __xor__(self, other):
-        """ returns (self ^ other), identical to
-        self.symmetric_difference(other) """
+        """returns (self ^ other), identical to
+        self.symmetric_difference(other)"""
         return self.symmetric_difference(other)
 
     def __sub__(self, other):
-        """ returns (self - other), identical to self.difference(other) """
+        """returns (self - other), identical to self.difference(other)"""
         return self.difference(other)
 
     def __add__(self, other):
-        """ Returns (self + other), identical to self.union(other) """
+        """Returns (self + other), identical to self.union(other)"""
         return self.union(other)
 
     def __iand__(self, other):
-        """ Executes (self &= other), identical to self.intersection_update(other) """
+        """Executes (self &= other), identical to self.intersection_update(other)"""
         self.intersection_update(other)
         return self
 
     def __ior__(self, other):
-        """ Executes (self |= other), identical to self.update(other) """
+        """Executes (self |= other), identical to self.update(other)"""
         self.update(other)
         return self
 
     def __ixor__(self, other):
-        """ Executes (self ^= other), identical to self.symmetric_difference_update(other) """
+        """Executes (self ^= other), identical to self.symmetric_difference_update(other)"""
         self.symmetric_difference_update(other)
         return self
 
     def __iadd__(self, other):
-        """ Executes (self += other), identical to self.update(other) """
+        """Executes (self += other), identical to self.update(other)"""
         self.update(other)
         return self
 
     def __isub__(self, other):
-        """ Executes (self -= other), identical to self.difference_update(other) """
+        """Executes (self -= other), identical to self.difference_update(other)"""
         self.difference_update(other)
         return self
 
@@ -1878,7 +1878,7 @@ class RangeDict:
         return RangeDict(self)
 
     def _sort_ranges(self):
-        """ Helper method to gnomesort all _LinkedLists-of-RangeSets. """
+        """Helper method to gnomesort all _LinkedLists-of-RangeSets."""
         for linkedlist in self._rangesets:
             linkedlist.gnomesort()
 

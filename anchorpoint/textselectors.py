@@ -227,9 +227,6 @@ class TextPositionSelector(Range):
         if self.end is not None and self.start >= self.end:
             raise IndexError("Selected end position must be after the start position.")
 
-    def __repr__(self):
-        return super().__repr__().replace("Range", "TextPositionSelector")
-
     def __add__(
         self, value: TextPositionSelector
     ) -> Optional[Union[TextPositionSelector, TextPositionSet]]:
