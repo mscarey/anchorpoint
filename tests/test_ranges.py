@@ -219,7 +219,7 @@ def test_range_constructor_invalid(args, kwargs):
         (Range(), float('inf'), False, "[-inf, inf)", "Range[-inf, inf)"),  # inclusive Infinity is deliberate
         (Range(include_end=True), float('inf'), True, "[-inf, inf]", "Range[-inf, inf]"),  # (see IEEE 754)
         (Range(-3, 3), Range(1, 2), True, "[-3, 3)", "Range[-3, 3)"),
-        (Range(-3, 3), Range(1, 3), False, "[-3, 3)", "Range[-3, 3)"),
+        (Range(-3, 3), Range(1, 3), True, "[-3, 3)", "Range[-3, 3)"),
         (Range(-3, 3), Range(-4, 4), False, "[-3, 3)", "Range[-3, 3)"),
         (Range(-3, 3), Range(-3, -2), True, "[-3, 3)", "Range[-3, 3)"),
         (Range(), float('nan'), False, "[-inf, inf)", "Range[-inf, inf)"),
@@ -348,7 +348,7 @@ def test_range_union(rng1, rng2, union, error_type):
         (Range(1, 3), Range(2, 4), Range(2, 3, include_end=False), None),
         (Range(1, 3), "[2, 4)", Range(2, 3, include_end=False), "r2"),
         (Range(1, 3, include_end=True), Range(2, 4), Range(2, 3, include_end=True), None),
-        (Range(1, 2), Range(2, 3), Range(2, 2), None),
+        (Range(1, 2), Range(2, 3), None, None),
         (Range(1, 3), Range(1, 3), Range(1, 3), None),
         (Range(1, 4), Range(2, 3), Range(2, 3), None),
         (Range(1, 3), Range(3, 5, include_start=False), None, None),
@@ -2210,7 +2210,13 @@ def test_issue4():
     assert(Range(0, 4, include_start=False) in rd2)
     assert(Range(1, 4) in rd2)
     assert(Range(1, 5) in rd2)
-    
+
+def test_issue6():
+    # issue: cannot use unhashable types as the value in a RangeDict
+
+    x = RangeDict({Range(0, 1): ["A", "B"]})
+    assert(str(x) == "{{[0, 1)}: ['A', 'B']}")
+
 def test_issue8():
     # issue: adding a Range to a RangeSet containing two non-overlapping ranges, such that the new range overlaps
     # with one but not the other, leads to a TypeError being raised.

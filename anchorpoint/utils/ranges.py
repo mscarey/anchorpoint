@@ -28,6 +28,7 @@ from anchorpoint.utils._helper import (
     InfiniteValue,
     _is_iterable_non_string,
     Inf,
+    _UnhashableFriendlyDict,
 )
 
 
@@ -331,9 +332,7 @@ class Range:
             raise TypeError("Cannot overlap a Range with a non-Range")
         # do the ranges overlap?
         rng_a, rng_b = (self, rng) if self < rng else (rng, self)
-        if rng_a.isdisjoint(rng_b) and not (
-            rng_a.end == rng_b.start and rng_a.include_end != rng_b.include_start
-        ):
+        if rng_a.isdisjoint(rng_b):
             return None
         # compute parameters for new intersecting range
         # new_start = rng_b.start
@@ -1386,6 +1385,8 @@ class RangeDict:
         iterable of 2-tuples (range, value).
         """
         # Internally, RangeDict has two data structures
+        #    _values is a dict {value: [rangeset, ...], ..., '_sentinel': [(value: [rangeset, ...]), ...]}
+        #          The sentinel allows the RangeDict to accommodate unhashable types.
         #    _values is a dict {value: [rangeset1, rangeset2, ...]}
         #    _ranges is a list-of-lists, [[(intrangeset1, value1), (intrangeset2, value2), ...],
         #                                 [(strrangeset1, value1), (strrangeset2, value2), ...],
@@ -1396,18 +1397,17 @@ class RangeDict:
         #  _ranges for the value we want to point to.
         # Meanwhile, _ranges is a list-of-lists instead of just a list, so that we can accommodate ranges of
         #  different types (e.g. a RangeSet of ints and a RangeSet of strings) pointing to the same values.
+        self._values = _UnhashableFriendlyDict()
         if iterable is RangeDict._sentinel:
-            self._values = {}
             self._rangesets = _LinkedList()
         elif isinstance(iterable, RangeDict):
-            self._values = {
-                val: rngsets[:] for val, rngsets in iterable._values.items()
-            }
+            self._values.update(
+                {val: rngsets[:] for val, rngsets in iterable._values.items()}
+            )
             self._rangesets = _LinkedList(
                 [rngset.copy() for rngset in iterable._rangesets]
             )
         elif isinstance(iterable, dict):
-            self._values = {}
             self._rangesets = _LinkedList()
             for rng, val in iterable.items():
                 if _is_iterable_non_string(rng):
@@ -1420,7 +1420,6 @@ class RangeDict:
                 assert _is_iterable_non_string(
                     iterable
                 )  # creative method of avoiding code reuse!
-                self._values = {}
                 self._rangesets = _LinkedList()
                 for rng, val in iterable:
                     # this should not produce an IndexError. It produces a TypeError instead.
@@ -1433,6 +1432,7 @@ class RangeDict:
                         self.add(rng, val)
             except (TypeError, ValueError, AssertionError):
                 raise ValueError("Expected a dict, RangeDict, or iterable of 2-tuples")
+        self._values[RangeDict._sentinel] = []
         self.popempty()
 
     def add(self, rng, value):
