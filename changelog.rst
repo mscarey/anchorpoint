@@ -1,6 +1,12 @@
 Changelog
 =========
 
+dev
+------------------
+- TextPositionSelector no longer inherits from Range
+- TextPositionSet no longer inherits from RangeSet
+- TextPositionSelector no longer has real_start and real_end that can differ from start and end
+
 0.5.3 (2021-08-11)
 ------------------
 - change readme to .rst

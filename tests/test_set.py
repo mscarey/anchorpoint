@@ -211,7 +211,7 @@ class TestCombineSelectorSet:
     def test_make_quote_selectors_from_set(self, make_text):
         quote = TextQuoteSelector(exact="United States", suffix=" and subject")
         position = quote.as_position(make_text["amendment"])
-        position_set = TextPositionSet(position)
+        position_set = TextPositionSet(selectors=position)
         new_quotes = position_set.as_quotes(make_text["amendment"])
         assert new_quotes[0].exact == "United States"
         assert new_quotes[0].prefix.strip().endswith("in the")
@@ -227,17 +227,20 @@ class TestCompareSelectorSet:
                 TextQuoteSelector(exact="extend to any idea"),
             ]
         )
-        full_passage = TextPositionSet([TextPositionSelector(0, 200)])
+        full_passage = TextPositionSet(selectors=[TextPositionSelector(0, end=200)])
         assert full_passage > selector_set
 
     def test_not_greater_than_regular_set(self):
-        full_passage = TextPositionSet([TextPositionSelector(0, 200)])
+        full_passage = TextPositionSet(selectors=[TextPositionSelector(0, end=200)])
         regular_set = set()
         assert not full_passage > regular_set
 
     def test_add_blank_margin(self):
         selector_set = TextPositionSet(
-            [TextPositionSelector(0, 4), TextPositionSelector(5, 10)]
+            selectors=[
+                TextPositionSelector(start=0, end=4),
+                TextPositionSelector(start=5, end=10),
+            ]
         )
         passage = "Some text."
         assert selector_set.as_string(text=passage) == "Some…text."
@@ -247,14 +250,20 @@ class TestCompareSelectorSet:
     def test_cannot_add_negative_margin(self):
         passage = "Some text."
         selector_set = TextPositionSet(
-            [TextPositionSelector(0, 4), TextPositionSelector(5, 10)]
+            selectors=[
+                TextPositionSelector(start=0, end=4),
+                TextPositionSelector(start=5, end=10),
+            ]
         )
         with pytest.raises(ValueError):
             selector_set.add_margin(text=passage, margin_width=-1)
 
     def test_add_margin_with_characters(self):
         selector_set = TextPositionSet(
-            [TextPositionSelector(0, 7), TextPositionSelector(11, 21)]
+            selectors=[
+                TextPositionSelector(start=0, end=7),
+                TextPositionSelector(start=11, end=21),
+            ]
         )
         passage = 'a quote.") Therefore,'
         assert selector_set.as_string(text=passage) == "a quote…Therefore,"

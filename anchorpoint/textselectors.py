@@ -306,7 +306,7 @@ class TextPositionSelector(BaseModel):
 
     def __sub__(self, value: Union[int, TextPositionSelector]) -> TextPositionSelector:
         if not isinstance(value, int):
-            new_range = self.range - value.range
+            new_range = self.range() - value.range()
             if isinstance(new_range, RangeSet):
                 return TextPositionSet.from_range_set(new_range)
             return TextPositionSelector(start=new_range.start, end=new_range.end)
@@ -522,12 +522,12 @@ class TextPositionSet(BaseModel):
         margin_selectors = TextPositionSet()
         for left in self.ranges():
             for right in self.ranges():
-                if left.real_end < right.real_start <= left.real_end + margin_width:
+                if left.end < right.start <= left.end + margin_width:
                     if all(
                         letter in margin_characters
-                        for letter in text[left.real_end : right.real_start]
+                        for letter in text[left.end : right.start]
                     ):
                         margin_selectors += TextPositionSelector(
-                            start=left.real_end, end=right.real_start
+                            start=left.end, end=right.start
                         )
         return self + margin_selectors
