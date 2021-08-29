@@ -13,8 +13,9 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union
 
 from anchorpoint.textsequences import TextPassage, TextSequence
-from anchorpoint.utils._helper import _is_iterable_non_string, InfiniteValue
+from anchorpoint.utils._helper import _is_iterable_non_string, InfiniteValue, Inf
 from anchorpoint.utils.ranges import Range, RangeSet
+from pydantic import BaseModel, validator, root_validator
 
 
 class TextSelectionError(Exception):
@@ -144,7 +145,7 @@ class TextQuoteSelector:
         if match:
             # Getting indices from match group 1 (in the parentheses),
             # not match 0 which includes prefix and suffix
-            return TextPositionSelector(match.start(1), match.end(1))
+            return TextPositionSelector(start=match.start(1), end=match.end(1))
         text_sample = text[:100] + "..." if len(text) > 100 else text
         raise TextSelectionError(
             f'Unable to find pattern "{self.passage_regex()}" in text: "{text_sample}"'
@@ -203,7 +204,7 @@ class TextQuoteSelector:
         return (r"\s*" + re.escape(self.suffix.strip())) if self.suffix else ""
 
 
-class TextPositionSelector(Range):
+class TextPositionSelector(BaseModel):
     """
     Describes a textual segment by start and end positions.
 
@@ -220,12 +221,32 @@ class TextPositionSelector(Range):
         The character is not included within the segment.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.start < 0:
+    start: int = 0
+    end: Optional[int] = None
+
+    @validator("start")
+    def start_not_negative(cls, v) -> bool:
+        """
+        Check if start position is not negative.
+
+        :returns:
+            whether the start position is not negative
+        """
+        if v < 0:
             raise IndexError("Start position for text range cannot be negative.")
-        if self.end is not None and self.start >= self.end:
-            raise IndexError("Selected end position must be after the start position.")
+        return v
+
+    @root_validator
+    def start_less_than_end(cls, values):
+        start, end = values.get("start"), values.get("end")
+        if end and end <= start:
+            raise IndexError("End position must be greater than start position.")
+        return values
+
+    @property
+    def range(self) -> Range:
+        """Get the range of the text."""
+        return Range(start=self.start, end=self.end or Inf)
 
     def __add__(
         self, value: TextPositionSelector
@@ -284,26 +305,15 @@ class TextPositionSelector(Range):
 
         return cls(start=start, end=end)
 
-    @property
-    def real_start(self) -> int:
-        """Start value following Python convention of including first character."""
-        if not self.include_start:
-            return self.start + 1
-        return self.start
-
-    @property
-    def real_end(self) -> int:
-        """Start value following Python convention of excluding first character."""
-        if self.include_end:
-            return self.end + 1
-        return self.end
-
     def __sub__(self, value: Union[int, TextPositionSelector]) -> TextPositionSelector:
         if not isinstance(value, int):
-            return super().__sub__(value)
+            new_range = self.range - value.range
+            if isinstance(new_range, RangeSet):
+                return TextPositionSet.from_range_set(new_range)
+            return TextPositionSelector(start=new_range.start, end=new_range.end)
         new_start = max(0, self.start - value)
 
-        if str(self.end) == "inf":
+        if self.end is None:
             new_end = self.end
         else:
             new_end = self.end - value
@@ -316,8 +326,6 @@ class TextPositionSelector(Range):
         return TextPositionSelector(
             start=new_start,
             end=new_end,
-            include_start=self.include_start,
-            include_end=self.include_end,
         )
 
     def difference(

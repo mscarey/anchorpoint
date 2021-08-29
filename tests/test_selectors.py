@@ -9,7 +9,7 @@ from anchorpoint.textselectors import (
     TextPositionSelector,
     TextSelectionError,
 )
-from marshmallow import ValidationError
+from pydantic import ValidationError
 
 
 class TestTextQuoteSelectors:
@@ -79,7 +79,7 @@ class TestTextQuoteSelectors:
         """
         selector = TextQuoteSelector(prefix="method of operation,")
         assert selector.as_position(make_text["s102b"]) == TextPositionSelector(
-            141, len(make_text["s102b"])
+            start=141, end=len(make_text["s102b"])
         )
 
     def test_exact_from_just_suffix(self, make_text):
@@ -191,13 +191,13 @@ class TestTextQuoteSelectors:
 class TestCreateTextPositionSelectors:
     great_text = "Here is some great text to excerpt."
 
-    def test_make_selector_with_none_at_start(self):
-        selector = TextPositionSelector(start=None, end=12)
-        assert selector.start == 0
+    def test_cannot_make_selector_with_none_at_start(self):
+        with pytest.raises(ValidationError):
+            TextPositionSelector(start=None, end=12)
 
     def test_make_selector_with_none_at_end(self):
         selector = TextPositionSelector(start=5, end=None)
-        assert selector.end > 9999
+        assert selector.range.end > 9999
 
     def test_dump_position_selector(self):
         selector = TextPositionSelector(start=5, end=12)
@@ -215,7 +215,7 @@ class TestCreateTextPositionSelectors:
             _ = selector.passage(make_text["amendment"])
 
     def test_end_must_be_after_start_position(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(IndexError):
             _ = TextPositionSelector(start=53, end=14)
 
     def test_min_start_position_is_0(self):
@@ -231,7 +231,7 @@ class TestCreateTextPositionSelectors:
 
     def test_convert_position_with_inf_to_quote(self, make_text):
         """Test that position selector with no upper bound can be made into a quote selector."""
-        selector = TextPositionSelector("[53, inf)")
+        selector = TextPositionSelector(start=53, end=None)
         quote = selector.as_quote_selector(
             make_text["amendment"], left_margin=14, right_margin=10
         )
@@ -242,7 +242,7 @@ class TestCreateTextPositionSelectors:
 
     def test_make_quote_selector_from_entire_text(self):
         passage = "entire passage"
-        interval = TextPositionSelector(0, len(passage))
+        interval = TextPositionSelector(start=0, end=len(passage))
         quote = interval.as_quote_selector(passage)
         assert quote.exact == "entire passage"
         assert not quote.prefix
@@ -250,7 +250,7 @@ class TestCreateTextPositionSelectors:
 
     def test_default_to_full_text_for_unique_string(self):
         passage = "abcdeabcdeabcdeabcde"
-        interval = TextPositionSelector(0, 5)
+        interval = TextPositionSelector(start=0, end=5)
         quote = interval.unique_quote_selector(passage)
         assert quote.exact == "abcde"
         assert quote.suffix == "abcdeabcdeabcde"
@@ -351,15 +351,15 @@ class TestCombineTextPositionSelectors:
         assert new.end == 26
 
     def test_subtract_selector_from_position_selector(self):
-        selector = TextPositionSelector(5, 25)
-        to_subtract = TextPositionSelector(15, 20)
+        selector = TextPositionSelector(start=5, end=25)
+        to_subtract = TextPositionSelector(start=15, end=20)
         less = selector - to_subtract
         assert isinstance(less, TextPositionSet)
         assert isinstance(less.ranges()[0], TextPositionSelector)
         assert less.ranges()[0].end == 15
 
     def test_subtract_int_from_position_selector(self):
-        selector = TextPositionSelector(5, 15)
+        selector = TextPositionSelector(start=5, end=15)
         less = selector - 5
         assert less.start == 0
         assert less.end == 10
@@ -368,10 +368,10 @@ class TestCombineTextPositionSelectors:
         selector = TextPositionSelector(start=15)
         less = selector - 10
         assert less.start == 5
-        assert str(less.end) == "inf"
+        assert less.end is None
 
     def test_subtract_from_position_selector_with_None_as_end(self):
         selector = TextPositionSelector(start=15, end=None)
         less = selector - 10
         assert less.start == 5
-        assert str(less.end) == "inf"
+        assert less.end is None
