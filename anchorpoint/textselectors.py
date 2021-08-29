@@ -308,7 +308,7 @@ class TextPositionSelector(BaseModel):
         if not isinstance(value, int):
             new_range = self.range() - value.range()
             if isinstance(new_range, RangeSet):
-                return TextPositionSet.from_range_set(new_range)
+                return TextPositionSet.from_ranges(new_range)
             return TextPositionSelector(start=new_range.start, end=new_range.end)
         new_start = max(0, self.start - value)
 
@@ -423,6 +423,19 @@ class TextPositionSet(BaseModel):
     """
 
     selectors: List[TextPositionSelector] = []
+
+    @classmethod
+    def from_ranges(
+        cls, ranges: Union[RangeSet, Range, List[Range]]
+    ) -> "TextPositionSet":
+        if isinstance(ranges, RangeSet):
+            ranges = ranges.ranges()
+        if isinstance(ranges, Range):
+            ranges = [ranges]
+        selectors = [
+            TextPositionSelector(start=item.start, end=item.end) for item in ranges
+        ]
+        return cls(selectors=selectors)
 
     def __repr__(self):
         return super().__repr__().replace("RangeSet", self.__class__.__name__)

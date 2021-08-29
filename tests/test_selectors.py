@@ -8,6 +8,7 @@ from anchorpoint.textselectors import (
     TextQuoteSelector,
     TextPositionSelector,
     TextSelectionError,
+    Range,
 )
 from pydantic import ValidationError
 
@@ -355,7 +356,7 @@ class TestCombineTextPositionSelectors:
         to_subtract = TextPositionSelector(start=15, end=20)
         less = selector - to_subtract
         assert isinstance(less, TextPositionSet)
-        assert isinstance(less.ranges()[0], TextPositionSelector)
+        assert isinstance(less.ranges()[0], Range)
         assert less.ranges()[0].end == 15
 
     def test_subtract_int_from_position_selector(self):
