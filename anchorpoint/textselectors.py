@@ -243,7 +243,6 @@ class TextPositionSelector(BaseModel):
             raise IndexError("End position must be greater than start position.")
         return values
 
-    @property
     def range(self) -> Range:
         """Get the range of the text."""
         return Range(start=self.start, end=self.end or Inf)
@@ -423,7 +422,7 @@ class TextPositionSet(BaseModel):
     A set of TextPositionSelectors.
     """
 
-    selectors: List[TextPositionSelector]
+    selectors: List[TextPositionSelector] = []
 
     def __repr__(self):
         return super().__repr__().replace("RangeSet", self.__class__.__name__)
@@ -455,6 +454,15 @@ class TextPositionSet(BaseModel):
         if not isinstance(value, int):
             return super().__sub__(value)
         return TextPositionSet([text_range - value for text_range in self])
+
+    @validator("selectors", pre=True)
+    def selectors_are_in_list(
+        cls, selectors: Union[TextPositionSelector, List[TextPositionSelector]]
+    ):
+        """Put single selector in list."""
+        if isinstance(selectors, TextPositionSelector):
+            selectors = [selectors]
+        return selectors
 
     def as_quotes(self, text: str) -> List[TextQuoteSelector]:
         return [selector.unique_quote_selector(text) for selector in self.ranges()]
@@ -490,6 +498,13 @@ class TextPositionSet(BaseModel):
         elif text and include_nones and (not selected or selected[-1] is not None):
             selected.append(None)
         return TextSequence(selected)
+
+    def rangeset(self) -> RangeSet:
+        ranges = [selector.range() for selector in self.selectors]
+        return RangeSet(ranges)
+
+    def ranges(self) -> List[Range]:
+        return self.rangeset().ranges()
 
     def as_string(self, text: str) -> str:
         """Return a string representing the selected parts of `text`."""
