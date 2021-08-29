@@ -224,7 +224,7 @@ class TextPositionSelector(BaseModel):
     start: int = 0
     end: Optional[int] = None
 
-    @validator("start")
+    @validator("start", allow_reuse=True)
     def start_not_negative(cls, v) -> bool:
         """
         Check if start position is not negative.
@@ -236,7 +236,7 @@ class TextPositionSelector(BaseModel):
             raise IndexError("Start position for text range cannot be negative.")
         return v
 
-    @root_validator
+    @root_validator(allow_reuse=True)
     def start_less_than_end(cls, values):
         start, end = values.get("start"), values.get("end")
         if end and end <= start:
@@ -405,16 +405,12 @@ class TextPositionSelector(BaseModel):
 
     def passage(self, text: str) -> str:
         """Get the quotation from text identified by start and end positions."""
-        self.validate(text)
+        self.verify_text_positions(text)
         return text[self.start : self.end]
 
-    def validate(self, text: str) -> None:
+    def verify_text_positions(self, text: str) -> None:
         """Verify that selector's text positions exist in text."""
-        if (
-            self.end
-            and not isinstance(self.end, InfiniteValue)
-            and self.end > len(text)
-        ):
+        if self.end and self.end > len(text):
             raise IndexError(
                 f'Text "{text}" is too short to include '
                 + f"the interval ({self.start}, {self.end})"
@@ -422,28 +418,12 @@ class TextPositionSelector(BaseModel):
         return None
 
 
-class TextPositionSet(RangeSet):
+class TextPositionSet(BaseModel):
     r"""
     A set of TextPositionSelectors.
-
-    Implements the interface of Python :py:class:`set`\s.
     """
 
-    def __init__(self, *args):
-        """
-        Constructs a new TextPositionSet containing the given sub-ranges.
-        """
-        # flatten args
-        temp_list = []
-        for arg in args:
-            if isinstance(arg, TextPositionSelector):
-                temp_list.append(arg)
-            elif _is_iterable_non_string(arg):
-                temp_list.extend(TextPositionSelector(x) for x in arg)
-            else:
-                temp_list.append(TextPositionSelector(arg))
-        # assign own Ranges
-        self._ranges = self.__class__._merge_ranges(temp_list)
+    selectors: List[TextPositionSelector]
 
     def __repr__(self):
         return super().__repr__().replace("RangeSet", self.__class__.__name__)
