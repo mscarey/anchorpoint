@@ -427,7 +427,7 @@ class TextPositionSet(BaseModel):
     @classmethod
     def from_ranges(
         cls, ranges: Union[RangeSet, Range, List[Range]]
-    ) -> "TextPositionSet":
+    ) -> TextPositionSet:
         if isinstance(ranges, RangeSet):
             ranges = ranges.ranges()
         if isinstance(ranges, Range):
@@ -459,6 +459,38 @@ class TextPositionSet(BaseModel):
         if not isinstance(value, int):
             return self | value
         return TextPositionSet([text_range + value for text_range in self])
+
+    def merge_rangeset(self, rangeset: RangeSet) -> "TextPositionSet":
+        """
+        Merge another RangeSet into this one, returning a new TextPositionSet.
+
+        :param rangeset:
+            the RangeSet to merge
+
+        :returns:
+            a new TextPositionSet representing the combined ranges
+        """
+        new_rangeset = self.rangeset() | rangeset
+        return TextPositionSet.from_ranges(new_rangeset)
+
+    def __gt__(self, other: Union[TextPositionSelector, TextPositionSet]) -> bool:
+        if isinstance(other, TextPositionSet):
+            return self.rangeset() > other.rangeset()
+        elif isinstance(other, TextPositionSelector):
+            return self.rangeset() > other.range()
+        return self.rangeset() > other
+
+    def __ge__(self, other: Union[TextPositionSelector, TextPositionSet]) -> bool:
+        if self == other:
+            return True
+        return self > other
+
+    def __or__(
+        self, other: Union[TextPositionSet, TextPositionSelector]
+    ) -> "TextPositionSet":
+        if isinstance(other, TextPositionSelector):
+            other = TextPositionSet(selectors=[other])
+        return self.merge_rangeset(other.rangeset())
 
     def __sub__(
         self, value: Union[int, TextPositionSelector, TextPositionSet]

@@ -227,11 +227,16 @@ class TestCompareSelectorSet:
                 TextQuoteSelector(exact="extend to any idea"),
             ]
         )
-        full_passage = TextPositionSet(selectors=[TextPositionSelector(0, end=200)])
+        full_passage = TextPositionSet(
+            selectors=[TextPositionSelector(start=0, end=200)]
+        )
         assert full_passage > selector_set
+        assert full_passage >= selector_set
 
     def test_not_greater_than_regular_set(self):
-        full_passage = TextPositionSet(selectors=[TextPositionSelector(0, end=200)])
+        full_passage = TextPositionSet(
+            selectors=[TextPositionSelector(start=0, end=200)]
+        )
         regular_set = set()
         assert not full_passage > regular_set
 
