@@ -224,6 +224,14 @@ class TextPositionSelector(BaseModel):
     start: int = 0
     end: Optional[int] = None
 
+    @classmethod
+    def from_range(cls, range: Range) -> TextPositionSelector:
+        if isinstance(range.end, InfiniteValue):
+            end = None
+        else:
+            end = range.end
+        return TextPositionSelector(start=range.start, end=end)
+
     @validator("start", allow_reuse=True)
     def start_not_negative(cls, v) -> bool:
         """
@@ -246,6 +254,10 @@ class TextPositionSelector(BaseModel):
     def range(self) -> Range:
         """Get the range of the text."""
         return Range(start=self.start, end=self.end or Inf)
+
+    def rangeset(self) -> RangeSet:
+        """Get the range set of the text."""
+        return RangeSet([self.range()])
 
     def __add__(
         self, value: TextPositionSelector
@@ -271,17 +283,35 @@ class TextPositionSelector(BaseModel):
                 "would result in a negative start position."
             )
 
-        if str(self.end) == "inf":
+        if self.end is None:
             new_end = self.end
         else:
             new_end = self.end + value
 
-        return TextPositionSelector(
-            start=self.start + value,
-            end=new_end,
-            include_start=self.include_start,
-            include_end=self.include_end,
-        )
+        return TextPositionSelector(start=self.start + value, end=new_end)
+
+    def __or__(
+        self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
+    ) -> Union[TextPositionSelector, TextPositionSet]:
+        """
+        Make a new selector covering the combined ranges of self and other.
+
+        :param other:
+            selector for another text interval
+
+        :returns:
+            a selector reflecting the combined range
+        """
+        if isinstance(other, (TextPositionSelector, TextPositionSet)):
+            other = other.rangeset()
+
+        new_rangeset = self.rangeset() | other
+
+        new_ranges = new_rangeset.ranges()
+        if len(new_ranges) == 1:
+            return TextPositionSelector.from_range(new_ranges[0])
+
+        return TextPositionSet.from_ranges(new_ranges)
 
     @classmethod
     def from_text(
@@ -395,7 +425,7 @@ class TextPositionSelector(BaseModel):
     def combine(self, other: TextPositionSelector, text: str):
         """Make new selector combining ranges of self and other if it will fit in text."""
         for selector in (self, other):
-            selector.validate(text)
+            selector.verify_text_positions(text)
         return self + other
 
     def dump(self):

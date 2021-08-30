@@ -264,11 +264,11 @@ class TestCreateTextPositionSelectors:
 
     def test_zero_length_selector_not_allowed(self):
         with pytest.raises(IndexError):
-            TextPositionSelector(5, 5)
+            TextPositionSelector(start=5, end=5)
 
     def test_zero_length_string_selector_not_allowed(self):
         with pytest.raises(IndexError):
-            TextPositionSelector("[0,0)")
+            TextPositionSelector(start=0, end=0)
 
     def test_create_selector_from_phrase_and_number(self):
         result = TextPositionSelector.from_text(
@@ -319,13 +319,13 @@ class TestCombineTextPositionSelectors:
         right = TextPositionSelector(start=20)
         new = left + right
         assert new.start == 5
-        assert new.end > 22
+        assert new.end is None
 
     def test_add_infinite_selector(self):
-        left = TextPositionSelector("(5, inf]")
+        left = TextPositionSelector(start=5, end=None)
         new = left + 5
         assert new.start == 10
-        assert new.end > 22
+        assert new.end is None
 
     def test_adding_nonoverlapping_selectors(self):
         """
