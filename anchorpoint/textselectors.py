@@ -334,12 +334,11 @@ class TextPositionSelector(BaseModel):
 
         return cls(start=start, end=end)
 
-    def __sub__(self, value: Union[int, TextPositionSelector]) -> TextPositionSelector:
+    def __sub__(
+        self, value: Union[int, TextPositionSelector, TextPositionSet]
+    ) -> TextPositionSelector:
         if not isinstance(value, int):
-            new_range = self.range() - value.range()
-            if isinstance(new_range, RangeSet):
-                return TextPositionSet.from_ranges(new_range)
-            return TextPositionSelector.from_range(new_range)
+            return self.difference(value)
         new_start = max(0, self.start - value)
 
         if self.end is None:
@@ -363,10 +362,16 @@ class TextPositionSelector(BaseModel):
         """
         Apply Range difference method replacing RangeSet with TextPositionSet in return value.
         """
-        result = super().difference(rng)
-        if isinstance(result, RangeSet):
-            result = TextPositionSet(result)
-        return result
+        if isinstance(rng, TextPositionSet):
+            to_compare: Union[Range, RangeSet] = rng.rangeset()
+        elif isinstance(rng, TextPositionSelector):
+            to_compare = rng.range()
+        else:
+            to_compare = rng
+        new_rangeset = self.rangeset().difference(to_compare)
+        if len(new_rangeset.ranges()) == 1:
+            return TextPositionSelector.from_range(new_rangeset.ranges()[0])
+        return TextPositionSet.from_ranges(new_rangeset)
 
     def as_quote_selector(
         self, text: str, left_margin: int = 0, right_margin: int = 0

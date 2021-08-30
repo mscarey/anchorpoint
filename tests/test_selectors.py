@@ -384,3 +384,28 @@ class TestCombineTextPositionSelectors:
         less = selector - 10
         assert less.start == 5
         assert less.end is None
+
+    def test_difference_of_selectors(self):
+        left = TextPositionSelector(start=5, end=25)
+        right = TextPositionSelector(start=15, end=30)
+        diff = left.difference(right)
+        assert isinstance(diff, TextPositionSelector)
+        assert diff.start == 5
+        assert diff.end == 15
+
+    def test_difference_with_set(self):
+        left = TextPositionSelector(start=5, end=25)
+        right = TextPositionSelector(start=15, end=30)
+        right_set = TextPositionSet(selectors=right)
+        diff = left.difference(right_set)
+        assert isinstance(diff, TextPositionSelector)
+        assert diff.start == 5
+        assert diff.end == 15
+
+    def test_difference_with_range(self):
+        left = TextPositionSelector(start=5, end=25)
+        right = Range(start=15, end=30)
+        diff = left.difference(right)
+        assert isinstance(diff, TextPositionSelector)
+        assert diff.start == 5
+        assert diff.end == 15
