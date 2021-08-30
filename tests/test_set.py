@@ -3,6 +3,7 @@ from anchorpoint.textselectors import (
     TextPositionSelector,
     TextPositionSet,
     TextQuoteSelector,
+    Range,
 )
 
 import pytest
@@ -234,9 +235,8 @@ class TestCompareSelectorSet:
         assert full_passage >= selector_set
 
     def test_compare_to_empty_regular_set(self):
-        full_passage = TextPositionSet(
-            selectors=[TextPositionSelector(start=0, end=200)]
-        )
+        wide_range = Range(start=0, end=200)
+        full_passage = TextPositionSet.from_ranges(wide_range)
         regular_set = set()
         assert full_passage > regular_set
         assert full_passage >= regular_set

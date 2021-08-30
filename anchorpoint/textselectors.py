@@ -339,7 +339,7 @@ class TextPositionSelector(BaseModel):
             new_range = self.range() - value.range()
             if isinstance(new_range, RangeSet):
                 return TextPositionSet.from_ranges(new_range)
-            return TextPositionSelector(start=new_range.start, end=new_range.end)
+            return TextPositionSelector.from_range(new_range)
         new_start = max(0, self.start - value)
 
         if self.end is None:

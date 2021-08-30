@@ -351,6 +351,14 @@ class TestCombineTextPositionSelectors:
         new = left.combine(other=right, text=text)
         assert new.end == 26
 
+    def test_subtract_overlapping_selector(self):
+        selector = TextPositionSelector(start=5, end=25)
+        to_subtract = TextPositionSelector(start=15, end=30)
+        less = selector - to_subtract
+        assert isinstance(less, TextPositionSelector)
+        assert less.start == 5
+        assert less.end == 15
+
     def test_subtract_selector_from_position_selector(self):
         selector = TextPositionSelector(start=5, end=25)
         to_subtract = TextPositionSelector(start=15, end=20)
