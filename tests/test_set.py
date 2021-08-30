@@ -316,3 +316,18 @@ class TestTextFromSelectorSet:
         )
         result = selector_set.as_string(text=passage)
         assert result == "In no case does copyright protection…extend to any idea…"
+
+    def test_serialize_with_pydantic(self):
+        selector_set = TextPositionSet(
+            selectors=[
+                TextPositionSelector(start=0, end=4),
+                TextPositionSelector(start=5, end=10),
+            ]
+        )
+        assert selector_set.dict()["selectors"][0]["end"] == 4
+
+    def test_get_schema_with_pydantic(self):
+        assert (
+            TextPositionSet.schema()["properties"]["selectors"]["items"]["$ref"]
+            == "#/definitions/TextPositionSelector"
+        )
