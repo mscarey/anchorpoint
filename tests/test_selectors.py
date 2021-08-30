@@ -198,7 +198,7 @@ class TestCreateTextPositionSelectors:
 
     def test_make_selector_with_none_at_end(self):
         selector = TextPositionSelector(start=5, end=None)
-        assert selector.range.end > 9999
+        assert selector.range().end > 9999
 
     def test_dump_position_selector(self):
         selector = TextPositionSelector(start=5, end=12)
@@ -258,7 +258,7 @@ class TestCreateTextPositionSelectors:
 
     def test_fail_to_make_quote_selector(self):
         passage = "too short"
-        interval = TextPositionSelector(50, 100)
+        interval = TextPositionSelector(start=50, end=100)
         with pytest.raises(IndexError):
             _ = interval.as_quote_selector(passage)
 

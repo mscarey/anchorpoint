@@ -311,7 +311,7 @@ class TextPositionSelector(BaseModel):
         if len(new_ranges) == 1:
             return TextPositionSelector.from_range(new_ranges[0])
 
-        return TextPositionSet.from_ranges(new_ranges)
+        return TextPositionSet.from_ranges(new_rangeset)
 
     @classmethod
     def from_text(
@@ -462,16 +462,11 @@ class TextPositionSet(BaseModel):
             ranges = ranges.ranges()
         if isinstance(ranges, Range):
             ranges = [ranges]
-        selectors = [
-            TextPositionSelector(start=item.start, end=item.end) for item in ranges
-        ]
+        selectors = [TextPositionSelector.from_range(item) for item in ranges]
         return cls(selectors=selectors)
 
-    def __repr__(self):
-        return super().__repr__().replace("RangeSet", self.__class__.__name__)
-
     def __str__(self):
-        return f"TextPositionSet({self.ranges()})"
+        return repr(self)
 
     def __add__(
         self, value: Union[int, TextPositionSelector, TextPositionSet]
@@ -517,17 +512,26 @@ class TextPositionSet(BaseModel):
 
     def __or__(
         self, other: Union[TextPositionSet, TextPositionSelector]
-    ) -> "TextPositionSet":
+    ) -> TextPositionSet:
         if isinstance(other, TextPositionSelector):
             other = TextPositionSet(selectors=[other])
         return self.merge_rangeset(other.rangeset())
+
+    def __and__(
+        self, other: Union[TextPositionSet, TextPositionSelector]
+    ) -> TextPositionSet:
+        if isinstance(other, TextPositionSelector):
+            other = TextPositionSet(selectors=[other])
+        new_rangeset = self.rangeset() & other.rangeset()
+        return TextPositionSet.from_ranges(new_rangeset)
 
     def __sub__(
         self, value: Union[int, TextPositionSelector, TextPositionSet]
     ) -> TextPositionSet:
         """Decrease all startpoints and endpoints by the given amount."""
         if not isinstance(value, int):
-            return super().__sub__(value)
+            new_rangeset = self.rangeset() - value.rangeset()
+            return TextPositionSet.from_ranges(new_rangeset)
         return TextPositionSet([text_range - value for text_range in self])
 
     @validator("selectors", pre=True)
@@ -540,7 +544,7 @@ class TextPositionSet(BaseModel):
         return selectors
 
     def as_quotes(self, text: str) -> List[TextQuoteSelector]:
-        return [selector.unique_quote_selector(text) for selector in self.ranges()]
+        return [selector.unique_quote_selector(text) for selector in self.selectors]
 
     def as_text_sequence(self, text: str, include_nones: bool = True) -> TextSequence:
         """

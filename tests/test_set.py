@@ -87,7 +87,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(quotes)
+        group = TextPositionSet(selector=quotes)
         new_group = group - 5
         assert new_group.ranges()[0].start == 0
         assert new_group.ranges()[0].end == 5
@@ -97,7 +97,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(quotes)
+        group = TextPositionSet(selector=quotes)
         new_group = group + 5
         assert new_group.ranges()[0].start == 10
         assert new_group.ranges()[0].end == 15
@@ -107,7 +107,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(quotes)
+        group = TextPositionSet(selector=quotes)
         with pytest.raises(IndexError):
             _ = group + -15
 
@@ -116,55 +116,55 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(quotes)
+        group = TextPositionSet(selectors=quotes)
         with pytest.raises(IndexError):
             _ = group - 40
 
     def test_make_set_from_one_selector(self):
         quote = TextPositionSelector(start=5, end=10)
-        group = TextPositionSet(quote)
+        group = TextPositionSet(selectors=quote)
         assert group.ranges()[0].start == 5
 
     def test_string_for_set(self):
         quote = TextPositionSelector(start=5, end=10)
-        group = TextPositionSet(quote)
-        assert str(group).startswith("TextPositionSet([TextPositionSelector")
+        group = TextPositionSet(selectors=quote)
+        assert str(group).startswith("TextPositionSet(selectors")
 
     def test_add_non_overlapping_sets(self):
-        left = TextPositionSet(TextPositionSelector(start=50, end=60))
-        right = TextPositionSet(TextPositionSelector(start=20, end=40))
+        left = TextPositionSet(selectors=TextPositionSelector(start=50, end=60))
+        right = TextPositionSet(selectors=TextPositionSelector(start=20, end=40))
         new = left + right
         assert isinstance(new, TextPositionSet)
-        assert isinstance(new.ranges()[0], TextPositionSelector)
-        assert len(new.ranges()) == 2
-        assert new.ranges()[0].start == 20
+        assert isinstance(new.selectors[0], TextPositionSelector)
+        assert len(new.selectors) == 2
+        assert new.selectors[0].start == 20
 
     def test_add_overlapping_sets(self):
-        left = TextPositionSet(TextPositionSelector(start=40, end=60))
-        right = TextPositionSet(TextPositionSelector(start=50, end=80))
+        left = TextPositionSet(selectors=TextPositionSelector(start=40, end=60))
+        right = TextPositionSet(selectors=TextPositionSelector(start=50, end=80))
         new = left + right
         assert isinstance(new, TextPositionSet)
-        new_ranges = new.ranges()
+        new_ranges = new.selectors
         assert isinstance(new_ranges[0], TextPositionSelector)
         assert len(new_ranges) == 1
         assert new_ranges[0].start == 40
         assert new_ranges[0].end == 80
 
     def test_add_selector_to_set(self):
-        left = TextPositionSet(TextPositionSelector(start=50, end=60))
+        left = TextPositionSet(selectors=TextPositionSelector(start=50, end=60))
         right = TextPositionSelector(start=20, end=40)
         new = left + right
         assert isinstance(new, TextPositionSet)
-        assert isinstance(new.ranges()[0], TextPositionSelector)
+        assert isinstance(new.selectors[0], TextPositionSelector)
         assert len(new.ranges()) == 2
         assert new.ranges()[0].start == 20
 
     def test_add_set_to_selector(self):
         left = TextPositionSelector(start=40, end=60)
-        right = TextPositionSet(TextPositionSelector(start=20, end=35))
+        right = TextPositionSet(selectors=TextPositionSelector(start=20, end=35))
         new = left + right
         assert isinstance(new, TextPositionSet)
-        assert isinstance(new.ranges()[0], TextPositionSelector)
+        assert isinstance(new.selectors[0], TextPositionSelector)
         assert len(new.ranges()) == 2
         assert new.ranges()[0].start == 20
 
@@ -172,11 +172,11 @@ class TestCombineSelectorSet:
         s102b = make_text["s102b"]
         selector = TextQuoteSelector(suffix=", procedure")
         position = selector.as_position(s102b)
-        selector_set = TextPositionSet(position)
+        selector_set = TextPositionSet(selectors=position)
 
         to_subtract = TextQuoteSelector(exact="for an original work of authorship")
         position_to_subtract = to_subtract.as_position(s102b)
-        set_to_subtract = TextPositionSet(position_to_subtract)
+        set_to_subtract = TextPositionSet(selectors=position_to_subtract)
 
         new_set = selector_set - set_to_subtract
 
@@ -184,13 +184,13 @@ class TestCombineSelectorSet:
         assert new_set.ranges()[1].start == 71
 
         assert isinstance(new_set, TextPositionSet)
-        assert isinstance(new_set.ranges()[0], TextPositionSelector)
+        assert isinstance(new_set.selectors[0], TextPositionSelector)
 
     def test_intersection_of_set_and_selector(self, make_text):
         s102b = make_text["s102b"]
         selector = TextQuoteSelector(suffix=", procedure")
         position = selector.as_position(s102b)
-        selector_set = TextPositionSet(position)
+        selector_set = TextPositionSet(selectors=position)
         selector = TextPositionSelector(start=70, end=100)
         combined = selector_set & selector
         assert combined.ranges()[0].start == 70
@@ -201,7 +201,7 @@ class TestCombineSelectorSet:
         s102b = make_text["s102b"]
         selector = TextQuoteSelector(suffix=", procedure")
         position = selector.as_position(s102b)
-        selector_set = TextPositionSet(position)
+        selector_set = TextPositionSet(selectors=position)
         selector = TextPositionSelector(start=70, end=100)
         combined = selector_set | selector
         assert combined.ranges()[0].start == 0
