@@ -546,6 +546,11 @@ class TextPositionSet(BaseModel):
             selectors = [selectors]
         return selectors
 
+    @validator("selectors")
+    def order_of_selectors(cls, v):
+        """Ensure that selectors are in order."""
+        return sorted(v, key=lambda x: x.start)
+
     def as_quotes(self, text: str) -> List[TextQuoteSelector]:
         return [selector.unique_quote_selector(text) for selector in self.selectors]
 

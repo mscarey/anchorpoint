@@ -275,6 +275,22 @@ class TestCompareSelectorSet:
         result = selector_set.add_margin(text=passage, margin_width=4)
         assert result.as_string(text=passage) == 'a quote.") Therefore,'
 
+    def test_same_selector_set(self):
+        selector_set = TextPositionSet(
+            selectors=[
+                TextPositionSelector(start=0, end=4),
+                TextPositionSelector(start=5, end=10),
+            ]
+        )
+        other_set = TextPositionSet(
+            selectors=[
+                TextPositionSelector(start=5, end=10),
+                TextPositionSelector(start=0, end=4),
+            ]
+        )
+        assert selector_set == other_set
+        assert selector_set >= other_set
+
 
 class TestTextFromSelectorSet:
     def test_get_text_selection_from_set(self, make_text):
