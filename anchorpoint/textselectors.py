@@ -500,14 +500,20 @@ class TextPositionSet(BaseModel):
         new_rangeset = self.rangeset() | rangeset
         return TextPositionSet.from_ranges(new_rangeset)
 
-    def __gt__(self, other: Union[TextPositionSelector, TextPositionSet]) -> bool:
+    def __gt__(
+        self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
+    ) -> bool:
         if isinstance(other, TextPositionSet):
-            return self.rangeset() > other.rangeset()
+            to_compare: Union[Range, RangeSet] = other.rangeset()
         elif isinstance(other, TextPositionSelector):
-            return self.rangeset() > other.range()
-        return self.rangeset() > other
+            to_compare = other.range()
+        else:
+            to_compare = other
+        return not bool(to_compare.difference(self.rangeset()))
 
-    def __ge__(self, other: Union[TextPositionSelector, TextPositionSet]) -> bool:
+    def __ge__(
+        self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
+    ) -> bool:
         if self == other:
             return True
         return self > other

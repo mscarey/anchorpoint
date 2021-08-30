@@ -233,12 +233,13 @@ class TestCompareSelectorSet:
         assert full_passage > selector_set
         assert full_passage >= selector_set
 
-    def test_not_greater_than_regular_set(self):
+    def test_compare_to_empty_regular_set(self):
         full_passage = TextPositionSet(
             selectors=[TextPositionSelector(start=0, end=200)]
         )
         regular_set = set()
-        assert not full_passage > regular_set
+        assert full_passage > regular_set
+        assert full_passage >= regular_set
 
     def test_add_blank_margin(self):
         selector_set = TextPositionSet(
@@ -290,6 +291,17 @@ class TestCompareSelectorSet:
         )
         assert selector_set == other_set
         assert selector_set >= other_set
+
+    def test_set_greater_than_selector(self):
+        selector_set = TextPositionSet(
+            selectors=[
+                TextPositionSelector(start=0, end=4),
+                TextPositionSelector(start=5, end=10),
+            ]
+        )
+        other_selector = TextPositionSelector(start=6, end=10)
+        assert selector_set > other_selector
+        assert selector_set >= other_selector
 
 
 class TestTextFromSelectorSet:
