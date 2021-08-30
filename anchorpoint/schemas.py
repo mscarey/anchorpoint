@@ -184,9 +184,9 @@ class TextPositionSetFactory:
             if isinstance(selection, TextQuoteSelector):
                 selection = selection.as_position(self.passage)
             elif not isinstance(selection, TextPositionSelector):
-                selection = TextPositionSelector(*selection)
+                selection = TextPositionSelector(start=selection[0], end=selection[1])
             positions.append(selection)
-        return TextPositionSet(positions)
+        return TextPositionSet(selectors=positions)
 
     def from_exact_strings(self, selection: Sequence[str]) -> TextPositionSet:
         """

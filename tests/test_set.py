@@ -38,13 +38,13 @@ class TestMakeSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(quotes)
+        group = TextPositionSet(selectors=quotes)
         new_group = group + TextPositionSelector(start=2, end=8)
         assert new_group.ranges()[0].end == 10
         assert new_group.ranges()[1].start == 20
 
     def test_make_selector_set_with_selector_from_string(self):
-        group = TextPositionSet("[5, 10)")
+        group = TextPositionSet(selectors=TextPositionSelector(start=5, end=10))
         assert group.ranges()[0].start == 5
 
     def test_make_selector_set_from_position_selector(self):
@@ -77,7 +77,7 @@ class TestMakeSelectorSet:
         assert position_set.as_string(text=passage) == ""
 
     def test_selector_set_repr(self):
-        group = TextPositionSet("[5, 10)")
+        group = TextPositionSet()
         assert repr(group).startswith("TextPositionSet")
 
 
@@ -87,7 +87,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(selector=quotes)
+        group = TextPositionSet(selectors=quotes)
         new_group = group - 5
         assert new_group.ranges()[0].start == 0
         assert new_group.ranges()[0].end == 5
@@ -97,7 +97,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(selector=quotes)
+        group = TextPositionSet(selectors=quotes)
         new_group = group + 5
         assert new_group.ranges()[0].start == 10
         assert new_group.ranges()[0].end == 15
@@ -107,7 +107,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(selector=quotes)
+        group = TextPositionSet(selectors=quotes)
         with pytest.raises(IndexError):
             _ = group + -15
 

@@ -247,7 +247,7 @@ class TextPositionSelector(BaseModel):
     @root_validator(allow_reuse=True)
     def start_less_than_end(cls, values):
         start, end = values.get("start"), values.get("end")
-        if end and end <= start:
+        if end is not None and end <= start:
             raise IndexError("End position must be greater than start position.")
         return values
 
@@ -483,7 +483,9 @@ class TextPositionSet(BaseModel):
         """
         if not isinstance(value, int):
             return self | value
-        return TextPositionSet([text_range + value for text_range in self])
+        return TextPositionSet(
+            selectors=[text_range + value for text_range in self.selectors]
+        )
 
     def merge_rangeset(self, rangeset: RangeSet) -> "TextPositionSet":
         """
@@ -532,7 +534,8 @@ class TextPositionSet(BaseModel):
         if not isinstance(value, int):
             new_rangeset = self.rangeset() - value.rangeset()
             return TextPositionSet.from_ranges(new_rangeset)
-        return TextPositionSet([text_range - value for text_range in self])
+        ranges = [selector - value for selector in self.selectors]
+        return TextPositionSet.from_ranges(ranges)
 
     @validator("selectors", pre=True)
     def selectors_are_in_list(
