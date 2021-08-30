@@ -16,8 +16,6 @@ class PositionSelectorDict(TypedDict, total=False):
 
     start: int
     end: Optional[int]
-    include_start: bool
-    include_end: bool
 
 
 class PositionSelectorSchema(Schema):
@@ -31,13 +29,6 @@ class PositionSelectorSchema(Schema):
 
     class Meta:
         ordered = True
-
-    @pre_dump
-    def get_real_start_and_end(self, obj, many=False):
-        if isinstance(obj, TextPositionSelector):
-            obj.start = obj.real_start
-            obj.end = obj.real_end
-        return obj
 
     @post_load
     def make_object(self, data: PositionSelectorDict, **kwargs) -> TextPositionSelector:
@@ -64,18 +55,9 @@ class SelectorSchema(Schema):
 
     start = fields.Int()
     end = fields.Int(load_default=None)
-    include_start = fields.Bool(load_default=True, load_only=True)
-    include_end = fields.Bool(load_default=False, load_only=True)
 
     class Meta:
         ordered = True
-
-    @pre_dump
-    def get_real_start_and_end(self, obj, many=False):
-        if isinstance(obj, TextPositionSelector):
-            obj.start = obj.real_start
-            obj.end = obj.real_end
-        return obj
 
     def expand_anchor_shorthand(self, text: str) -> Mapping[str, str]:
         """
@@ -119,7 +101,7 @@ class SelectorSchema(Schema):
         self, data, **kwargs
     ) -> Optional[Union[TextPositionSelector, TextQuoteSelector]]:
         if data.get("exact") or data.get("prefix") or data.get("suffix"):
-            for unwanted in ("start", "end", "include_start", "include_end"):
+            for unwanted in ("start", "end"):
                 data.pop(unwanted, None)
             return TextQuoteSelector(**data)
 
