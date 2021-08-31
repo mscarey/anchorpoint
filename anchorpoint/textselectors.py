@@ -105,19 +105,29 @@ class TextQuoteSelector(BaseModel):
 
         :returns:
             a regular expression match, or None
+
+        >>> text = "process, system, method of operation, concept, principle"
+        >>> selector = TextQuoteSelector(exact="method of operation")
+        >>> selector.find_match(text)
+        <re.Match object; span=(17, 36), match='method of operation'>
         """
         pattern = self.passage_regex()
         return re.search(pattern, text, re.IGNORECASE)
 
     def select_text(self, text: str) -> Optional[str]:
         """
-        Get the passage matching the selector, minus any whitespace.
+        Get the passage matching the selector, minus any whitespace at ends.
 
         :param text:
             the passage where an exact quotation needs to be located.
 
         :returns:
             the passage between :attr:`prefix` and :attr:`suffix` in ``text``.
+
+        >>> text = "process, system, method of operation, concept, principle"
+        >>> selector = TextQuoteSelector(prefix="method of operation,")
+        >>> selector.select_text(text)
+        'concept, principle'
         """
         match = self.find_match(text)
         if match:
@@ -604,14 +614,9 @@ class TextPositionSet(BaseModel):
             if include_nones and 0 < selection_ranges[0].start < len(text):
                 selected.append(None)
             for passage in selection_ranges:
-                end_value = (
-                    None
-                    if passage.end > 999999
-                    else passage.end + int(passage.include_end)
-                )
-                if passage.start < end_value and passage.start < len(text):
-                    selected.append(TextPassage(text[passage.start : end_value]))
-                if include_nones and end_value and (end_value < len(text)):
+                if passage.start < passage.end and passage.start < len(text):
+                    selected.append(TextPassage(text[passage.start : passage.end]))
+                if include_nones and passage.end and (passage.end < len(text)):
                     selected.append(None)
         elif text and include_nones and (not selected or selected[-1] is not None):
             selected.append(None)

@@ -18,6 +18,20 @@ class TextPassage:
         self.text = text
 
     def means(self, other: Optional[TextPassage]) -> bool:
+        """
+        Test if passages have the same text, disregarding end puncutation.
+
+        :param other:
+            the other passage to test against
+
+        :return:
+            True if the two passages have the same text, False otherwise
+
+        >>> TextPassage("Hello, world.").means(TextPassage("Hello, world"))
+        True
+        >>> TextPassage("Hello world").means(TextPassage("Hello, world"))
+        False
+        """
         if other is None:
             return False
         if not isinstance(other, self.__class__):

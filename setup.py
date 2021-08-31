@@ -24,6 +24,6 @@ setuptools.setup(
         "Natural Language :: English",
     ],
     packages=setuptools.find_packages(exclude=["tests"]),
-    install_requires=["marshmallow>=3.2.2"],
+    install_requires=["marshmallow>=3.2.2", "pydantic>=1.8.2"],
     python_requires=">=3.8",
 )
