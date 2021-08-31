@@ -8,12 +8,11 @@ Model <https://www.w3.org/TR/annotation-model/>`_.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 
 from typing import List, Optional, Tuple, Union
 
 from anchorpoint.textsequences import TextPassage, TextSequence
-from anchorpoint.utils._helper import _is_iterable_non_string, InfiniteValue, Inf
+from anchorpoint.utils._helper import InfiniteValue, Inf
 from anchorpoint.utils.ranges import Range, RangeSet
 from pydantic import BaseModel, validator, root_validator
 
@@ -24,8 +23,7 @@ class TextSelectionError(Exception):
     pass
 
 
-@dataclass(frozen=True)
-class TextQuoteSelector:
+class TextQuoteSelector(BaseModel):
     """
     Describes a textual segment by quoting it, or passages before or after it.
 
@@ -73,6 +71,28 @@ class TextQuoteSelector:
 
     @classmethod
     def from_text(cls, text: str) -> TextQuoteSelector:
+        """
+        Create a selector from a text string.
+
+        "prefix" and "suffix" fields may be created by separating part
+        of the text with a pipe character ("|").
+
+        :param text:
+            the passage where an exact quotation needs to be located
+
+        :returns:
+            a selector for the location of the exact quotation
+
+        >>> text = "process, system,|method of operation|, concept, principle"
+        >>> selector = TextQuoteSelector.from_text(text)
+        >>> selector.prefix
+        'process, system,'
+        >>> selector.exact
+        'method of operation'
+        >>> selector.suffix
+        ', concept, principle'
+
+        """
         split_text = cls.split_anchor_text(text)
         return cls(prefix=split_text[0], exact=split_text[1], suffix=split_text[2])
 

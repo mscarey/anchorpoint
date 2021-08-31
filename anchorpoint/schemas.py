@@ -63,11 +63,9 @@ class SelectorSchema(Schema):
         """
         Convert input from shorthand format to normal selector format.
 
-        .. code-block:: python
-
             >>> schema = SelectorSchema()
             >>> schema.expand_anchor_shorthand("eats,|shoots,|and leaves")
-            {'exact': 'shoots,', 'prefix': 'eats,', 'suffix': 'and leaves'}
+            {'prefix': 'eats,', 'exact': 'shoots,', 'suffix': 'and leaves'}
         """
         result = {}
         (

@@ -69,8 +69,10 @@ class Range:
 
           >>> e = Range(3, 5)
           >>> f = Range(3, 5, include_start=False, include_end=True)
-          >>> print(e)  # [3, 5)
-          >>> print(f)  # (3, 5]
+          >>> e
+          Range[3, 5)
+          >>> f
+          Range(3, 5]
 
         4. From the keyword arguments `start` and/or `end`. `start` and `end`
           may be anything so long as the condition `start <= end` is True and
@@ -1311,9 +1313,12 @@ class RangeDict:
     ...     Range('h', 'p'): "Second third of the lowercase alphabet",
     ...     Range('p', '{'): "Final third of the lowercase alphabet",
     ... })
-    >>> print(c['brian'])  # First third of the lowercase alphabet
-    >>> print(c['king arthur'])  # Second third of the lowercase alphabet
-    >>> print(c['python'])  # Final third of the lowercase alphabet
+    >>> c['brian']
+    'First third of the lowercase alphabet'
+    >>> c['king arthur']
+    'Second third of the lowercase alphabet'
+    >>> c['python']
+    'Final third of the lowercase alphabet'
 
     >>> # From an iterable of 2-tuples, like a regular dict
     >>> d = RangeDict([
