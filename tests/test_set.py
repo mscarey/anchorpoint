@@ -15,21 +15,21 @@ class TestMakeSelectorSet:
             TextPositionSelector(start=0, end=7),
             TextQuoteSelector(exact="great"),
         ]
-        factory = TextPositionSetFactory(passage="Here is some great text.")
+        factory = TextPositionSetFactory(text="Here is some great text.")
         selector_set = factory.from_selection(quotes)
         assert selector_set.ranges()[0].end == 7
         assert selector_set.ranges()[1].start == 13
 
     def test_make_selector_set_from_exact_strings(self):
         quotes = ["some", "text"]
-        factory = TextPositionSetFactory(passage="Here is some great text.")
+        factory = TextPositionSetFactory(text="Here is some great text.")
         selector_set = factory.from_exact_strings(quotes)
         assert selector_set.ranges()[0].start == 8
         assert selector_set.ranges()[1].start == 19
 
     def test_make_selector_set_from_one_string(self):
         quote = "Here is some"
-        factory = TextPositionSetFactory(passage="Here is some great text.")
+        factory = TextPositionSetFactory(text="Here is some great text.")
         selector_set = factory.from_selection(quote)
         assert selector_set.ranges()[0].start == 0
         assert selector_set.ranges()[0].end == 12
@@ -49,31 +49,31 @@ class TestMakeSelectorSet:
         assert group.ranges()[0].start == 5
 
     def test_make_selector_set_from_position_selector(self):
-        factory = TextPositionSetFactory(passage="Here is some great text.")
+        factory = TextPositionSetFactory(text="Here is some great text.")
         position_set = factory.from_selection(TextPositionSelector(start=5, end=10))
         assert position_set.ranges()[0].start == 5
 
     def test_make_selector_set_from_list_of_strings(self):
-        factory = TextPositionSetFactory(passage="Here is some great text.")
+        factory = TextPositionSetFactory(text="Here is some great text.")
         position_set = factory.from_selection(["Here is some", "text."])
         assert position_set.ranges()[0].start == 0
         assert position_set.ranges()[0].end == 12
 
     def test_make_selector_set_from_list_of_tuples(self):
-        factory = TextPositionSetFactory(passage="Here is some great text.")
+        factory = TextPositionSetFactory(text="Here is some great text.")
         position_set = factory.from_selection([(0, 12), (19, 22)])
         assert position_set.ranges()[0].start == 0
         assert position_set.ranges()[0].end == 12
 
     def test_make_selector_set_from_True(self):
         passage = "Here is some great text."
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         position_set = factory.from_selection(True)
         assert position_set.as_string(text=passage) == "Here is some great text."
 
     def test_make_selector_set_from_False(self):
         passage = "Here is some great text."
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         position_set = factory.from_selection(False)
         assert position_set.as_string(text=passage) == ""
 
@@ -221,7 +221,7 @@ class TestCombineSelectorSet:
 class TestCompareSelectorSet:
     def test_full_passage_implies_selections(self, make_text):
         passage = make_text["s102b"]
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         selector_set = factory.from_quote_selectors(
             [
                 TextQuoteSelector(exact="In no case does copyright protection"),
@@ -307,7 +307,7 @@ class TestCompareSelectorSet:
 class TestTextFromSelectorSet:
     def test_get_text_selection_from_set(self, make_text):
         passage = make_text["s102b"]
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         selector_set = factory.from_quote_selectors(
             [
                 TextQuoteSelector(exact="In no case does copyright protection"),

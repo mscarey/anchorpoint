@@ -34,7 +34,7 @@ class TestCreateTextSequence:
     def test_no_extra_None_when_creating_sequence_from_position_selector(self):
         """Test zero indexing bug, length not same as index of last character."""
         passage = "A short passage."
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         selector_set = factory.from_selection(TextPositionSelector(start=0, end=16))
         sequence = selector_set.as_text_sequence(passage)
         assert len(sequence) == 1
@@ -76,7 +76,7 @@ class TestCreateTextSequence:
     def test_correct_end_index_when_creating_sequence_from_True(self):
         """Test zero indexing bug, length not same as index of last character."""
         passage = "A short passage."
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         selector_set = factory.from_selection(True)
         ranges = selector_set.ranges()
         assert ranges[0].start == 0
@@ -87,7 +87,7 @@ class TestCreateTextSequence:
 class TestCompareTextSequence:
     def test_same_meaning_regardless_of_leading_ellipsis(self, make_text):
         passage = make_text["s102b"]
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         selector_set = factory.from_quote_selectors(
             [
                 TextQuoteSelector(exact="In no case does copyright protection"),
@@ -131,7 +131,7 @@ class TestCompareTextSequence:
 
     def test_one_sequence_means_another(self, make_text):
         passage = make_text["s102b"]
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         selector_set = factory.from_quote_selectors(
             [
                 TextQuoteSelector(exact="In no case does copyright protection"),
@@ -151,7 +151,7 @@ class TestCompareTextSequence:
 
     def test_omitting_None_from_sequence_changes_meaning(self, make_text):
         passage = make_text["s102b"]
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         selector_set = factory.from_quote_selectors(
             [
                 TextQuoteSelector(exact="In no case does copyright protection"),
@@ -177,7 +177,7 @@ class TestCompareTextSequence:
 
     def test_full_passage_implies_selections(self, make_text):
         passage = make_text["s102b"]
-        factory = TextPositionSetFactory(passage=passage)
+        factory = TextPositionSetFactory(text=passage)
         selector_set = factory.from_quote_selectors(
             [
                 TextQuoteSelector(exact="In no case does copyright protection"),

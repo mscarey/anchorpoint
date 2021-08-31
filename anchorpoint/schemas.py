@@ -114,15 +114,15 @@ class SelectorSchema(Schema):
 class TextPositionSetFactory:
     r"""Factory for constructing :class:`~anchorpoint.textselectors.TextPositionSet` from text passages and various kinds of selector."""
 
-    def __init__(self, passage: str) -> None:
+    def __init__(self, text: str) -> None:
         """Store text passage that will be used to generate text selections."""
-        self.passage = passage
+        self.text = text
 
     def from_bool(self, selection: bool) -> TextPositionSet:
         """Select either the whole passage or none of it."""
         if selection is True:
             return TextPositionSet(
-                selectors=[TextPositionSelector(start=0, end=len(self.passage))]
+                selectors=[TextPositionSelector(start=0, end=len(self.text))]
             )
         return TextPositionSet()
 
@@ -162,7 +162,7 @@ class TextPositionSetFactory:
             if isinstance(selection, str):
                 selection = TextQuoteSelector(exact=selection)
             if isinstance(selection, TextQuoteSelector):
-                selection = selection.as_position(self.passage)
+                selection = selection.as_position(self.text)
             elif not isinstance(selection, TextPositionSelector):
                 selection = TextPositionSelector(start=selection[0], end=selection[1])
             positions.append(selection)
@@ -181,5 +181,5 @@ class TextPositionSetFactory:
         self, quotes: Sequence[TextQuoteSelector]
     ) -> TextPositionSet:
         """Construct TextPositionSet from a sequence of TextQuoteSelectors."""
-        position_selectors = [quote.as_position(self.passage) for quote in quotes]
+        position_selectors = [quote.as_position(self.text) for quote in quotes]
         return TextPositionSet(selectors=position_selectors)

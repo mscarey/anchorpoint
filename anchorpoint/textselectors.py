@@ -597,7 +597,7 @@ class TextPositionSet(BaseModel):
 
     def as_text_sequence(self, text: str, include_nones: bool = True) -> TextSequence:
         """
-        List the phrases in the Enactment selected by TextPositionSelectors.
+        List the phrases in a text passage selected by this TextPositionSet.
 
         :param passage:
             A passage to select text from
@@ -605,6 +605,14 @@ class TextPositionSet(BaseModel):
         :param include_nones:
             Whether the list of phrases should include `None` to indicate a block of
             unselected text
+
+        :returns:
+            A TextSequence of the phrases in the text
+
+        >>> selectors = [TextPositionSelector(start=5, end=10)]
+        >>> selector_set = TextPositionSet(selectors=selectors)
+        >>> selector_set.as_text_sequence("Some text.")
+        TextSequence([None, TextPassage("text.")])
         """
         selected: List[Union[None, TextPassage]] = []
 
@@ -630,7 +638,15 @@ class TextPositionSet(BaseModel):
         return self.rangeset().ranges()
 
     def as_string(self, text: str) -> str:
-        """Return a string representing the selected parts of `text`."""
+        """
+        Return a string representing the selected parts of `text`.
+
+        >>> selectors = [TextPositionSelector(start=5, end=10)]
+        >>> selector_set = TextPositionSet(selectors=selectors)
+        >>> sequence = selector_set.as_text_sequence("Some text.")
+        >>> selector_set.as_string("Some text.")
+        '…text.'
+        """
         text_sequence = self.as_text_sequence(text)
         return str(text_sequence)
 
@@ -640,6 +656,39 @@ class TextPositionSet(BaseModel):
         margin_width: int = 3,
         margin_characters: str = """,."' ;[]()""",
     ) -> TextPositionSet:
+        """
+        Expands selected text to include margin of punctuation.
+
+        This can cause multiple selections to be merged into a single one.
+
+        :param text:
+            The text that passages are selected from
+
+        :param margin_width:
+            The width of the margin to add
+
+        :param margin_characters:
+            The characters to include in the margin
+
+        :returns:
+            A new TextPositionSet with the margin added
+
+        >>> from anchorpoint.schemas import TextPositionSetFactory
+        >>> text = "I predict that the grass is wet. (It rained.)"
+        >>> factory = TextPositionSetFactory(text=text)
+        >>> selectors = [TextQuoteSelector(exact="the grass is wet"), TextQuoteSelector(exact="it rained")]
+        >>> position_set = factory.from_selection(selection=selectors)
+        >>> len(position_set.ranges())
+        2
+        >>> new_position_set = position_set.add_margin(text=text)
+        >>> len(new_position_set.ranges())
+        1
+        >>> new_position_set.ranges()[0].start
+        15
+        >>> new_position_set.ranges()[0].end
+        43
+
+        """
         if margin_width < 1:
             raise ValueError("margin_width must be a positive integer")
         margin_selectors = TextPositionSet()
