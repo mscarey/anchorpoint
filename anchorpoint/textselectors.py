@@ -14,7 +14,7 @@ from typing import List, Optional, Tuple, Union
 from anchorpoint.textsequences import TextPassage, TextSequence
 from anchorpoint.utils._helper import InfiniteValue, Inf
 from anchorpoint.utils.ranges import Range, RangeSet
-from pydantic import BaseModel, validator, root_validator
+from pydantic import BaseModel, Field, validator, root_validator
 
 
 class TextSelectionError(Exception):
@@ -46,6 +46,7 @@ class TextQuoteSelector(BaseModel):
     exact: str = ""
     prefix: str = ""
     suffix: str = ""
+    type: str = Field("TextQuoteSelector", const=True)
 
     @staticmethod
     def split_anchor_text(text: str) -> Tuple[str, ...]:
@@ -152,15 +153,6 @@ class TextQuoteSelector(BaseModel):
             return None
         return TextQuoteSelector(exact=exact, prefix=self.prefix, suffix=self.suffix)
 
-    def dump(self):
-        """Serialize the selector."""
-        return {
-            "type": "TextQuoteSelector",
-            "exact": self.exact,
-            "prefix": self.prefix,
-            "suffix": self.suffix,
-        }
-
     def as_position(self, text: str) -> TextPositionSelector:
         """
         Get the interval where the selected quote appears in "text".
@@ -253,6 +245,7 @@ class TextPositionSelector(BaseModel):
 
     start: int = 0
     end: Optional[int] = None
+    type: str = Field("TextPositionSelector", const=True)
 
     @classmethod
     def from_range(cls, range: Range) -> TextPositionSelector:
@@ -463,10 +456,6 @@ class TextPositionSelector(BaseModel):
             selector.verify_text_positions(text)
         return self + other
 
-    def dump(self):
-        """Serialize the selector."""
-        return {"type": "TextPositionSelector", "start": self.start, "end": self.end}
-
     def passage(self, text: str) -> str:
         """Get the quotation from text identified by start and end positions."""
         self.verify_text_positions(text)
@@ -480,6 +469,10 @@ class TextPositionSelector(BaseModel):
                 + f"the interval ({self.start}, {self.end})"
             )
         return None
+
+
+class TextSelector(BaseModel):
+    __root__: Union[TextQuoteSelector, TextPositionSelector]
 
 
 class TextPositionSet(BaseModel):

@@ -33,8 +33,12 @@ class TestTextQuoteSelectors:
     )
 
     def test_convert_selector_to_json(self):
-        copyright_dict = self.preexisting_material.dump()
-        assert '"exact": "protection for a work' in json.dumps(copyright_dict)
+        copyright_json = self.preexisting_material.json()
+        assert '"exact": "protection for a work' in copyright_json
+
+    def test_type_in_quote_selector_dict(self):
+        quote_dict = self.preexisting_material.dict()
+        assert quote_dict["type"] == "TextQuoteSelector"
 
     def test_create_from_text(self):
         method = TextQuoteSelector.from_text(
@@ -202,7 +206,7 @@ class TestCreateTextPositionSelectors:
 
     def test_dump_position_selector(self):
         selector = TextPositionSelector(start=5, end=12)
-        dumped = selector.dump()
+        dumped = selector.dict()
         assert dumped["type"] == "TextPositionSelector"
 
     def test_get_passage_from_position(self, make_text):
