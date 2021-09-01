@@ -70,6 +70,13 @@ class TextQuoteSelector(BaseModel):
             "two, separating the string into 'prefix', 'exact', and 'suffix'."
         )
 
+    @validator("prefix", "exact", "suffix", pre=True)
+    def no_none_for_prefix(cls, value):
+        """Ensure that 'prefix', 'exact', and 'suffix' are not None."""
+        if value is None:
+            return ""
+        return value
+
     @classmethod
     def from_text(cls, text: str) -> TextQuoteSelector:
         """

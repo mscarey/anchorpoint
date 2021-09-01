@@ -126,6 +126,13 @@ class TestTextQuoteSelectors:
         selector = TextQuoteSelector(prefix="in no case", suffix="protection")
         assert selector.select_text(make_text["s102b"]) == "does copyright"
 
+    def test_none_in_selector_becomes_empty_string(self, make_text):
+        selector = TextQuoteSelector(
+            prefix="in no case", exact="does copyright", suffix=None
+        )
+        assert selector.suffix == ""
+        assert selector.select_text(make_text["s102b"]) == "does copyright"
+
     def test_rebuilding_from_text(self, make_text):
         new_selector = self.amendment_selector.rebuild_from_text(make_text["amendment"])
         assert new_selector.exact.startswith("nor shall any State deprive")
