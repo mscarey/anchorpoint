@@ -2,7 +2,7 @@
 
 from typing import Dict, Mapping, Optional, Sequence, TypedDict, Union
 
-from marshmallow import Schema, fields, pre_dump, post_load, pre_load
+from marshmallow import Schema, fields, post_load, pre_load
 
 from anchorpoint.textselectors import (
     TextQuoteSelector,

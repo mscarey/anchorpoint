@@ -366,7 +366,7 @@ class TextPositionSelector(BaseModel):
 
     def __sub__(
         self, value: Union[int, TextPositionSelector, TextPositionSet]
-    ) -> TextPositionSelector:
+    ) -> Union[TextPositionSelector, TextPositionSet]:
         if not isinstance(value, int):
             return self.difference(value)
         new_start = max(0, self.start - value)
@@ -434,8 +434,7 @@ class TextPositionSelector(BaseModel):
         prefix = text[max(0, self.start - left_margin) : self.start]
         suffix = text[end : min(len(text), end + right_margin)]
 
-        new_selector = TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
-        return new_selector
+        return TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
 
     def unique_quote_selector(self, text: str) -> TextQuoteSelector:
         """
@@ -445,14 +444,12 @@ class TextPositionSelector(BaseModel):
             the passage where an exact quotation needs to be located
         """
         exact = text[self.start : self.end]
-        margins = 0
-        while margins < (len(text) - len(exact)):
+        for margins in range(0, len(text) - len(exact), 5):
             new_selector = self.as_quote_selector(
                 text=text, left_margin=margins, right_margin=margins
             )
             if new_selector.is_unique_in(text):
                 return new_selector
-            margins += 5
         return TextQuoteSelector(
             exact=exact, prefix=text[: self.start], suffix=text[self.end :]
         )
