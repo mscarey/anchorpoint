@@ -63,6 +63,12 @@ class TestPositionSelector:
         dumped = schema.dump(loaded)
         assert list(dumped.keys())[0] == "start"
 
+    def test_schema_position_selector_with_type(self):
+        schema = SelectorSchema()
+        data = {"start": 0, "end": 12, "type": "TextPositionSelector"}
+        result = schema.load(data)
+        assert type(result) == TextPositionSelector
+
 
 class TestDumpSelector:
     def test_dump_quote_selector(self):
@@ -72,16 +78,14 @@ class TestDumpSelector:
         dumped = schema.dump(loaded)
         assert dumped["prefix"] == "eats,"
         assert dumped["suffix"] == "and leaves"
+        assert dumped["type"] == "TextQuoteSelector"
 
     def test_dump_position_selector(self):
         schema = SelectorSchema()
         data = {"start": 0, "end": 12}
         loaded = schema.load(data)
         dumped = schema.dump(loaded)
-        assert dumped == {
-            "start": 0,
-            "end": 12,
-        }
+        assert dumped == {"start": 0, "end": 12, "type": "TextPositionSelector"}
 
     def test_ordered_position_selector_fields(self):
         """Test that "start" is before "end"."""

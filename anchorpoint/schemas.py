@@ -56,6 +56,8 @@ class SelectorSchema(Schema):
     start = fields.Int()
     end = fields.Int(load_default=None)
 
+    type = fields.Str(required=False)
+
     class Meta:
         ordered = True
 
