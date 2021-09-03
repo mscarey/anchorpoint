@@ -255,7 +255,9 @@ class TextPositionSelector(BaseModel):
     type: str = Field("TextPositionSelector", const=True)
 
     @classmethod
-    def from_range(cls, range: Range) -> TextPositionSelector:
+    def from_range(
+        cls, range: Union[Range, TextPositionSelector]
+    ) -> TextPositionSelector:
         if isinstance(range.end, InfiniteValue):
             end = None
         else:
@@ -290,7 +292,7 @@ class TextPositionSelector(BaseModel):
         return RangeSet([self.range()])
 
     def __add__(
-        self, value: TextPositionSelector
+        self, value: Union[int, TextPositionSelector]
     ) -> Optional[Union[TextPositionSelector, TextPositionSet]]:
         """
         Make a new selector covering the combined ranges of self and other.
@@ -364,11 +366,7 @@ class TextPositionSelector(BaseModel):
 
         return cls(start=start, end=end)
 
-    def __sub__(
-        self, value: Union[int, TextPositionSelector, TextPositionSet]
-    ) -> Union[TextPositionSelector, TextPositionSet]:
-        if not isinstance(value, int):
-            return self.difference(value)
+    def subtract_integer(self, value: int) -> TextPositionSelector:
         new_start = max(0, self.start - value)
 
         if self.end is None:
@@ -380,11 +378,17 @@ class TextPositionSelector(BaseModel):
                     f"Subtracting {value} from ({self.start}, {self.end}) "
                     "would result in a negative end position."
                 )
-
         return TextPositionSelector(
             start=new_start,
             end=new_end,
         )
+
+    def __sub__(
+        self, value: Union[int, TextPositionSelector, TextPositionSet]
+    ) -> Union[TextPositionSelector, TextPositionSet]:
+        if not isinstance(value, int):
+            return self.difference(value)
+        return self.subtract_integer(value)
 
     def difference(
         self, rng: Union[TextPositionSet, TextPositionSelector]
@@ -488,7 +492,7 @@ class TextPositionSet(BaseModel):
 
     @classmethod
     def from_ranges(
-        cls, ranges: Union[RangeSet, Range, List[Range]]
+        cls, ranges: Union[RangeSet, Range, List[Range], List[TextPositionSelector]]
     ) -> TextPositionSet:
         if isinstance(ranges, RangeSet):
             ranges = ranges.ranges()
@@ -572,7 +576,7 @@ class TextPositionSet(BaseModel):
         if not isinstance(value, int):
             new_rangeset = self.rangeset() - value.rangeset()
             return TextPositionSet.from_ranges(new_rangeset)
-        ranges = [selector - value for selector in self.selectors]
+        ranges = [selector.subtract_integer(value) for selector in self.selectors]
         return TextPositionSet.from_ranges(ranges)
 
     @validator("selectors", pre=True)
