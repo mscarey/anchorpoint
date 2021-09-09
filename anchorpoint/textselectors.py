@@ -507,7 +507,7 @@ class TextPositionSet(BaseModel):
     A set of TextPositionSelectors.
     """
 
-    selectors: List[TextPositionSelector] = []
+    selectors: List[Union[TextPositionSelector, TextQuoteSelector]] = []
 
     @classmethod
     def from_ranges(
@@ -610,10 +610,15 @@ class TextPositionSet(BaseModel):
     @validator("selectors")
     def order_of_selectors(cls, v):
         """Ensure that selectors are in order."""
-        return sorted(v, key=lambda x: x.start)
+        return sorted(v, key=lambda x: x.start if hasattr(x, "start") else 9999)
 
     def as_quotes(self, text: str) -> List[TextQuoteSelector]:
-        return [selector.unique_quote_selector(text) for selector in self.selectors]
+        return [
+            selector.unique_quote_selector(text)
+            if isinstance(selector, TextPositionSelector)
+            else selector
+            for selector in self.selectors
+        ]
 
     def as_text_sequence(self, text: str, include_nones: bool = True) -> TextSequence:
         """
@@ -636,7 +641,11 @@ class TextPositionSet(BaseModel):
         """
         selected: List[Union[None, TextPassage]] = []
 
-        selection_ranges = self.ranges()
+        position_ranges = self.rangeset()
+        quote_ranges = self.quotes_rangeset(text=text)
+
+        selection_rangeset = position_ranges | quote_ranges
+        selection_ranges = selection_rangeset.ranges()
 
         if selection_ranges:
             if include_nones and 0 < selection_ranges[0].start < len(text):
@@ -651,8 +660,28 @@ class TextPositionSet(BaseModel):
         return TextSequence(selected)
 
     def rangeset(self) -> RangeSet:
-        ranges = [selector.range() for selector in self.selectors]
+        ranges = [
+            selector.range()
+            for selector in self.selectors
+            if isinstance(selector, TextPositionSelector)
+        ]
         return RangeSet(ranges)
+
+    @property
+    def quote_selectors(self) -> List[TextQuoteSelector]:
+        return [
+            selector
+            for selector in self.selectors
+            if isinstance(selector, TextQuoteSelector)
+        ]
+
+    def positions_of_quote_selectors(self, text: str) -> List[TextPositionSelector]:
+        return [selector.as_position(text) for selector in self.quote_selectors]
+
+    def quotes_rangeset(self, text: str) -> RangeSet:
+        return RangeSet(
+            [selector.range() for selector in self.positions_of_quote_selectors(text)]
+        )
 
     def ranges(self) -> List[Range]:
         return self.rangeset().ranges()

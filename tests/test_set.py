@@ -81,6 +81,13 @@ class TestMakeSelectorSet:
         group = TextPositionSet()
         assert repr(group).startswith("TextPositionSet")
 
+    def test_set_from_position_and_quote_selectors(self):
+        text = "red orange yellow green blue indigo violet"
+        position = TextPositionSelector(start=4, end=17)
+        quote = TextQuoteSelector(exact="blue indigo")
+        group = TextPositionSet(selectors=[position, quote])
+        assert group.as_string(text=text) == "…orange yellow…blue indigo…"
+
 
 class TestCombineSelectorSet:
     def test_subtract_int_from_selector_set(self):
@@ -328,6 +335,8 @@ class TestTextFromSelectorSet:
 
     def test_get_schema_with_pydantic(self):
         assert (
-            TextPositionSet.schema()["properties"]["selectors"]["items"]["$ref"]
+            TextPositionSet.schema()["properties"]["selectors"]["items"]["anyOf"][0][
+                "$ref"
+            ]
             == "#/definitions/TextPositionSelector"
         )
