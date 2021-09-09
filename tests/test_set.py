@@ -88,6 +88,26 @@ class TestMakeSelectorSet:
         group = TextPositionSet(selectors=[position, quote])
         assert group.as_string(text=text) == "…orange yellow…blue indigo…"
 
+    def test_convert_quotes_to_positions(self):
+        text = "red orange yellow green blue indigo violet"
+        position = TextPositionSelector(start=4, end=17)
+        quote = TextQuoteSelector(exact="blue indigo")
+        group = TextPositionSet(selectors=[position, quote])
+        new = group.convert_quotes_to_positions(text=text)
+        assert new.selectors[1].start == 24
+        assert new.selectors[1].end == 35
+
+    def test_convert_overlapping_quotes_to_positions(self):
+        text = "red orange yellow green blue indigo violet"
+        position = TextPositionSelector(start=4, end=17)
+        quote = TextQuoteSelector(exact="yellow green")
+        group = TextPositionSet(selectors=[position, quote])
+        new = group.convert_quotes_to_positions(text=text)
+        assert len(new.selectors) == 1
+        assert group.as_string(text=text) == "…orange yellow green…"
+        assert new.selectors[0].start == 4
+        assert new.selectors[0].end == 23
+
 
 class TestCombineSelectorSet:
     def test_subtract_int_from_selector_set(self):

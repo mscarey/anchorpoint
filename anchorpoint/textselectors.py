@@ -613,12 +613,17 @@ class TextPositionSet(BaseModel):
         return sorted(v, key=lambda x: x.start if hasattr(x, "start") else 9999)
 
     def as_quotes(self, text: str) -> List[TextQuoteSelector]:
+        """Return copy of self's selector list, converting all position selectors to quote selectors."""
         return [
             selector.unique_quote_selector(text)
             if isinstance(selector, TextPositionSelector)
             else selector
             for selector in self.selectors
         ]
+
+    def convert_quotes_to_positions(self, text: str) -> "TextPositionSet":
+        """Return new TextPositionSet with all quotes replaced by their positions in the given text."""
+        return self.merge_rangeset(self.quotes_rangeset(text))
 
     def as_text_sequence(self, text: str, include_nones: bool = True) -> TextSequence:
         """

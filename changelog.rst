@@ -11,6 +11,8 @@ dev
 - add type field to SelectorSchema
 - update type annotations for TextPositionSelector.from_range
 - add TestQuoteSelector.as_unique_position method
+- TextPositionSet can include TextQuoteSelectors
+- add convert_quotes_to_positions method to TextPositionSet
 
 0.5.3 (2021-08-11)
 ------------------
