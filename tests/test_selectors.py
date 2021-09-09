@@ -417,7 +417,7 @@ class TestCombineTextPositionSelectors:
     def test_difference_with_set(self):
         left = TextPositionSelector(start=5, end=25)
         right = TextPositionSelector(start=15, end=30)
-        right_set = TextPositionSet(selectors=right)
+        right_set = TextPositionSet(positions=right)
         diff = left.difference(right_set)
         assert isinstance(diff, TextPositionSelector)
         assert diff.start == 5

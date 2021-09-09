@@ -46,7 +46,7 @@ class TestCreateTextSequence:
 
     def test_select_from_no_content(self):
         selector_set = TextPositionSet(
-            selectors=[TextPositionSelector(start=5, end=10)]
+            positions=[TextPositionSelector(start=5, end=10)]
         )
         sequence = selector_set.as_text_sequence("")
         assert len(sequence) == 0
@@ -60,14 +60,14 @@ class TestCreateTextSequence:
 
     def test_select_from_start_of_passage(self):
         selector_set = TextPositionSet(
-            selectors=TextPositionSelector(start=0, end=4),
+            positions=TextPositionSelector(start=0, end=4),
         )
         sequence = selector_set.as_text_sequence("Some text.")
         assert str(sequence) == "Some…"
 
     def test_select_after_start_of_passage(self):
         selector_set = TextPositionSet(
-            selectors=[TextPositionSelector(start=5, end=10)],
+            positions=[TextPositionSelector(start=5, end=10)],
         )
         sequence = selector_set.as_text_sequence("Some text.")
         assert str(sequence) == "…text."
@@ -185,7 +185,7 @@ class TestCompareTextSequence:
             ]
         )
         full_passage = TextPositionSet(
-            selectors=[TextPositionSelector(start=0, end=200)]
+            positions=[TextPositionSelector(start=0, end=200)]
         )
 
         passages_as_sequence = selector_set.as_text_sequence(passage)

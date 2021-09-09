@@ -124,7 +124,7 @@ class TextPositionSetFactory:
         """Select either the whole passage or none of it."""
         if selection is True:
             return TextPositionSet(
-                selectors=[TextPositionSelector(start=0, end=len(self.text))]
+                positions=[TextPositionSelector(start=0, end=len(self.text))]
             )
         return TextPositionSet()
 
@@ -146,7 +146,7 @@ class TextPositionSetFactory:
         if isinstance(selection, TextQuoteSelector):
             selection = [selection]
         elif isinstance(selection, TextPositionSelector):
-            return TextPositionSet(selectors=selection)
+            return TextPositionSet(positions=selection)
         if isinstance(selection, bool):
             return self.from_bool(selection)
         return self.from_selection_sequence(selection)
@@ -168,7 +168,7 @@ class TextPositionSetFactory:
             elif not isinstance(selection, TextPositionSelector):
                 selection = TextPositionSelector(start=selection[0], end=selection[1])
             positions.append(selection)
-        return TextPositionSet(selectors=positions)
+        return TextPositionSet(positions=positions)
 
     def from_exact_strings(self, selection: Sequence[str]) -> TextPositionSet:
         """
@@ -184,4 +184,4 @@ class TextPositionSetFactory:
     ) -> TextPositionSet:
         """Construct TextPositionSet from a sequence of TextQuoteSelectors."""
         position_selectors = [quote.as_position(self.text) for quote in quotes]
-        return TextPositionSet(selectors=position_selectors)
+        return TextPositionSet(positions=position_selectors)

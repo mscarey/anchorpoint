@@ -39,13 +39,13 @@ class TestMakeSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(selectors=quotes)
+        group = TextPositionSet(positions=quotes)
         new_group = group + TextPositionSelector(start=2, end=8)
         assert new_group.ranges()[0].end == 10
         assert new_group.ranges()[1].start == 20
 
     def test_make_selector_set_with_selector_from_string(self):
-        group = TextPositionSet(selectors=TextPositionSelector(start=5, end=10))
+        group = TextPositionSet(positions=TextPositionSelector(start=5, end=10))
         assert group.ranges()[0].start == 5
 
     def test_make_selector_set_from_position_selector(self):
@@ -85,28 +85,28 @@ class TestMakeSelectorSet:
         text = "red orange yellow green blue indigo violet"
         position = TextPositionSelector(start=4, end=17)
         quote = TextQuoteSelector(exact="blue indigo")
-        group = TextPositionSet(selectors=[position, quote])
+        group = TextPositionSet(positions=[position], quotes=[quote])
         assert group.as_string(text=text) == "…orange yellow…blue indigo…"
 
     def test_convert_quotes_to_positions(self):
         text = "red orange yellow green blue indigo violet"
         position = TextPositionSelector(start=4, end=17)
         quote = TextQuoteSelector(exact="blue indigo")
-        group = TextPositionSet(selectors=[position, quote])
+        group = TextPositionSet(positions=[position], quotes=[quote])
         new = group.convert_quotes_to_positions(text=text)
-        assert new.selectors[1].start == 24
-        assert new.selectors[1].end == 35
+        assert new.positions[1].start == 24
+        assert new.positions[1].end == 35
 
     def test_convert_overlapping_quotes_to_positions(self):
         text = "red orange yellow green blue indigo violet"
         position = TextPositionSelector(start=4, end=17)
         quote = TextQuoteSelector(exact="yellow green")
-        group = TextPositionSet(selectors=[position, quote])
+        group = TextPositionSet(positions=position, quotes=quote)
         new = group.convert_quotes_to_positions(text=text)
-        assert len(new.selectors) == 1
+        assert len(new.positions) == 1
         assert group.as_string(text=text) == "…orange yellow green…"
-        assert new.selectors[0].start == 4
-        assert new.selectors[0].end == 23
+        assert new.positions[0].start == 4
+        assert new.positions[0].end == 23
 
 
 class TestCombineSelectorSet:
@@ -115,7 +115,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(selectors=quotes)
+        group = TextPositionSet(positions=quotes)
         new_group = group - 5
         assert new_group.ranges()[0].start == 0
         assert new_group.ranges()[0].end == 5
@@ -125,7 +125,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(selectors=quotes)
+        group = TextPositionSet(positions=quotes)
         new_group = group + 5
         assert new_group.ranges()[0].start == 10
         assert new_group.ranges()[0].end == 15
@@ -135,7 +135,7 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(selectors=quotes)
+        group = TextPositionSet(positions=quotes)
         with pytest.raises(IndexError):
             _ = group + -15
 
@@ -144,55 +144,54 @@ class TestCombineSelectorSet:
             TextPositionSelector(start=5, end=10),
             TextPositionSelector(start=20, end=30),
         ]
-        group = TextPositionSet(selectors=quotes)
+        group = TextPositionSet(positions=quotes)
         with pytest.raises(IndexError):
             _ = group - 40
 
     def test_make_set_from_one_selector(self):
         quote = TextPositionSelector(start=5, end=10)
-        group = TextPositionSet(selectors=quote)
+        group = TextPositionSet(positions=quote)
         assert group.ranges()[0].start == 5
 
     def test_string_for_set(self):
         quote = TextPositionSelector(start=5, end=10)
-        group = TextPositionSet(selectors=quote)
-        assert str(group).startswith("TextPositionSet(selectors")
+        group = TextPositionSet(positions=quote)
+        assert str(group).startswith("TextPositionSet(positions")
 
     def test_add_non_overlapping_sets(self):
-        left = TextPositionSet(selectors=TextPositionSelector(start=50, end=60))
-        right = TextPositionSet(selectors=TextPositionSelector(start=20, end=40))
+        left = TextPositionSet(positions=TextPositionSelector(start=50, end=60))
+        right = TextPositionSet(positions=TextPositionSelector(start=20, end=40))
         new = left + right
         assert isinstance(new, TextPositionSet)
-        assert isinstance(new.selectors[0], TextPositionSelector)
-        assert len(new.selectors) == 2
-        assert new.selectors[0].start == 20
+        assert isinstance(new.positions[0], TextPositionSelector)
+        assert len(new.positions) == 2
+        assert new.positions[0].start == 20
 
     def test_add_overlapping_sets(self):
-        left = TextPositionSet(selectors=TextPositionSelector(start=40, end=60))
-        right = TextPositionSet(selectors=TextPositionSelector(start=50, end=80))
+        left = TextPositionSet(positions=TextPositionSelector(start=40, end=60))
+        right = TextPositionSet(positions=TextPositionSelector(start=50, end=80))
         new = left + right
         assert isinstance(new, TextPositionSet)
-        new_ranges = new.selectors
-        assert isinstance(new_ranges[0], TextPositionSelector)
-        assert len(new_ranges) == 1
-        assert new_ranges[0].start == 40
-        assert new_ranges[0].end == 80
+        assert isinstance(new.positions[0], TextPositionSelector)
+        assert len(new.positions) == 1
+        assert new.positions[0].start == 40
+        assert new.positions[0].end == 80
 
     def test_add_selector_to_set(self):
-        left = TextPositionSet(selectors=TextPositionSelector(start=50, end=60))
+        left = TextPositionSet(positions=TextPositionSelector(start=50, end=60))
         right = TextPositionSelector(start=20, end=40)
         new = left + right
         assert isinstance(new, TextPositionSet)
-        assert isinstance(new.selectors[0], TextPositionSelector)
+        assert isinstance(new.positions[0], TextPositionSelector)
         assert len(new.ranges()) == 2
         assert new.ranges()[0].start == 20
 
     def test_add_set_to_selector(self):
         left = TextPositionSelector(start=40, end=60)
-        right = TextPositionSet(selectors=TextPositionSelector(start=20, end=35))
+        right = TextPositionSet(positions=TextPositionSelector(start=20, end=35))
         new = left + right
         assert isinstance(new, TextPositionSet)
-        assert isinstance(new.selectors[0], TextPositionSelector)
+        assert isinstance(new.positions[0], TextPositionSelector)
         assert len(new.ranges()) == 2
         assert new.ranges()[0].start == 20
 
@@ -200,11 +199,11 @@ class TestCombineSelectorSet:
         s102b = make_text["s102b"]
         selector = TextQuoteSelector(suffix=", procedure")
         position = selector.as_position(s102b)
-        selector_set = TextPositionSet(selectors=position)
+        selector_set = TextPositionSet(positions=position)
 
         to_subtract = TextQuoteSelector(exact="for an original work of authorship")
         position_to_subtract = to_subtract.as_position(s102b)
-        set_to_subtract = TextPositionSet(selectors=position_to_subtract)
+        set_to_subtract = TextPositionSet(positions=position_to_subtract)
 
         new_set = selector_set - set_to_subtract
 
@@ -212,13 +211,13 @@ class TestCombineSelectorSet:
         assert new_set.ranges()[1].start == 71
 
         assert isinstance(new_set, TextPositionSet)
-        assert isinstance(new_set.selectors[0], TextPositionSelector)
+        assert isinstance(new_set.positions[0], TextPositionSelector)
 
     def test_intersection_of_set_and_selector(self, make_text):
         s102b = make_text["s102b"]
         selector = TextQuoteSelector(suffix=", procedure")
         position = selector.as_position(s102b)
-        selector_set = TextPositionSet(selectors=position)
+        selector_set = TextPositionSet(positions=position)
         selector = TextPositionSelector(start=70, end=100)
         combined = selector_set & selector
         assert combined.ranges()[0].start == 70
@@ -229,7 +228,7 @@ class TestCombineSelectorSet:
         s102b = make_text["s102b"]
         selector = TextQuoteSelector(suffix=", procedure")
         position = selector.as_position(s102b)
-        selector_set = TextPositionSet(selectors=position)
+        selector_set = TextPositionSet(positions=position)
         selector = TextPositionSelector(start=70, end=100)
         combined = selector_set | selector
         assert combined.ranges()[0].start == 0
@@ -239,7 +238,7 @@ class TestCombineSelectorSet:
     def test_make_quote_selectors_from_set(self, make_text):
         quote = TextQuoteSelector(exact="United States", suffix=" and subject")
         position = quote.as_position(make_text["amendment"])
-        position_set = TextPositionSet(selectors=position)
+        position_set = TextPositionSet(positions=position)
         new_quotes = position_set.as_quotes(make_text["amendment"])
         assert new_quotes[0].exact == "United States"
         assert new_quotes[0].prefix.strip().endswith("in the")
@@ -256,7 +255,7 @@ class TestCompareSelectorSet:
             ]
         )
         full_passage = TextPositionSet(
-            selectors=[TextPositionSelector(start=0, end=200)]
+            positions=[TextPositionSelector(start=0, end=200)]
         )
         assert full_passage > selector_set
         assert full_passage >= selector_set
@@ -270,7 +269,7 @@ class TestCompareSelectorSet:
 
     def test_add_blank_margin(self):
         selector_set = TextPositionSet(
-            selectors=[
+            positions=[
                 TextPositionSelector(start=0, end=4),
                 TextPositionSelector(start=5, end=10),
             ]
@@ -283,7 +282,7 @@ class TestCompareSelectorSet:
     def test_cannot_add_negative_margin(self):
         passage = "Some text."
         selector_set = TextPositionSet(
-            selectors=[
+            positions=[
                 TextPositionSelector(start=0, end=4),
                 TextPositionSelector(start=5, end=10),
             ]
@@ -293,7 +292,7 @@ class TestCompareSelectorSet:
 
     def test_add_margin_with_characters(self):
         selector_set = TextPositionSet(
-            selectors=[
+            positions=[
                 TextPositionSelector(start=0, end=7),
                 TextPositionSelector(start=11, end=21),
             ]
@@ -305,13 +304,13 @@ class TestCompareSelectorSet:
 
     def test_same_selector_set(self):
         selector_set = TextPositionSet(
-            selectors=[
+            positions=[
                 TextPositionSelector(start=0, end=4),
                 TextPositionSelector(start=5, end=10),
             ]
         )
         other_set = TextPositionSet(
-            selectors=[
+            positions=[
                 TextPositionSelector(start=5, end=10),
                 TextPositionSelector(start=0, end=4),
             ]
@@ -321,7 +320,7 @@ class TestCompareSelectorSet:
 
     def test_set_greater_than_selector(self):
         selector_set = TextPositionSet(
-            selectors=[
+            positions=[
                 TextPositionSelector(start=0, end=4),
                 TextPositionSelector(start=5, end=10),
             ]
@@ -346,17 +345,15 @@ class TestTextFromSelectorSet:
 
     def test_serialize_set_with_pydantic(self):
         selector_set = TextPositionSet(
-            selectors=[
+            positions=[
                 TextPositionSelector(start=0, end=4),
                 TextPositionSelector(start=5, end=10),
             ]
         )
-        assert selector_set.dict()["selectors"][0]["end"] == 4
+        assert selector_set.dict()["positions"][0]["end"] == 4
 
     def test_get_schema_with_pydantic(self):
         assert (
-            TextPositionSet.schema()["properties"]["selectors"]["items"]["anyOf"][0][
-                "$ref"
-            ]
+            TextPositionSet.schema()["properties"]["positions"]["items"]["$ref"]
             == "#/definitions/TextPositionSelector"
         )

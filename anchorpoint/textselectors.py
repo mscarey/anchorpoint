@@ -507,7 +507,8 @@ class TextPositionSet(BaseModel):
     A set of TextPositionSelectors.
     """
 
-    selectors: List[Union[TextPositionSelector, TextQuoteSelector]] = []
+    positions: List[TextPositionSelector] = []
+    quotes: List[TextQuoteSelector] = []
 
     @classmethod
     def from_ranges(
@@ -518,7 +519,7 @@ class TextPositionSet(BaseModel):
         if isinstance(ranges, Range):
             ranges = [ranges]
         selectors = [TextPositionSelector.from_range(item) for item in ranges]
-        return cls(selectors=selectors)
+        return cls(positions=selectors)
 
     def __str__(self):
         return repr(self)
@@ -539,7 +540,8 @@ class TextPositionSet(BaseModel):
         if not isinstance(value, int):
             return self | value
         return TextPositionSet(
-            selectors=[text_range + value for text_range in self.selectors]
+            positions=[text_range + value for text_range in self.positions],
+            quotes=self.quotes,
         )
 
     def merge_rangeset(self, rangeset: RangeSet) -> "TextPositionSet":
@@ -553,7 +555,9 @@ class TextPositionSet(BaseModel):
             a new TextPositionSet representing the combined ranges
         """
         new_rangeset = self.rangeset() | rangeset
-        return TextPositionSet.from_ranges(new_rangeset)
+        result = TextPositionSet.from_ranges(new_rangeset)
+        result.quotes = self.quotes
+        return result
 
     def __gt__(
         self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
@@ -577,14 +581,14 @@ class TextPositionSet(BaseModel):
         self, other: Union[TextPositionSet, TextPositionSelector]
     ) -> TextPositionSet:
         if isinstance(other, TextPositionSelector):
-            other = TextPositionSet(selectors=[other])
+            other = TextPositionSet(positions=[other])
         return self.merge_rangeset(other.rangeset())
 
     def __and__(
         self, other: Union[TextPositionSet, TextPositionSelector]
     ) -> TextPositionSet:
         if isinstance(other, TextPositionSelector):
-            other = TextPositionSet(selectors=[other])
+            other = TextPositionSet(positions=[other])
         new_rangeset = self.rangeset() & other.rangeset()
         return TextPositionSet.from_ranges(new_rangeset)
 
@@ -595,10 +599,10 @@ class TextPositionSet(BaseModel):
         if not isinstance(value, int):
             new_rangeset = self.rangeset() - value.rangeset()
             return TextPositionSet.from_ranges(new_rangeset)
-        ranges = [selector.subtract_integer(value) for selector in self.selectors]
+        ranges = [selector.subtract_integer(value) for selector in self.positions]
         return TextPositionSet.from_ranges(ranges)
 
-    @validator("selectors", pre=True)
+    @validator("positions", pre=True)
     def selectors_are_in_list(
         cls, selectors: Union[TextPositionSelector, List[TextPositionSelector]]
     ):
@@ -607,19 +611,27 @@ class TextPositionSet(BaseModel):
             selectors = [selectors]
         return selectors
 
-    @validator("selectors")
+    @validator("quotes", pre=True)
+    def quote_selectors_are_in_list(
+        cls, selectors: Union[TextQuoteSelector, List[TextQuoteSelector]]
+    ):
+        """Put single selector in list."""
+        if isinstance(selectors, TextQuoteSelector):
+            selectors = [selectors]
+        return selectors
+
+    @validator("positions")
     def order_of_selectors(cls, v):
         """Ensure that selectors are in order."""
-        return sorted(v, key=lambda x: x.start if hasattr(x, "start") else 9999)
+        return sorted(v, key=lambda x: x.start)
+
+    def positions_as_quotes(self, text: str) -> List[TextQuoteSelector]:
+        """Copy self's position selectors, converted to quote selectors."""
+        return [selector.unique_quote_selector(text) for selector in self.positions]
 
     def as_quotes(self, text: str) -> List[TextQuoteSelector]:
-        """Return copy of self's selector list, converting all position selectors to quote selectors."""
-        return [
-            selector.unique_quote_selector(text)
-            if isinstance(selector, TextPositionSelector)
-            else selector
-            for selector in self.selectors
-        ]
+        """Copy self's quote and position selectors, converting all position selectors to quote selectors."""
+        return self.positions_as_quotes(text) + self.quotes
 
     def convert_quotes_to_positions(self, text: str) -> "TextPositionSet":
         """Return new TextPositionSet with all quotes replaced by their positions in the given text."""
@@ -640,7 +652,7 @@ class TextPositionSet(BaseModel):
             A TextSequence of the phrases in the text
 
         >>> selectors = [TextPositionSelector(start=5, end=10)]
-        >>> selector_set = TextPositionSet(selectors=selectors)
+        >>> selector_set = TextPositionSet(positions=selectors)
         >>> selector_set.as_text_sequence("Some text.")
         TextSequence([None, TextPassage("text.")])
         """
@@ -665,23 +677,11 @@ class TextPositionSet(BaseModel):
         return TextSequence(selected)
 
     def rangeset(self) -> RangeSet:
-        ranges = [
-            selector.range()
-            for selector in self.selectors
-            if isinstance(selector, TextPositionSelector)
-        ]
+        ranges = [selector.range() for selector in self.positions]
         return RangeSet(ranges)
 
-    @property
-    def quote_selectors(self) -> List[TextQuoteSelector]:
-        return [
-            selector
-            for selector in self.selectors
-            if isinstance(selector, TextQuoteSelector)
-        ]
-
     def positions_of_quote_selectors(self, text: str) -> List[TextPositionSelector]:
-        return [selector.as_position(text) for selector in self.quote_selectors]
+        return [selector.as_position(text) for selector in self.quotes]
 
     def quotes_rangeset(self, text: str) -> RangeSet:
         return RangeSet(
@@ -696,7 +696,7 @@ class TextPositionSet(BaseModel):
         Return a string representing the selected parts of `text`.
 
         >>> selectors = [TextPositionSelector(start=5, end=10)]
-        >>> selector_set = TextPositionSet(selectors=selectors)
+        >>> selector_set = TextPositionSet(positions=selectors)
         >>> sequence = selector_set.as_text_sequence("Some text.")
         >>> selector_set.as_string("Some text.")
         '…text.'
@@ -711,9 +711,11 @@ class TextPositionSet(BaseModel):
         margin_characters: str = """,."' ;[]()""",
     ) -> TextPositionSet:
         """
-        Expands selected text to include margin of punctuation.
+        Expands selected position selectors to include margin of punctuation.
 
         This can cause multiple selections to be merged into a single one.
+
+        Ignores quote selectors.
 
         :param text:
             The text that passages are selected from

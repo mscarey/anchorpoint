@@ -13,6 +13,7 @@ dev
 - add TestQuoteSelector.as_unique_position method
 - TextPositionSet can include TextQuoteSelectors
 - add convert_quotes_to_positions method to TextPositionSet
+- replace `selectors` field with `positions` and `quotes`
 
 0.5.3 (2021-08-11)
 ------------------
