@@ -116,6 +116,16 @@ class TestTextQuoteSelectors:
         selected_text = position.passage(make_text["s102b"])
         assert not selected_text.startswith(" ")
 
+    def test_no_unique_position(self, make_text):
+        selector = TextQuoteSelector(exact="work")
+        with pytest.raises(TextSelectionError):
+            selector.as_unique_position(make_text["s102b"])
+
+    def test_find_unique_position(self, make_text):
+        selector = TextQuoteSelector(prefix="original ", exact="work")
+        answer = selector.as_unique_position(make_text["s102b"])
+        assert answer == TextPositionSelector(start=53, end=57)
+
     def test_select_text(self, make_text):
         selector = TextQuoteSelector(
             prefix="in no case", exact="does copyright", suffix="protection"

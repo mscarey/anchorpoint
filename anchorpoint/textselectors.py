@@ -180,6 +180,25 @@ class TextQuoteSelector(BaseModel):
             f'Unable to find pattern "{self.passage_regex()}" in text: "{text_sample}"'
         )
 
+    def as_unique_position(self, text: str) -> TextPositionSelector:
+        """
+        Get the interval where the selected quote appears in "text".
+
+        :param text:
+            the passage where an exact quotation needs to be located
+
+        :returns:
+            the position selector for the location of the exact quotation
+        """
+        position = self.as_position(text)
+
+        if not self.is_unique_in(text):
+            raise TextSelectionError(
+                f"Text selection {self} cannot be positioned because it "
+                f"is not unique in the given text."
+            )
+        return position
+
     def is_unique_in(self, text: str) -> bool:
         """
         Test if selector refers to exactly one passage in text.

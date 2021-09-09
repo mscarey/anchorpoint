@@ -8,6 +8,9 @@ dev
 - TextPositionSelector no longer has real_start and real_end that can differ from start and end
 - Selectors and TextPositionSets are Pydantic models
 - TextSelector is Pydantic model for either Quote or Position Selector
+- add type field to SelectorSchema
+- update type annotations for TextPositionSelector.from_range
+- add TestQuoteSelector.as_unique_position method
 
 0.5.3 (2021-08-11)
 ------------------
