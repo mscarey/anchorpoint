@@ -108,6 +108,12 @@ class TestMakeSelectorSet:
         assert new.positions[0].start == 4
         assert new.positions[0].end == 23
 
+    def test_make_quote_selector_from_string(self):
+        data = {"quotes": "red|orange|yellow"}
+        result = TextPositionSet(**data)
+        assert result.quotes[0].exact == "orange"
+        assert result.quotes[0].suffix == "yellow"
+
 
 class TestCombineSelectorSet:
     def test_subtract_int_from_selector_set(self):

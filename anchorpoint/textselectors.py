@@ -613,11 +613,19 @@ class TextPositionSet(BaseModel):
 
     @validator("quotes", pre=True)
     def quote_selectors_are_in_list(
-        cls, selectors: Union[TextQuoteSelector, List[TextQuoteSelector]]
+        cls,
+        selectors: Union[str, TextQuoteSelector, List[Union[str, TextQuoteSelector]]],
     ):
-        """Put single selector in list."""
-        if not isinstance(selectors, Sequence):
+        """Put single selector in list and convert strings to selectors."""
+        if isinstance(selectors, str) or not isinstance(selectors, Sequence):
             selectors = [selectors]
+
+        selectors = [
+            TextQuoteSelector.from_text(selector)
+            if isinstance(selector, str)
+            else selector
+            for selector in selectors
+        ]
         return selectors
 
     @validator("positions")
