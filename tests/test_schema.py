@@ -1,7 +1,11 @@
 import pytest
 
 from anchorpoint.schemas import SelectorSchema, PositionSelectorSchema
-from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
+from anchorpoint.textselectors import (
+    TextPositionSelector,
+    TextPositionSet,
+    TextSelectionError,
+)
 
 
 class TestLoadSelector:
@@ -68,6 +72,17 @@ class TestPositionSelector:
         data = {"start": 0, "end": 12, "type": "TextPositionSelector"}
         result = schema.load(data)
         assert type(result) == TextPositionSelector
+
+
+class TestLoadSelectorSet:
+    def test_quote_selector_not_in_list(self):
+        data = {
+            "quotes": {
+                "suffix": ", and no Warrants shall issue",
+            }
+        }
+        result = TextPositionSet(**data)
+        assert result.quotes[0].suffix == ", and no Warrants shall issue"
 
 
 class TestDumpSelector:
