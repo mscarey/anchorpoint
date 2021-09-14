@@ -1,6 +1,6 @@
 """Schema for serializing text selectors."""
 
-from typing import Dict, Mapping, Optional, Sequence, TypedDict, Union
+from typing import Dict, List, Mapping, Optional, Sequence, TypedDict, Union
 
 from marshmallow import Schema, fields, post_load, pre_load
 
@@ -99,6 +99,25 @@ class TextPositionSetSchema(Schema):
     __model__ = TextPositionSet
     quotes = fields.Nested(QuoteSchema, many=True)
     positions = fields.Nested(PositionSchema, many=True)
+
+    @pre_load
+    def preprocess_data(
+        self,
+        data: Union[
+            str, Mapping[str, Union[Mapping[str, str], List[Mapping[str, str]]]]
+        ],
+        **kwargs
+    ) -> Mapping[str, List[Mapping[str, str]]]:
+        if isinstance(data.get("quotes"), dict):
+            data["quotes"] = [data["quotes"]]
+        if isinstance(data.get("positions"), dict):
+            data["positions"] = [data["positions"]]
+        return data
+
+    @post_load
+    def make_object(self, data: Dict[str, str], **kwargs) -> TextPositionSet:
+
+        return TextPositionSet(**data)
 
 
 class TextPositionSetFactory:

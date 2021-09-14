@@ -1,6 +1,6 @@
 import pytest
 
-from anchorpoint.schemas import QuoteSchema, PositionSchema
+from anchorpoint.schemas import QuoteSchema, PositionSchema, TextPositionSetSchema
 from anchorpoint.textselectors import (
     TextPositionSelector,
     TextPositionSet,
@@ -76,6 +76,12 @@ class TestLoadSelectorSet:
             }
         }
         result = TextPositionSet(**data)
+        assert result.quotes[0].suffix == ", and no Warrants shall issue"
+
+    def test_selector_set_schema_with_quote_outside_list(self):
+        data = {"quotes": {"suffix": ", and no Warrants shall issue"}}
+        schema = TextPositionSetSchema()
+        result = schema.load(data)
         assert result.quotes[0].suffix == ", and no Warrants shall issue"
 
 
