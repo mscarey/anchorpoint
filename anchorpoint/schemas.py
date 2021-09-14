@@ -18,45 +18,47 @@ class PositionSelectorDict(TypedDict, total=False):
     end: Optional[int]
 
 
-class PositionSelectorSchema(Schema):
+class PositionSchema(Schema):
     r"""Schema for :class:`~anchorpoint.textselectors.TextPositionSelector`."""
     __model__ = TextPositionSelector
 
     start = fields.Int()
     end = fields.Int(load_default=None)
-    include_start = fields.Bool(load_default=True, load_only=True)
-    include_end = fields.Bool(load_default=False, load_only=True)
 
     class Meta:
         ordered = True
 
-    @post_load
-    def make_object(self, data: PositionSelectorDict, **kwargs) -> TextPositionSelector:
+    def convert_bool_to_dict(self, data: bool) -> Dict[str, int]:
+        """Interpret True as a TextPositionSelector including the whole section."""
 
+        if data is True:
+            return {"start": 0}
+        return {"start": 0, "end": 0}
+
+    @pre_load
+    def preprocess_data(
+        self, data: Union[bool, Mapping[str, int]], **kwargs
+    ) -> Mapping[str, int]:
+        if isinstance(data, bool):
+            return self.convert_bool_to_dict(data)
+        return data
+
+    @post_load
+    def make_object(
+        self, data: PositionSelectorDict, **kwargs
+    ) -> Optional[TextPositionSelector]:
+        if data["start"] == data.get("end") == 0:
+            return None
         return TextPositionSelector(**data)
 
 
-class SelectorSchema(Schema):
-    r"""
-    Schema for loading a :class:`~anchorpoint.textselectors.TextQuoteSelector` or
-    :class:`~anchorpoint.textselectors.TextPositionSelector`.
-
-    Generates a :class:`~anchorpoint.textselectors.TextQuoteSelector`
-    if the input data contains any of the fields "exact", "prefix",
-    or "suffix", and returns a
-    :class:`~anchorpoint.textselectors.TextPositionSelector` otherwise.
-
-    """
+class QuoteSchema(Schema):
+    r"""Schema for :class:`~anchorpoint.textselectors.TextPositionSelector`."""
     __model__ = TextQuoteSelector
 
-    exact = fields.Str(load_default=None)
     prefix = fields.Str(load_default=None)
+    exact = fields.Str(load_default=None)
     suffix = fields.Str(load_default=None)
-
-    start = fields.Int()
-    end = fields.Int(load_default=None)
-
-    type = fields.Str(required=False)
 
     class Meta:
         ordered = True
@@ -77,40 +79,26 @@ class SelectorSchema(Schema):
         ) = TextQuoteSelector.split_anchor_text(text)
         return result
 
-    def convert_bool_to_dict(self, data: bool) -> Dict[str, int]:
-        """Interpret True as a TextPositionSelector including the whole section."""
-
-        if data is True:
-            return {"start": 0}
-        return {"start": 0, "end": 0}
-
     @pre_load
     def preprocess_data(
-        self, data: Union[str, bool, Mapping[str, Union[str, bool, int]]], **kwargs
-    ) -> Mapping[str, Union[str, bool, int]]:
-        if isinstance(data, bool):
-            return self.convert_bool_to_dict(data)
+        self, data: Union[str, Mapping[str, str]], **kwargs
+    ) -> Mapping[str, str]:
         if isinstance(data, str):
             return self.expand_anchor_shorthand(data)
-        if "text" in data.keys() and isinstance(data["text"], str):
-            return self.expand_anchor_shorthand(data["text"])
         return data
 
     @post_load
-    def make_object(
-        self, data, **kwargs
-    ) -> Optional[Union[TextPositionSelector, TextQuoteSelector]]:
-        if data.get("exact") or data.get("prefix") or data.get("suffix"):
-            for unwanted in ("start", "end"):
-                data.pop(unwanted, None)
-            return TextQuoteSelector(**data)
+    def make_object(self, data: Dict[str, str], **kwargs) -> TextQuoteSelector:
 
-        if data.get("start") == data.get("end"):
-            return None
+        return TextQuoteSelector(**data)
 
-        for unwanted in ("exact", "prefix", "suffix"):
-            data.pop(unwanted, None)
-        return TextPositionSelector(**data)
+
+class TextPositionSetSchema(Schema):
+    """Schema for a set of positions in a text."""
+
+    __model__ = TextPositionSet
+    quotes = fields.Nested(QuoteSchema, many=True)
+    positions = fields.Nested(PositionSchema, many=True)
 
 
 class TextPositionSetFactory:
@@ -140,7 +128,7 @@ class TextPositionSetFactory:
     ) -> TextPositionSet:
         """Construct TextPositionSet for a provided text passage, from any type of selector."""
         if isinstance(selection, str):
-            schema = SelectorSchema()
+            schema = QuoteSchema()
             data = schema.expand_anchor_shorthand(selection)
             selection = schema.load(data)
         if isinstance(selection, TextQuoteSelector):
