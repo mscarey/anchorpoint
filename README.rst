@@ -23,7 +23,7 @@ Anchorpoint supplies TextQuoteSelector and TextPositionSelector
 classes based on the Web Annotation Data Model, which is
 a `W3C Recommendation`_. Anchorpoint includes helper methods
 for switching between selector types, and
-a `marshmallow`_ schema for serialization. Anchorpoint is used
+a `pydantic`_ schema for serialization. Anchorpoint is used
 by `Legislice`_ for referencing laws such as statutes, and
 by `AuthoritySpoke`_ for referencing judicial opinions.
 
@@ -39,7 +39,7 @@ In Javascript, try the `Text Quote Anchor`_ and `Text Position Anchor`_ packages
 In Python try python-ranges_, which is the basis for much of the TextPositionSelector class's behavior.
 
 .. _W3C Recommendation: https://www.w3.org/TR/annotation-model/
-.. _marshmallow: https://marshmallow.readthedocs.io/
+.. _pydantic: https://pydantic-docs.helpmanual.io/
 .. _Legislice: https://github.com/mscarey/legislice
 .. _AuthoritySpoke: https://authorityspoke.readthedocs.io
 .. _API Documentation: https://anchorpoint.readthedocs.io/en/latest/
