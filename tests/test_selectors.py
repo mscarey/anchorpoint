@@ -36,10 +36,6 @@ class TestTextQuoteSelectors:
         copyright_json = self.preexisting_material.json()
         assert '"exact": "protection for a work' in copyright_json
 
-    def test_type_in_quote_selector_dict(self):
-        quote_dict = self.preexisting_material.dict()
-        assert quote_dict["type"] == "TextQuoteSelector"
-
     def test_create_from_text(self):
         method = TextQuoteSelector.from_text(
             "process, system,|method of operation|, concept, principle"
@@ -220,11 +216,6 @@ class TestCreateTextPositionSelectors:
     def test_make_selector_with_none_at_end(self):
         selector = TextPositionSelector(start=5, end=None)
         assert selector.range().end > 9999
-
-    def test_dump_position_selector(self):
-        selector = TextPositionSelector(start=5, end=12)
-        dumped = selector.dict()
-        assert dumped["type"] == "TextPositionSelector"
 
     def test_get_passage_from_position(self, make_text):
         selector = TextPositionSelector(start=53, end=84)

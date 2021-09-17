@@ -46,7 +46,6 @@ class TextQuoteSelector(BaseModel):
     exact: str = ""
     prefix: str = ""
     suffix: str = ""
-    type: str = Field("TextQuoteSelector", const=True)
 
     @staticmethod
     def split_anchor_text(text: str) -> Tuple[str, ...]:
@@ -271,7 +270,6 @@ class TextPositionSelector(BaseModel):
 
     start: int = 0
     end: Optional[int] = None
-    type: str = Field("TextPositionSelector", const=True)
 
     @classmethod
     def from_range(
