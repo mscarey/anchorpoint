@@ -66,9 +66,9 @@ ambiguity. For example, this selector applies to the second instance of the word
 Converting Between Selector Types
 ---------------------------------
 
-The :meth:`~anchorpoint.textselectors.TextQuoteSelector.as_position` and
-:meth:`~anchorpoint.textselectors.TextPositionSelector.as_quote` methods can
-be used to convert between the two types of selector.
+You can use the :meth:`~anchorpoint.textselectors.TextQuoteSelector.as_position` and
+:meth:`~anchorpoint.textselectors.TextPositionSelector.as_quote` methods
+to convert between the two types of selector.
 
     >>> authorship_selector.as_position(legal_text)
     TextPositionSelector(start=306, end=316)
@@ -88,13 +88,34 @@ Position selectors can be combined into a single selector that covers both spans
 If two position selectors don't overlap, then adding them returns a different
 class called a :class:`~anchorpoint.textselectors.TextPositionSet`\.
 
-    >>> left = TextPositionSelector(start=5, end=12)
-    >>> right = TextPositionSelector(start=24, end=27)
+    >>> from anchorpoint import TextPositionSet
+    >>> left = TextPositionSelector(start=65, end=79)
+    >>> right = TextPositionSelector(start=100, end=136)
     >>> selector_set = left + right
     >>> selector_set
-    TextPositionSet(positions=[TextPositionSelector(start=5, end=12), TextPositionSelector(start=24, end=27)], quotes=[])
+    TextPositionSet(positions=[TextPositionSelector(start=65, end=79), TextPositionSelector(start=100, end=136)], quotes=[])
 
 The TextPositionSet can be used to select nonconsecutive passages of text.
 
     >>> selector_set.select_text(legal_text)
-    ''
+    '…original works…in any tangible medium of expression…'
+
+If needed, you can use a :class:`~anchorpoint.textselectors.TextPositionSet` to
+select text with a combination of both positions and quotes.
+
+    >>> text = "red orange yellow green blue indigo violet"
+    >>> position = TextPositionSelector(start=4, end=17)
+    >>> quote = TextQuoteSelector(exact="blue indigo")
+    >>> group = TextPositionSet(positions=[position], quotes=[quote])
+    >>> group.select_text(text)
+    '…orange yellow…blue indigo…'
+
+You can also add or subtract an integer to move the text selection left or right, but
+only the position selectors will be moved, not the quote selectors.
+
+    >>> earlier_selectors = group - 7
+    >>> earlier_selectors.select_text(text)
+    'red orange…blue indigo…'
+
+Comparing Selectors and Sets
+----------------------------

@@ -92,6 +92,22 @@ class TestMakeSelectorSet:
             == "…orange yellow green blue indigo…"
         )
 
+    def test_subtract_from_set_with_quote(self):
+        text = "red orange yellow green blue indigo violet"
+        position = TextPositionSelector(start=4, end=17)
+        quote = TextQuoteSelector(exact="blue indigo")
+        group = TextPositionSet(positions=[position], quotes=[quote])
+        earlier_selectors = group - 7
+        assert earlier_selectors.select_text(text) == "red orange…blue indigo…"
+
+    def test_add_to_set_with_quote(self):
+        text = "red orange yellow green blue indigo violet"
+        position = TextPositionSelector(start=4, end=17)
+        quote = TextQuoteSelector(exact="blue indigo")
+        group = TextPositionSet(positions=[position], quotes=[quote])
+        earlier_selectors = group + 2
+        assert earlier_selectors.select_text(text) == "…ange yellow g…blue indigo…"
+
     def test_convert_quotes_to_positions(self):
         text = "red orange yellow green blue indigo violet"
         position = TextPositionSelector(start=4, end=17)

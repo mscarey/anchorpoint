@@ -596,9 +596,13 @@ class TextPositionSet(BaseModel):
         """Decrease all startpoints and endpoints by the given amount."""
         if not isinstance(value, int):
             new_rangeset = self.rangeset() - value.rangeset()
-            return TextPositionSet.from_ranges(new_rangeset)
-        ranges = [selector.subtract_integer(value) for selector in self.positions]
-        return TextPositionSet.from_ranges(ranges)
+        else:
+            new_rangeset = [
+                selector.subtract_integer(value) for selector in self.positions
+            ]
+        new = TextPositionSet.from_ranges(new_rangeset)
+        new.quotes = self.quotes
+        return new
 
     @validator("positions", pre=True)
     def selectors_are_in_list(
@@ -754,9 +758,7 @@ class TextPositionSet(BaseModel):
         if margin_width < 1:
             raise ValueError("margin_width must be a positive integer")
 
-        new_rangeset = (
-            self.rangeset() | self.convert_quotes_to_positions(text).rangeset()
-        )
+        new_rangeset = self.rangeset() | self.quotes_rangeset(text)
         margin_selectors = TextPositionSet()
         for left in new_rangeset.ranges():
             for right in new_rangeset.ranges():
