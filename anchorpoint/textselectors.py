@@ -339,6 +339,21 @@ class TextPositionSelector(BaseModel):
 
         return TextPositionSelector(start=self.start + value, end=new_end)
 
+    def __gt__(self, other: Union[TextPositionSelector, TextPositionSet]) -> bool:
+        """
+        Check if self is greater than other.
+
+        :param other:
+            selector for another text interval
+
+        :returns:
+            whether self is greater than other
+        """
+        return self >= other and self != other
+
+    def __ge__(self, other: Union[TextPositionSelector, TextPositionSet]) -> bool:
+        return self.rangeset() | other.rangeset() == self.rangeset()
+
     def __or__(
         self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
     ) -> Union[TextPositionSelector, TextPositionSet]:
@@ -361,6 +376,27 @@ class TextPositionSelector(BaseModel):
             return TextPositionSelector.from_range(new_ranges[0])
 
         return TextPositionSet.from_ranges(new_rangeset)
+
+    def __and__(
+        self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
+    ) -> Optional[TextPositionSelector]:
+        """
+        Make a new selector covering the combined ranges of self and other.
+
+        :param other:
+            selector for another text interval
+
+        :returns:
+            a selector reflecting the combined range
+        """
+        if isinstance(other, (TextPositionSelector, TextPositionSet)):
+            other = other.rangeset()
+
+        new_rangeset = self.rangeset() & other
+
+        if not new_rangeset:
+            return None
+        return TextPositionSelector.from_range(new_rangeset.ranges()[0])
 
     @classmethod
     def from_text(

@@ -117,5 +117,25 @@ only the position selectors will be moved, not the quote selectors.
     >>> earlier_selectors.select_text(text)
     'red orange…blue indigo…'
 
+Union and intersection operators also work.
+
+    >>> left = TextPositionSelector(start=2, end=10)
+    >>> right = TextPositionSelector(start=5, end=20)
+    >>> left & right
+    TextPositionSelector(start=5, end=10)
+
 Comparing Selectors and Sets
 ----------------------------
+
+The greater than and less than operators can be used to check whether one selector
+or set covers the entire range of another. This is used to check whether one selector
+only contains text that's already within another selector.
+
+    >>> smaller = TextPositionSelector(start=3, end=8)
+    >>> overlapping = TextPositionSelector(start=5, end=50)
+    >>> overlapping > smaller
+    False
+    >>> superset = TextPositionSelector(start=0, end=10)
+    >>> superset > smaller
+    True
+

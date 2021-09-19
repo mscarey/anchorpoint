@@ -417,3 +417,23 @@ class TestCombineTextPositionSelectors:
         assert isinstance(diff, TextPositionSelector)
         assert diff.start == 5
         assert diff.end == 15
+
+    def test_intersection(self):
+        left = TextPositionSelector(start=2, end=10)
+        right = TextPositionSelector(start=5, end=20)
+        assert left & right == TextPositionSelector(start=5, end=10)
+
+    def test_ge(self):
+        left = TextPositionSelector(start=3, end=8)
+        same = TextPositionSelector(start=3, end=8)
+        larger = TextPositionSelector(start=3, end=50)
+        assert left >= same
+        assert not left >= larger
+        assert larger >= left
+
+    def test_gt(self):
+        smaller = TextPositionSelector(start=3, end=8)
+        overlapping = TextPositionSelector(start=5, end=50)
+        assert not overlapping > smaller
+        superset = TextPositionSelector(start=0, end=10)
+        assert superset > smaller
