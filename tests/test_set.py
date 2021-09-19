@@ -87,6 +87,10 @@ class TestMakeSelectorSet:
         quote = TextQuoteSelector(exact="blue indigo")
         group = TextPositionSet(positions=[position], quotes=[quote])
         assert group.as_string(text=text) == "…orange yellow…blue indigo…"
+        assert (
+            group.select_text(text=text, margin_width=10, margin_characters="green ")
+            == "…orange yellow green blue indigo…"
+        )
 
     def test_convert_quotes_to_positions(self):
         text = "red orange yellow green blue indigo violet"

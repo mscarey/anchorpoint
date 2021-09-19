@@ -753,9 +753,13 @@ class TextPositionSet(BaseModel):
         """
         if margin_width < 1:
             raise ValueError("margin_width must be a positive integer")
+
+        new_rangeset = (
+            self.rangeset() | self.convert_quotes_to_positions(text).rangeset()
+        )
         margin_selectors = TextPositionSet()
-        for left in self.ranges():
-            for right in self.ranges():
+        for left in new_rangeset.ranges():
+            for right in new_rangeset.ranges():
                 if left.end < right.start <= left.end + margin_width:
                     if all(
                         letter in margin_characters
@@ -764,7 +768,43 @@ class TextPositionSet(BaseModel):
                         margin_selectors += TextPositionSelector(
                             start=left.end, end=right.start
                         )
-        return self + margin_selectors
+        with_margin = new_rangeset + margin_selectors.rangeset()
+        return TextPositionSet.from_ranges(with_margin)
+
+    def select_text(
+        self,
+        text: str,
+        margin_width: int = 3,
+        margin_characters: str = """,."' ;[]()""",
+    ) -> str:
+        """
+        Return the selected text from `text`.
+
+        :param text:
+            The text that passages are selected from
+
+        :param margin_width:
+            The width of the margin to add
+
+        :param margin_characters:
+            The characters to include in the margin
+
+        :returns:
+            The selected text
+
+        >>> from anchorpoint.schemas import TextPositionSetFactory
+        >>> text = "I predict that the grass is wet. (It rained.)"
+        >>> factory = TextPositionSetFactory(text=text)
+        >>> selectors = [TextQuoteSelector(exact="the grass is wet"), TextQuoteSelector(exact="it rained")]
+        >>> position_set = factory.from_selection(selection=selectors)
+        >>> position_set.select_text(text=text)
+        'the grass is wet. (It rained.)'
+        """
+        with_margin = self.add_margin(
+            text=text, margin_width=margin_width, margin_characters=margin_characters
+        )
+        text_sequence = with_margin.as_text_sequence(text)
+        return str(text_sequence)
 
 
 class TextPositionSetFactory:

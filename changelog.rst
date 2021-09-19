@@ -14,6 +14,7 @@ dev
 - TextPositionSet can include TextQuoteSelectors
 - add convert_quotes_to_positions method to TextPositionSet
 - replace `TextPositionSet.selectors` field with `positions` and `quotes`
+- change `as_quote_selector` method to `as_quote`
 
 0.5.3 (2021-08-11)
 ------------------

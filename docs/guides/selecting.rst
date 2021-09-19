@@ -74,3 +74,27 @@ be used to convert between the two types of selector.
     TextPositionSelector(start=306, end=316)
     >>> positions.as_quote(legal_text)
     TextQuoteSelector(exact='original works of authorship', prefix='', suffix='')
+
+Combining and Grouping Selectors
+--------------------------------
+
+Position selectors can be combined into a single selector that covers both spans of text.
+
+    >>> left = TextPositionSelector(start=5, end=22)
+    >>> right = TextPositionSelector(start=12, end=27)
+    >>> left + right
+    TextPositionSelector(start=5, end=27)
+
+If two position selectors don't overlap, then adding them returns a different
+class called a :class:`~anchorpoint.textselectors.TextPositionSet`\.
+
+    >>> left = TextPositionSelector(start=5, end=12)
+    >>> right = TextPositionSelector(start=24, end=27)
+    >>> selector_set = left + right
+    >>> selector_set
+    TextPositionSet(positions=[TextPositionSelector(start=5, end=12), TextPositionSelector(start=24, end=27)], quotes=[])
+
+The TextPositionSet can be used to select nonconsecutive passages of text.
+
+    >>> selector_set.select_text(legal_text)
+    ''

@@ -339,10 +339,7 @@ class TestCombineTextPositionSelectors:
         assert new.end is None
 
     def test_adding_nonoverlapping_selectors(self):
-        """
-        When the selectors aren't near enough to be added,
-        the operation returns None.
-        """
+
         left = TextPositionSelector(start=5, end=12)
         right = TextPositionSelector(start=24, end=27)
         new = left + right
