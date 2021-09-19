@@ -596,6 +596,7 @@ class TextPositionSet(BaseModel):
     def __gt__(
         self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
     ) -> bool:
+        """Test if self's rangeset includes all of other's rangeset, but is not identical."""
         if isinstance(other, TextPositionSet):
             to_compare: Union[Range, RangeSet] = other.rangeset()
         elif isinstance(other, TextPositionSelector):
@@ -607,6 +608,7 @@ class TextPositionSet(BaseModel):
     def __ge__(
         self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
     ) -> bool:
+        """Test if self's rangeset includes all of other's rangeset."""
         if self == other:
             return True
         return self > other

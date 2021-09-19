@@ -1,6 +1,6 @@
-==============
-Selecting Text
-==============
+===============================
+Selecting Text with Anchorpoint
+===============================
 
 Anchorpoint is a tool for labeling referenced passages within text documents,
 in a format that allows the "anchors" to the referenced passages to be stored
@@ -35,7 +35,7 @@ that is being selected.
 
 Sometimes a selected passage is too long to include in full in
 the :class:`~anchorpoint.textselectors.TextQuoteSelector`\.
-In that case, you can identify the selection by specifying its `prefix` and `suffix`.
+In that case, you can identify the selection by specifying its ``prefix`` and ``suffix``.
 That is, the text immediately before and immediately after the text you want to select.
 
     >>> quote = TextQuoteSelector(prefix="otherwise communicated, ", suffix=" Works of authorship")
@@ -55,7 +55,7 @@ of the text string.
 
 If you want to use a :class:`~anchorpoint.textselectors.TextQuoteSelector` to select
 a particular instance of a phrase that appears more than once in the text, then you
-can add a `prefix` or `suffix` in addition to the `exact` phrase to eliminate the
+can add a ``prefix`` or ``suffix`` in addition to the ``exact`` phrase to eliminate the
 ambiguity. For example, this selector applies to the second instance of the word
 "authorship" in the text, not the first instance.
 
@@ -95,7 +95,7 @@ class called a :class:`~anchorpoint.textselectors.TextPositionSet`\.
     >>> selector_set
     TextPositionSet(positions=[TextPositionSelector(start=65, end=79), TextPositionSelector(start=100, end=136)], quotes=[])
 
-The TextPositionSet can be used to select nonconsecutive passages of text.
+The :class:`~anchorpoint.textselectors.TextPositionSet` can be used to select nonconsecutive passages of text.
 
     >>> selector_set.select_text(legal_text)
     '…original works…in any tangible medium of expression…'
@@ -131,11 +131,42 @@ The greater than and less than operators can be used to check whether one select
 or set covers the entire range of another. This is used to check whether one selector
 only contains text that's already within another selector.
 
-    >>> smaller = TextPositionSelector(start=3, end=8)
-    >>> overlapping = TextPositionSelector(start=5, end=50)
+    >>> smaller = TextPositionSelector(start=4, end=8)
+    >>> overlapping = TextPositionSelector(start=6, end=50)
     >>> overlapping > smaller
     False
     >>> superset = TextPositionSelector(start=0, end=10)
     >>> superset > smaller
     True
 
+TextPositionSets also have a :meth:`~anchorpoint.textselectors.TextPositionSet.__gt__` method
+that works in the same way.
+
+    >>> selector_set > TextPositionSelector(start=100, end=110)
+    True
+
+Serializing Selectors
+---------------------
+
+Anchorpoint uses `Pydantic <https://pydantic-docs.helpmanual.io/>`__ to
+serialize selectors either to Python dictionaries
+or to JSON strings suitable for sending over the internet with APIs.
+
+    >>> authorship_selector.json()
+    '{"exact": "authorship", "prefix": "", "suffix": "include"}'
+    >>> selector_set.dict()
+    {'positions': [{'start': 65, 'end': 79}, {'start': 100, 'end': 136}], 'quotes': []}
+
+Pydantic's data loading methods mean that you can also create the data for an
+Anchorpoint selector using nested dictionaries, and then load it with the class's
+constructor method.
+
+    >>> data = {'positions': [{'start': 65, 'end': 79}, {'start': 100, 'end': 136}]}
+    >>> TextPositionSet(**data)
+    TextPositionSet(positions=[TextPositionSelector(start=65, end=79), TextPositionSelector(start=100, end=136)], quotes=[])
+
+You can also `get a valid OpenAPI schema <https://pydantic-docs.helpmanual.io/usage/schema/>`__,
+for using Anchorpoint selectors in an API that you design.
+
+    >>> TextPositionSelector.schema_json()
+    '{"title": "TextPositionSelector", "description": "Describes a textual segment by start and end positions.\\n\\nBased on the Web Annotation Data Model `Text Position Selector\\n<https://www.w3.org/TR/annotation-model/#text-position-selector>`_ standard\\n\\n:param start:\\n    The starting position of the segment of text.\\n    The first character in the full text is character position 0,\\n    and the character is included within the segment.\\n\\n:param end:\\n    The end position of the segment of text.\\n    The character is not included within the segment.", "type": "object", "properties": {"start": {"title": "Start", "default": 0, "type": "integer"}, "end": {"title": "End", "type": "integer"}}}'
