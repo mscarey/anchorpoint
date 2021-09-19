@@ -102,13 +102,13 @@ class TestTextQuoteSelectors:
         """Test that to_position strips whitespace, like select_text does."""
         selector = TextQuoteSelector(exact="", prefix="", suffix="idea, procedure,")
         position = selector.as_position(make_text["s102b"])
-        selected_text = position.passage(make_text["s102b"])
+        selected_text = position.select_text(make_text["s102b"])
         assert not selected_text.endswith(" ")
 
     def test_no_leading_whitespace_when_selecting_from_prefix(self, make_text):
         selector = TextQuoteSelector(prefix="described, explained,")
         position = selector.as_position(make_text["s102b"])
-        selected_text = position.passage(make_text["s102b"])
+        selected_text = position.select_text(make_text["s102b"])
         assert not selected_text.startswith(" ")
 
     def test_no_unique_position(self, make_text):
@@ -218,13 +218,13 @@ class TestCreateTextPositionSelectors:
 
     def test_get_passage_from_position(self, make_text):
         selector = TextPositionSelector(start=53, end=84)
-        passage = selector.passage(make_text["amendment"])
+        passage = selector.select_text(make_text["amendment"])
         assert passage == "and subject to the jurisdiction"
 
     def test_fail_to_get_passage_from_position(self, make_text):
         selector = TextPositionSelector(start=53, end=9984)
         with pytest.raises(IndexError):
-            _ = selector.passage(make_text["amendment"])
+            _ = selector.select_text(make_text["amendment"])
 
     def test_end_must_be_after_start_position(self):
         with pytest.raises(IndexError):
@@ -244,7 +244,7 @@ class TestCreateTextPositionSelectors:
     def test_convert_position_with_inf_to_quote(self, make_text):
         """Test that position selector with no upper bound can be made into a quote selector."""
         selector = TextPositionSelector(start=53, end=None)
-        quote = selector.as_quote_selector(
+        quote = selector.as_quote(
             make_text["amendment"], left_margin=14, right_margin=10
         )
         assert quote.prefix.strip() == "United States"
@@ -255,7 +255,7 @@ class TestCreateTextPositionSelectors:
     def test_make_quote_selector_from_entire_text(self):
         passage = "entire passage"
         interval = TextPositionSelector(start=0, end=len(passage))
-        quote = interval.as_quote_selector(passage)
+        quote = interval.as_quote(passage)
         assert quote.exact == "entire passage"
         assert not quote.prefix
         assert not quote.suffix
@@ -271,7 +271,7 @@ class TestCreateTextPositionSelectors:
         passage = "too short"
         interval = TextPositionSelector(start=50, end=100)
         with pytest.raises(IndexError):
-            _ = interval.as_quote_selector(passage)
+            _ = interval.as_quote(passage)
 
     def test_zero_length_selector_not_allowed(self):
         with pytest.raises(IndexError):
@@ -287,7 +287,7 @@ class TestCreateTextPositionSelectors:
         )
         assert result.start == 8
         assert result.end == 23
-        assert result.passage(self.great_text) == "some great text"
+        assert result.select_text(self.great_text) == "some great text"
 
     def test_create_selector_from_phrases(self):
         result = TextPositionSelector.from_text(
@@ -295,7 +295,7 @@ class TestCreateTextPositionSelectors:
         )
         assert result.start == 8
         assert result.end == 23
-        assert result.passage(self.great_text) == "some great text"
+        assert result.select_text(self.great_text) == "some great text"
 
     def test_wrong_start_phrase_selector(self):
         with pytest.raises(TextSelectionError):
@@ -309,11 +309,11 @@ class TestCreateTextPositionSelectors:
 
     def test_phrase_selector_start_only(self):
         selector = TextPositionSelector.from_text(text=self.great_text, start=8)
-        assert selector.passage(self.great_text) == "some great text to excerpt."
+        assert selector.select_text(self.great_text) == "some great text to excerpt."
 
     def test_phrase_selector_end_only(self):
         selector = TextPositionSelector.from_text(text=self.great_text, end=23)
-        assert selector.passage(self.great_text) == "Here is some great text"
+        assert selector.select_text(self.great_text) == "Here is some great text"
 
 
 class TestCombineTextPositionSelectors:

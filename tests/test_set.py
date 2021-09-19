@@ -1,8 +1,8 @@
-from anchorpoint.schemas import TextPositionSetFactory
 from anchorpoint.textselectors import (
     TextPositionSelector,
     TextPositionSet,
     TextQuoteSelector,
+    TextPositionSetFactory,
     Range,
 )
 

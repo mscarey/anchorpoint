@@ -5,7 +5,7 @@ from anchorpoint.textselectors import (
     TextQuoteSelector,
     TextPositionSelector,
 )
-from anchorpoint.schemas import TextPositionSetFactory
+from anchorpoint.textselectors import TextPositionSetFactory
 from anchorpoint.textsequences import TextPassage, TextSequence
 
 
