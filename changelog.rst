@@ -15,6 +15,10 @@ dev
 - add convert_quotes_to_positions method to TextPositionSet
 - replace `TextPositionSet.selectors` field with `positions` and `quotes`
 - change `as_quote_selector` method to `as_quote`
+- TextPositionSet.add_margin includes quotes
+- fix bug: subtracting int from selector set caused quotes to be lost
+- add __ge__ and __gt__ methods for TextPositionSelector
+- add Selecting Text with Anchorpoint guide
 
 0.5.3 (2021-08-11)
 ------------------
