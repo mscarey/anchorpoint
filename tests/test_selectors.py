@@ -423,6 +423,11 @@ class TestCombineTextPositionSelectors:
         right = TextPositionSelector(start=5, end=20)
         assert left & right == TextPositionSelector(start=5, end=10)
 
+    def test_intersection_is_none(self):
+        left = TextPositionSelector(start=2, end=10)
+        right = TextPositionSelector(start=15, end=20)
+        assert left & right is None
+
     def test_ge(self):
         left = TextPositionSelector(start=3, end=8)
         same = TextPositionSelector(start=3, end=8)

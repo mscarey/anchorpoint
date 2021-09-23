@@ -12,9 +12,9 @@ import re
 from typing import List, Optional, Sequence, Tuple, Union
 
 from anchorpoint.textsequences import TextPassage, TextSequence
-from anchorpoint.utils._helper import InfiniteValue, Inf
-from anchorpoint.utils.ranges import Range, RangeSet
-from pydantic import BaseModel, Field, validator, root_validator
+from ranges import Range, RangeSet, Inf
+from ranges._helper import _InfiniteValue
+from pydantic import BaseModel, validator, root_validator
 
 
 class TextSelectionError(Exception):
@@ -275,7 +275,7 @@ class TextPositionSelector(BaseModel):
     def from_range(
         cls, range: Union[Range, TextPositionSelector]
     ) -> TextPositionSelector:
-        if isinstance(range.end, InfiniteValue):
+        if isinstance(range.end, _InfiniteValue):
             end = None
         else:
             end = range.end
@@ -381,13 +381,13 @@ class TextPositionSelector(BaseModel):
         self, other: Union[TextPositionSelector, TextPositionSet, Range, RangeSet]
     ) -> Optional[TextPositionSelector]:
         """
-        Make a new selector covering the combined ranges of self and other.
+        Make a new selector covering the intersection of the ranges of self and other.
 
         :param other:
             selector for another text interval
 
         :returns:
-            a selector reflecting the combined range
+            a selector reflecting the range of the intersection
         """
         if isinstance(other, (TextPositionSelector, TextPositionSet)):
             other = other.rangeset()

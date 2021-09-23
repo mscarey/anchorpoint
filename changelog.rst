@@ -1,7 +1,11 @@
 Changelog
 =========
 
-dev
+0.6.1 (2021-09-23)
+------------------
+- python-ranges by Superbird11 is imported instead of vendored
+
+0.6.0 (2021-09-19)
 ------------------
 - TextPositionSelector no longer inherits from Range
 - TextPositionSet no longer inherits from RangeSet
