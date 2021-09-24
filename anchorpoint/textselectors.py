@@ -545,6 +545,20 @@ class TextPositionSet(BaseModel):
     quotes: List[TextQuoteSelector] = []
 
     @classmethod
+    def from_quotes(
+        self,
+        selection: Union[str, TextQuoteSelector, List[Union[TextQuoteSelector, str]]],
+    ) -> TextPositionSet:
+        """Construct TextPositionSet from any type of selector, without using a text passage."""
+        if isinstance(selection, (str, TextQuoteSelector)):
+            selection = [selection]
+        selection = [
+            TextQuoteSelector.from_text(s) if isinstance(s, str) else s
+            for s in selection
+        ]
+        return TextPositionSet(quotes=selection)
+
+    @classmethod
     def from_ranges(
         cls, ranges: Union[RangeSet, Range, List[Range], List[TextPositionSelector]]
     ) -> TextPositionSet:

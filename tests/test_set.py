@@ -134,6 +134,24 @@ class TestMakeSelectorSet:
         assert result.quotes[0].exact == "orange"
         assert result.quotes[0].suffix == "yellow"
 
+    def test_make_set_from_string(self):
+        result = TextPositionSet.from_quotes("red|orange|yellow")
+        assert result.quotes[0].exact == "orange"
+        assert result.quotes[0].suffix == "yellow"
+
+    def test_make_set_from_exact_strings(self):
+        result = TextPositionSet.from_quotes(["red", "yellow"])
+        assert result.quotes[0].exact == "red"
+        assert result.quotes[1].exact == "yellow"
+
+    def test_make_set_from_quote_and_string(self):
+        result = TextPositionSet.from_quotes(
+            [TextQuoteSelector(suffix="orange"), "yellow"]
+        )
+        assert result.quotes[0].exact == ""
+        assert result.quotes[0].suffix == "orange"
+        assert result.quotes[1].exact == "yellow"
+
 
 class TestCombineSelectorSet:
     def test_subtract_int_from_selector_set(self):
