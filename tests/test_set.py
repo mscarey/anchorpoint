@@ -401,3 +401,14 @@ class TestTextFromSelectorSet:
             TextPositionSet.schema()["properties"]["positions"]["items"]["$ref"]
             == "#/definitions/TextPositionSelector"
         )
+
+    def test_set_as_text_sequence_with_no_endpoint(self):
+        """Test whether a Range with end "Inf" causes a string slicing error."""
+        obj = TextPositionSet(
+            positions=[TextPositionSelector(start=0, end=None)], quotes=[]
+        )
+        text = "The right of the people to be secure in their persons"
+        assert (
+            str(obj.as_text_sequence(text=text))
+            == "The right of the people to be secure in their persons"
+        )

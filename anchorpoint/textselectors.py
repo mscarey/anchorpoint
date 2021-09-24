@@ -731,7 +731,12 @@ class TextPositionSet(BaseModel):
                 selected.append(None)
             for passage in selection_ranges:
                 if passage.start < passage.end and passage.start < len(text):
-                    selected.append(TextPassage(text[passage.start : passage.end]))
+                    string_end = (
+                        passage.end
+                        if not isinstance(passage.end, _InfiniteValue)
+                        else None
+                    )
+                    selected.append(TextPassage(text[passage.start : string_end]))
                 if include_nones and passage.end and (passage.end < len(text)):
                     selected.append(None)
         elif text and include_nones and (not selected or selected[-1] is not None):
