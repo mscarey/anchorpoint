@@ -152,6 +152,12 @@ class TestMakeSelectorSet:
         assert result.quotes[0].suffix == "orange"
         assert result.quotes[1].exact == "yellow"
 
+    def test_pass_empty_selector_set_to_factory(self):
+        factory = TextPositionSetFactory("hi")
+        result = factory.from_selection(TextPositionSet())
+        assert result.quotes == []
+        assert result.positions == []
+
 
 class TestCombineSelectorSet:
     def test_subtract_int_from_selector_set(self):

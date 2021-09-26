@@ -910,6 +910,8 @@ class TextPositionSetFactory:
 
         First converts strings to TextQuoteSelectors, and then to TextPositionSelectors.
         """
+        if isinstance(selections, TextPositionSet):
+            return selections
         positions = []
         for selection in selections:
             if isinstance(selection, str):
