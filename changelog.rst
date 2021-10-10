@@ -6,6 +6,7 @@ Changelog
 - fix bug: Range with end "Inf" caused string slicing error
 - add TextPositionSet.from_quotes
 - remove TextSelector class
+- start_less_than_end is no longer a root_validator
 
 0.6.1 (2021-09-23)
 ------------------

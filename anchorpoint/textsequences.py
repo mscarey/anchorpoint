@@ -1,3 +1,5 @@
+"""Sequences of quoted text, specifying their order but not position in a longer passage."""
+
 from __future__ import annotations
 
 from typing import List, Optional, Sequence, Union
@@ -7,14 +9,19 @@ class TextPassage:
     """
     A contiguous passage of text.
 
-    :param text:
-        the text content of the contiguous passage
+    Can be used to compare passages while disregarding end punctuation.
     """
 
     def __repr__(self):
         return f'TextPassage("{self.text}")'
 
     def __init__(self, text: str):
+        """
+        Create a new TextPassage.
+
+        :param text:
+            the text content of the contiguous passage
+        """
         self.text = text
 
     def means(self, other: Optional[TextPassage]) -> bool:
@@ -62,15 +69,18 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
     Unlike a `Legislice <https://legislice.readthedocs.io/>`__ Enactment, a
     TextSequence does not preserve the tree structure
     of the quoted document.
-
-    :param passages:
-        the text passages included in the TextSequence, which should be chosen
-        to express a coherent idea. "None"s in the sequence represent spans of
-        text that exist in the source document, but that haven't been chosen
-        to be part of the TextSequence.
     """
 
     def __init__(self, passages: List[Optional[TextPassage]] = None):
+        """
+        Make new TextSequence from :class:`.TextPassage` list.
+        
+        :param passages:
+            the text passages included in the TextSequence, which should be chosen
+            to express a coherent idea. "None"s in the sequence represent spans of
+            text that exist in the source document, but that haven't been chosen
+            to be part of the TextSequence.
+        """
         self.passages = passages or []
 
     def __repr__(self):

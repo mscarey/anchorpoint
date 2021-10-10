@@ -14,7 +14,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from anchorpoint.textsequences import TextPassage, TextSequence
 from ranges import Range, RangeSet, Inf
 from ranges._helper import _InfiniteValue
-from pydantic import BaseModel, validator, root_validator
+from pydantic import BaseModel, validator
 
 
 class TextSelectionError(Exception):
@@ -275,30 +275,37 @@ class TextPositionSelector(BaseModel):
     def from_range(
         cls, range: Union[Range, TextPositionSelector]
     ) -> TextPositionSelector:
+        """Make TextPositionSelector with same extent as a Range object from python-ranges."""
         if isinstance(range.end, _InfiniteValue):
             end = None
         else:
             end = range.end
         return TextPositionSelector(start=range.start, end=end)
 
-    @validator("start", allow_reuse=True)
+    @validator("start")
     def start_not_negative(cls, v) -> bool:
         """
-        Check if start position is not negative.
+        Verify start position is not negative.
 
         :returns:
-            whether the start position is not negative
+            the start position, which is not negative
         """
         if v < 0:
             raise IndexError("Start position for text range cannot be negative.")
         return v
 
-    @root_validator(allow_reuse=True)
-    def start_less_than_end(cls, values):
-        start, end = values.get("start"), values.get("end")
+    @validator("end")
+    def start_less_than_end(cls, v, values):
+        """
+        Verify start position is before the end position.
+
+        :returns:
+            the end position, which after the start position
+        """
+        start, end = values.get("start"), v
         if end is not None and end <= start:
             raise IndexError("End position must be greater than start position.")
-        return values
+        return v
 
     def range(self) -> Range:
         """Get the range of the text."""
@@ -405,6 +412,7 @@ class TextPositionSelector(BaseModel):
         start: Union[int, str] = 0,
         end: Optional[Union[int, str]] = None,
     ) -> TextPositionSelector:
+        """Make position selector including the text strings "start" and "end" within "text"."""
         if isinstance(start, str):
             start_index = text.find(start)
             if start_index == -1:
@@ -420,6 +428,7 @@ class TextPositionSelector(BaseModel):
         return cls(start=start, end=end)
 
     def subtract_integer(self, value: int) -> TextPositionSelector:
+        """Reduce self's startpoint and endpoint by an integer."""
         new_start = max(0, self.start - value)
 
         if self.end is None:
@@ -444,17 +453,20 @@ class TextPositionSelector(BaseModel):
         return self.subtract_integer(value)
 
     def difference(
-        self, rng: Union[TextPositionSet, TextPositionSelector]
+        self, other: Union[TextPositionSet, TextPositionSelector]
     ) -> Union[TextPositionSet, TextPositionSelector]:
         """
-        Apply Range difference method replacing RangeSet with TextPositionSet in return value.
+        Get selectors in self or other but not both.
+
+        Applies Range difference, method replacing RangeSet
+        with :class:`.TextPositionSet` in return value.
         """
-        if isinstance(rng, TextPositionSet):
-            to_compare: Union[Range, RangeSet] = rng.rangeset()
-        elif isinstance(rng, TextPositionSelector):
-            to_compare = rng.range()
+        if isinstance(other, TextPositionSet):
+            to_compare: Union[Range, RangeSet] = other.rangeset()
+        elif isinstance(other, TextPositionSelector):
+            to_compare = other.range()
         else:
-            to_compare = rng
+            to_compare = other
         new_rangeset = self.rangeset().difference(to_compare)
         if len(new_rangeset.ranges()) == 1:
             return TextPositionSelector.from_range(new_rangeset.ranges()[0])
@@ -748,6 +760,7 @@ class TextPositionSet(BaseModel):
         return RangeSet(ranges)
 
     def positions_of_quote_selectors(self, text: str) -> List[TextPositionSelector]:
+        """Convert self's quote selectors to position selectors for a given text."""
         return [selector.as_position(text) for selector in self.quotes]
 
     def quotes_rangeset(self, text: str) -> RangeSet:
