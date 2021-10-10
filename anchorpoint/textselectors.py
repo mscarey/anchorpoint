@@ -532,14 +532,8 @@ class TextPositionSelector(BaseModel):
         return None
 
 
-class TextSelector(BaseModel):
-    __root__: Union[TextQuoteSelector, TextPositionSelector]
-
-
 class TextPositionSet(BaseModel):
-    r"""
-    A set of TextPositionSelectors.
-    """
+    r"""A set of TextPositionSelectors."""
 
     positions: List[TextPositionSelector] = []
     quotes: List[TextQuoteSelector] = []
@@ -549,7 +543,11 @@ class TextPositionSet(BaseModel):
         self,
         selection: Union[str, TextQuoteSelector, List[Union[TextQuoteSelector, str]]],
     ) -> TextPositionSet:
-        """Construct TextPositionSet from any type of selector, without using a text passage."""
+        """
+        Construct TextPositionSet from string or TextQuoteSelectors.
+
+        If a string is used, it will be converted to a :class:`.TextQuoteSelector` with no prefix or suffix.
+        """
         if isinstance(selection, (str, TextQuoteSelector)):
             selection = [selection]
         selection = [
@@ -562,6 +560,7 @@ class TextPositionSet(BaseModel):
     def from_ranges(
         cls, ranges: Union[RangeSet, Range, List[Range], List[TextPositionSelector]]
     ) -> TextPositionSet:
+        """Make new class instance from Range objects from python-ranges library."""
         if isinstance(ranges, RangeSet):
             ranges = ranges.ranges()
         if isinstance(ranges, Range):
@@ -744,6 +743,7 @@ class TextPositionSet(BaseModel):
         return TextSequence(selected)
 
     def rangeset(self) -> RangeSet:
+        """Convert positions into python-ranges Rangeset."""
         ranges = [selector.range() for selector in self.positions]
         return RangeSet(ranges)
 
@@ -751,11 +751,13 @@ class TextPositionSet(BaseModel):
         return [selector.as_position(text) for selector in self.quotes]
 
     def quotes_rangeset(self, text: str) -> RangeSet:
+        """Get ranges where these quotes appear in the provided text."""
         return RangeSet(
             [selector.range() for selector in self.positions_of_quote_selectors(text)]
         )
 
     def ranges(self) -> List[Range]:
+        """Get positions as Range objects from python-ranges library."""
         return self.rangeset().ranges()
 
     def as_string(self, text: str) -> str:
@@ -778,7 +780,7 @@ class TextPositionSet(BaseModel):
         margin_characters: str = """,."' ;[]()""",
     ) -> TextPositionSet:
         """
-        Expands selected position selectors to include margin of punctuation.
+        Expand selected position selectors to include margin of punctuation.
 
         This can cause multiple selections to be merged into a single one.
 
@@ -796,7 +798,7 @@ class TextPositionSet(BaseModel):
         :returns:
             A new TextPositionSet with the margin added
 
-        >>> from anchorpoint.schemas import TextPositionSetFactory
+        >>> from anchorpoint.textselectors import TextPositionSetFactory
         >>> text = "I predict that the grass is wet. (It rained.)"
         >>> factory = TextPositionSetFactory(text=text)
         >>> selectors = [TextQuoteSelector(exact="the grass is wet"), TextQuoteSelector(exact="it rained")]
@@ -851,13 +853,13 @@ class TextPositionSet(BaseModel):
         :returns:
             The selected text
 
-        >>> from anchorpoint.schemas import TextPositionSetFactory
+        >>> from anchorpoint.textselectors import TextPositionSetFactory
         >>> text = "I predict that the grass is wet. (It rained.)"
         >>> factory = TextPositionSetFactory(text=text)
         >>> selectors = [TextQuoteSelector(exact="the grass is wet"), TextQuoteSelector(exact="it rained")]
         >>> position_set = factory.from_selection(selection=selectors)
         >>> position_set.select_text(text=text)
-        'the grass is wet. (It rained.)'
+        '…the grass is wet. (It rained…'
         """
         with_margin = self.add_margin(
             text=text, margin_width=margin_width, margin_characters=margin_characters

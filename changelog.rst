@@ -1,5 +1,11 @@
 Changelog
 =========
+0.6.2 (2021-10-09)
+------------------
+- passing TextPositionSet to from_selection_sequence doesn't cause error
+- fix bug: Range with end "Inf" caused string slicing error
+- add TextPositionSet.from_quotes
+- remove TextSelector class
 
 0.6.1 (2021-09-23)
 ------------------
