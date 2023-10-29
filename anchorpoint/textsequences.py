@@ -74,7 +74,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
     def __init__(self, passages: List[Optional[TextPassage]] = None):
         """
         Make new TextSequence from :class:`.TextPassage` list.
-        
+
         :param passages:
             the text passages included in the TextSequence, which should be chosen
             to express a coherent idea. "None"s in the sequence represent spans of

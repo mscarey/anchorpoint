@@ -14,7 +14,7 @@ from pydantic import ValidationError
 from anchorpoint.textsequences import TextPassage, TextSequence
 from ranges import Range, RangeSet, Inf
 from ranges._helper import _InfiniteValue
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, model_validator
 
 
 class TextSelectionError(Exception):
@@ -296,18 +296,17 @@ class TextPositionSelector(BaseModel):
             raise ValidationError("Start position for text range cannot be negative.")
         return v
 
-    @validator("end")
-    def start_less_than_end(cls, v, values):
+    @model_validator(mode="after")
+    def start_less_than_end(self) -> "TextPositionSelector":
         """
         Verify start position is before the end position.
 
         :returns:
             the end position, which after the start position
         """
-        start, end = values.get("start"), v
-        if end is not None and end <= start:
+        if self.end is not None and self.end <= self.start:
             raise IndexError("End position must be greater than start position.")
-        return v
+        return self
 
     def range(self) -> Range:
         """Get the range of the text."""
