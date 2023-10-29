@@ -405,7 +405,7 @@ class TestTextFromSelectorSet:
     def test_get_schema_with_pydantic(self):
         assert (
             TextPositionSet.schema()["properties"]["positions"]["items"]["$ref"]
-            == "#/definitions/TextPositionSelector"
+            == "#/$defs/TextPositionSelector"
         )
 
     def test_set_as_text_sequence_with_no_endpoint(self):

@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 
 from typing import List, Optional, Sequence, Tuple, Union
-
+from pydantic import ValidationError
 from anchorpoint.textsequences import TextPassage, TextSequence
 from ranges import Range, RangeSet, Inf
 from ranges._helper import _InfiniteValue
@@ -292,6 +292,8 @@ class TextPositionSelector(BaseModel):
         """
         if v < 0:
             raise IndexError("Start position for text range cannot be negative.")
+        elif v is None:
+            raise ValidationError("Start position for text range cannot be negative.")
         return v
 
     @validator("end")
