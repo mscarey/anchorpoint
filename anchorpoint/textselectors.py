@@ -671,7 +671,7 @@ class TextPositionSet(BaseModel):
         return new
 
 
-    @validator("quotes", pre=True)
+    @field_validator("quotes", mode="before")
     def quote_selectors_are_in_list(
         cls,
         selectors: Union[str, TextQuoteSelector, List[Union[str, TextQuoteSelector]]],
