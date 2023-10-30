@@ -399,7 +399,7 @@ class TextPositionSelector(BaseModel):
         if isinstance(other, (TextPositionSelector, TextPositionSet)):
             other = other.rangeset()
 
-        new_rangeset = self.rangeset() & other
+        new_rangeset: RangeSet = self.rangeset() & other
 
         if not new_rangeset:
             return None
@@ -552,7 +552,7 @@ class TextPositionSet(BaseModel):
 
     @classmethod
     def from_quotes(
-        self,
+        cls,
         selection: Union[str, TextQuoteSelector, List[Union[TextQuoteSelector, str]]],
     ) -> TextPositionSet:
         """
@@ -562,11 +562,11 @@ class TextPositionSet(BaseModel):
         """
         if isinstance(selection, (str, TextQuoteSelector)):
             selection = [selection]
-        selection = [
+        selection_as_selectors: list[TextQuoteSelector] = [
             TextQuoteSelector.from_text(s) if isinstance(s, str) else s
             for s in selection
         ]
-        return TextPositionSet(quotes=selection)
+        return TextPositionSet(quotes=selection_as_selectors)
 
     @classmethod
     def from_ranges(
