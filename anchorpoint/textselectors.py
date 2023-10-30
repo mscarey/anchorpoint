@@ -669,14 +669,6 @@ class TextPositionSet(BaseModel):
         new.quotes = self.quotes
         return new
 
-    @validator("positions", pre=True)
-    def selectors_are_in_list(
-        cls, selectors: Union[TextPositionSelector, List[TextPositionSelector]]
-    ):
-        """Put single selector in list."""
-        if not isinstance(selectors, Sequence):
-            selectors = [selectors]
-        return selectors
 
     @validator("quotes", pre=True)
     def quote_selectors_are_in_list(
@@ -695,9 +687,12 @@ class TextPositionSet(BaseModel):
         ]
         return selectors
 
-    @validator("positions")
-    def order_of_selectors(cls, v):
+    @field_validator("positions", mode="before")
+    @classmethod
+    def order_of_selectors(cls, v: list[TextPositionSelector]):
         """Ensure that selectors are in order."""
+        if not isinstance(v, Sequence):
+            v = [v]
         return sorted(v, key=lambda x: x.start)
 
     def positions_as_quotes(self, text: str) -> List[TextQuoteSelector]:
