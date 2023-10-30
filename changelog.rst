@@ -1,5 +1,15 @@
 Changelog
 =========
+0.8.0 (2023-10-29)
+------------------
+- add tests for Python 3.12
+- update models to pydantic v2
+- add None checks for type checker
+- fix type issue with TextPositionSet.sub()
+- add type hints to TextPositionSet.from_quotes()
+- replace CircleCI with GitHub CI
+- remove unreachable validation check
+
 0.7.0 (2021-10-09)
 ------------------
 - passing TextPositionSet to from_selection_sequence doesn't cause error
