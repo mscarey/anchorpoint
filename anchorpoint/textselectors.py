@@ -736,7 +736,11 @@ class TextPositionSet(BaseModel):
             if include_nones and 0 < selection_ranges[0].start < len(text):
                 selected.append(None)
             for passage in selection_ranges:
-                if passage.start < passage.end and passage.start < len(text):
+                if (
+                    passage.start is not None
+                    and passage.start < passage.end
+                    and passage.start < len(text)
+                ):
                     string_end = (
                         passage.end
                         if not isinstance(passage.end, _InfiniteValue)
@@ -829,7 +833,10 @@ class TextPositionSet(BaseModel):
         margin_selectors = TextPositionSet()
         for left in new_rangeset.ranges():
             for right in new_rangeset.ranges():
-                if left.end < right.start <= left.end + margin_width:
+                if (
+                    left.end is not None
+                    and left.end < right.start <= left.end + margin_width
+                ):
                     if all(
                         letter in margin_characters
                         for letter in text[left.end : right.start]
