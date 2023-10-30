@@ -32,7 +32,7 @@ class TestTextQuoteSelectors:
     )
 
     def test_convert_selector_to_json(self):
-        copyright_json = self.preexisting_material.json()
+        copyright_json = self.preexisting_material.model_dump_json()
         assert '"exact":"protection for a work' in copyright_json
 
     def test_create_from_text(self):

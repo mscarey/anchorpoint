@@ -400,11 +400,11 @@ class TestTextFromSelectorSet:
                 TextPositionSelector(start=5, end=10),
             ]
         )
-        assert selector_set.dict()["positions"][0]["end"] == 4
+        assert selector_set.model_dump()["positions"][0]["end"] == 4
 
     def test_get_schema_with_pydantic(self):
         assert (
-            TextPositionSet.schema()["properties"]["positions"]["items"]["$ref"]
+            TextPositionSet.model_json_schema()["properties"]["positions"]["items"]["$ref"]
             == "#/$defs/TextPositionSelector"
         )
 

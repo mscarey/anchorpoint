@@ -40,7 +40,7 @@ class TestPositionSelector:
         """Test that "start" is before "end"."""
         data = {"start": 0, "end": 12}
         loaded = TextPositionSelector(**data)
-        dumped = loaded.dict()
+        dumped = loaded.model_dump()
         assert list(dumped.keys())[0] == "start"
 
 
@@ -69,7 +69,7 @@ class TestDumpSelector:
     def test_dump_quote_selector(self):
         data = "eats,|shoots,|and leaves"
         loaded = TextQuoteSelector.from_text(data)
-        dumped = loaded.dict()
+        dumped = loaded.model_dump()
         assert dumped["prefix"] == "eats,"
         assert dumped["suffix"] == "and leaves"
 
@@ -77,6 +77,6 @@ class TestDumpSelector:
         """Test that "start" is before "end"."""
         data = {"start": 0, "end": 12}
         loaded = TextPositionSelector(**data)
-        dumped = loaded.dict()
+        dumped = loaded.model_dump()
         assert dumped == {"start": 0, "end": 12}
         assert list(dumped.keys())[0] == "start"

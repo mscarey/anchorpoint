@@ -14,7 +14,7 @@ from pydantic import ValidationError
 from anchorpoint.textsequences import TextPassage, TextSequence
 from ranges import Range, RangeSet, Inf
 from ranges._helper import _InfiniteValue
-from pydantic import BaseModel, validator, model_validator
+from pydantic import BaseModel, field_validator, validator, model_validator
 
 
 class TextSelectionError(Exception):
@@ -69,8 +69,9 @@ class TextQuoteSelector(BaseModel):
             "two, separating the string into 'prefix', 'exact', and 'suffix'."
         )
 
-    @validator("prefix", "exact", "suffix", pre=True)
-    def no_none_for_prefix(cls, value):
+    @field_validator("prefix", "exact", "suffix", mode="before")
+    @classmethod
+    def no_none_for_prefix(cls, value: str | None) -> str:
         """Ensure that 'prefix', 'exact', and 'suffix' are not None."""
         if value is None:
             return ""
