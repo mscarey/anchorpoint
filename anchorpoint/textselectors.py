@@ -10,11 +10,10 @@ from __future__ import annotations
 import re
 
 from typing import List, Optional, Sequence, Tuple, Union
-from pydantic import ValidationError
 from anchorpoint.textsequences import TextPassage, TextSequence
 from ranges import Range, RangeSet, Inf
 from ranges._helper import _InfiniteValue
-from pydantic import BaseModel, field_validator, validator, model_validator
+from pydantic import BaseModel, field_validator, model_validator
 
 
 class TextSelectionError(Exception):
@@ -667,7 +666,6 @@ class TextPositionSet(BaseModel):
         new = TextPositionSet.from_ranges(new_rangeset)
         new.quotes = self.quotes
         return new
-
 
     @field_validator("quotes", mode="before")
     def quote_selectors_are_in_list(
