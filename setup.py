@@ -19,6 +19,7 @@ setuptools.setup(
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: Free To Use But Restricted",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
@@ -27,6 +28,6 @@ setuptools.setup(
         "Natural Language :: English",
     ],
     packages=setuptools.find_packages(exclude=["tests"]),
-    install_requires=["pydantic>=1.8.2"],
+    install_requires=["pydantic>2.4.2", "python-ranges>=1.2.2"],
     python_requires=">=3.8",
 )
