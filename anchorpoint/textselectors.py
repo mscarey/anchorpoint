@@ -650,7 +650,7 @@ class TextPositionSet(BaseModel):
     ) -> TextPositionSet:
         if isinstance(other, TextPositionSelector):
             other = TextPositionSet(positions=[other])
-        new_rangeset = self.rangeset() & other.rangeset()
+        new_rangeset: RangeSet = self.rangeset() & other.rangeset()
         return TextPositionSet.from_ranges(new_rangeset)
 
     def __sub__(
@@ -659,11 +659,12 @@ class TextPositionSet(BaseModel):
         """Decrease all startpoints and endpoints by the given amount."""
         if not isinstance(value, int):
             new_rangeset = self.rangeset() - value.rangeset()
+            new = TextPositionSet.from_ranges(new_rangeset)
         else:
-            new_rangeset = [
+            new_selectors = [
                 selector.subtract_integer(value) for selector in self.positions
             ]
-        new = TextPositionSet.from_ranges(new_rangeset)
+            new = TextPositionSet.from_ranges(new_selectors)
         new.quotes = self.quotes
         return new
 
