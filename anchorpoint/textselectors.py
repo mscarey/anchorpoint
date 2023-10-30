@@ -10,11 +10,10 @@ from __future__ import annotations
 import re
 
 from typing import List, Optional, Sequence, Tuple, Union
-
 from anchorpoint.textsequences import TextPassage, TextSequence
 from ranges import Range, RangeSet, Inf
 from ranges._helper import _InfiniteValue
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, model_validator
 
 
 class TextSelectionError(Exception):
@@ -69,8 +68,9 @@ class TextQuoteSelector(BaseModel):
             "two, separating the string into 'prefix', 'exact', and 'suffix'."
         )
 
-    @validator("prefix", "exact", "suffix", pre=True)
-    def no_none_for_prefix(cls, value):
+    @field_validator("prefix", "exact", "suffix", mode="before")
+    @classmethod
+    def no_none_for_prefix(cls, value: str | None) -> str:
         """Ensure that 'prefix', 'exact', and 'suffix' are not None."""
         if value is None:
             return ""
@@ -282,8 +282,9 @@ class TextPositionSelector(BaseModel):
             end = range.end
         return TextPositionSelector(start=range.start, end=end)
 
-    @validator("start")
-    def start_not_negative(cls, v) -> bool:
+    @field_validator("start", mode="after")
+    @classmethod
+    def start_not_negative(cls, v: int) -> int:
         """
         Verify start position is not negative.
 
@@ -294,18 +295,17 @@ class TextPositionSelector(BaseModel):
             raise IndexError("Start position for text range cannot be negative.")
         return v
 
-    @validator("end")
-    def start_less_than_end(cls, v, values):
+    @model_validator(mode="after")
+    def start_less_than_end(self) -> "TextPositionSelector":
         """
         Verify start position is before the end position.
 
         :returns:
             the end position, which after the start position
         """
-        start, end = values.get("start"), v
-        if end is not None and end <= start:
+        if self.end is not None and self.end <= self.start:
             raise IndexError("End position must be greater than start position.")
-        return v
+        return self
 
     def range(self) -> Range:
         """Get the range of the text."""
@@ -399,7 +399,7 @@ class TextPositionSelector(BaseModel):
         if isinstance(other, (TextPositionSelector, TextPositionSet)):
             other = other.rangeset()
 
-        new_rangeset = self.rangeset() & other
+        new_rangeset: RangeSet = self.rangeset() & other
 
         if not new_rangeset:
             return None
@@ -552,7 +552,7 @@ class TextPositionSet(BaseModel):
 
     @classmethod
     def from_quotes(
-        self,
+        cls,
         selection: Union[str, TextQuoteSelector, List[Union[TextQuoteSelector, str]]],
     ) -> TextPositionSet:
         """
@@ -562,11 +562,11 @@ class TextPositionSet(BaseModel):
         """
         if isinstance(selection, (str, TextQuoteSelector)):
             selection = [selection]
-        selection = [
+        selection_as_selectors: list[TextQuoteSelector] = [
             TextQuoteSelector.from_text(s) if isinstance(s, str) else s
             for s in selection
         ]
-        return TextPositionSet(quotes=selection)
+        return TextPositionSet(quotes=selection_as_selectors)
 
     @classmethod
     def from_ranges(
@@ -650,7 +650,7 @@ class TextPositionSet(BaseModel):
     ) -> TextPositionSet:
         if isinstance(other, TextPositionSelector):
             other = TextPositionSet(positions=[other])
-        new_rangeset = self.rangeset() & other.rangeset()
+        new_rangeset: RangeSet = self.rangeset() & other.rangeset()
         return TextPositionSet.from_ranges(new_rangeset)
 
     def __sub__(
@@ -659,24 +659,16 @@ class TextPositionSet(BaseModel):
         """Decrease all startpoints and endpoints by the given amount."""
         if not isinstance(value, int):
             new_rangeset = self.rangeset() - value.rangeset()
+            new = TextPositionSet.from_ranges(new_rangeset)
         else:
-            new_rangeset = [
+            new_selectors = [
                 selector.subtract_integer(value) for selector in self.positions
             ]
-        new = TextPositionSet.from_ranges(new_rangeset)
+            new = TextPositionSet.from_ranges(new_selectors)
         new.quotes = self.quotes
         return new
 
-    @validator("positions", pre=True)
-    def selectors_are_in_list(
-        cls, selectors: Union[TextPositionSelector, List[TextPositionSelector]]
-    ):
-        """Put single selector in list."""
-        if not isinstance(selectors, Sequence):
-            selectors = [selectors]
-        return selectors
-
-    @validator("quotes", pre=True)
+    @field_validator("quotes", mode="before")
     def quote_selectors_are_in_list(
         cls,
         selectors: Union[str, TextQuoteSelector, List[Union[str, TextQuoteSelector]]],
@@ -693,9 +685,12 @@ class TextPositionSet(BaseModel):
         ]
         return selectors
 
-    @validator("positions")
-    def order_of_selectors(cls, v):
+    @field_validator("positions", mode="before")
+    @classmethod
+    def order_of_selectors(cls, v: list[TextPositionSelector]):
         """Ensure that selectors are in order."""
+        if not isinstance(v, Sequence):
+            v = [v]
         return sorted(v, key=lambda x: x.start)
 
     def positions_as_quotes(self, text: str) -> List[TextQuoteSelector]:
@@ -741,7 +736,11 @@ class TextPositionSet(BaseModel):
             if include_nones and 0 < selection_ranges[0].start < len(text):
                 selected.append(None)
             for passage in selection_ranges:
-                if passage.start < passage.end and passage.start < len(text):
+                if (
+                    passage.start is not None
+                    and passage.start < passage.end
+                    and passage.start < len(text)
+                ):
                     string_end = (
                         passage.end
                         if not isinstance(passage.end, _InfiniteValue)
@@ -834,7 +833,10 @@ class TextPositionSet(BaseModel):
         margin_selectors = TextPositionSet()
         for left in new_rangeset.ranges():
             for right in new_rangeset.ranges():
-                if left.end < right.start <= left.end + margin_width:
+                if (
+                    left.end is not None
+                    and left.end < right.start <= left.end + margin_width
+                ):
                     if all(
                         letter in margin_characters
                         for letter in text[left.end : right.start]

@@ -2,11 +2,11 @@ black
 build
 coverage
 coveralls
-flake8
 mypy
 pydocstyle
 pytest
 pytest-cov
+ruff
 rstcheck
 setuptools
 Sphinx

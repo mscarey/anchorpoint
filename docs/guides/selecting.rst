@@ -152,9 +152,9 @@ Anchorpoint uses `Pydantic <https://pydantic-docs.helpmanual.io/>`__ to
 serialize selectors either to Python dictionaries
 or to JSON strings suitable for sending over the internet with APIs.
 
-    >>> authorship_selector.json()
+    >>> authorship_selector.model_dump_json()
     '{"exact": "authorship", "prefix": "", "suffix": "include"}'
-    >>> selector_set.dict()
+    >>> selector_set.model_dump()
     {'positions': [{'start': 65, 'end': 79}, {'start': 100, 'end': 136}], 'quotes': []}
 
 Pydantic's data loading methods mean that you can also create the data for an
