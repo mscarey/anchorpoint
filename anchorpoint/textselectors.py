@@ -285,16 +285,14 @@ class TextPositionSelector(BaseModel):
 
     @field_validator("start", mode="after")
     @classmethod
-    def start_not_negative(cls, v: int | None) -> int:
+    def start_not_negative(cls, v: int) -> int:
         """
         Verify start position is not negative.
 
         :returns:
             the start position, which is not negative
         """
-        if v is None:
-            raise IndexError("Start position for text range cannot be None.")
-        elif v < 0:
+        if v < 0:
             raise IndexError("Start position for text range cannot be negative.")
         return v
 
