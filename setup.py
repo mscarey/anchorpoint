@@ -5,7 +5,7 @@ with open("README.rst", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="anchorpoint",
-    version="0.8.0",
+    version="0.8.1",
     author="Matt Carey",
     author_email="matt@authorityspoke.com",
     description="Text substring selectors for anchoring annotations",
@@ -28,6 +28,6 @@ setuptools.setup(
         "Natural Language :: English",
     ],
     packages=setuptools.find_packages(exclude=["tests"]),
-    install_requires=["pydantic>2.4.2", "python-ranges>=1.2.2"],
+    install_requires=["pydantic>=2.4.2", "python-ranges>=1.2.2"],
     python_requires=">=3.8",
 )

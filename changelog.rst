@@ -1,5 +1,9 @@
 Changelog
 =========
+0.8.1 (2023-11-05)
+------------------
+- fix error in specifying Pydantic version in setup.py
+
 0.8.0 (2023-10-29)
 ------------------
 - add tests for Python 3.12
