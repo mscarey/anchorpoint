@@ -687,10 +687,16 @@ class TextPositionSet(BaseModel):
 
     @field_validator("positions", mode="before")
     @classmethod
-    def order_of_selectors(cls, v: list[TextPositionSelector]):
-        """Ensure that selectors are in order."""
+    def is_sequence(cls, v: list[TextPositionSelector]):
+        """Ensure that selectors are in a sequence."""
         if not isinstance(v, Sequence):
             v = [v]
+        return v
+
+    @field_validator("positions", mode="after")
+    @classmethod
+    def order_of_selectors(cls, v: list[TextPositionSelector]):
+        """Ensure that selectors are in order."""
         return sorted(v, key=lambda x: x.start)
 
     def positions_as_quotes(self, text: str) -> List[TextQuoteSelector]:

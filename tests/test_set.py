@@ -128,6 +128,12 @@ class TestMakeSelectorSet:
         assert new.positions[0].start == 4
         assert new.positions[0].end == 23
 
+    def test_make_position_set_from_dict(self):
+        data = {"positions": [{"start": 3, "end": 15}]}
+        result = TextPositionSet(**data)
+        assert result.positions[0].start == 3
+        assert result.positions[0].end == 15
+
     def test_make_quote_selector_from_string(self):
         data = {"quotes": "red|orange|yellow"}
         result = TextPositionSet(**data)
@@ -404,7 +410,9 @@ class TestTextFromSelectorSet:
 
     def test_get_schema_with_pydantic(self):
         assert (
-            TextPositionSet.model_json_schema()["properties"]["positions"]["items"]["$ref"]
+            TextPositionSet.model_json_schema()["properties"]["positions"]["items"][
+                "$ref"
+            ]
             == "#/$defs/TextPositionSelector"
         )
 
