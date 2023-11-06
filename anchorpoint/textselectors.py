@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, TypeVar, Union
 from anchorpoint.textsequences import TextPassage, TextSequence
 from ranges import Range, RangeSet, Inf
 from ranges._helper import _InfiniteValue
@@ -249,6 +249,9 @@ class TextQuoteSelector(BaseModel):
     def suffix_regex(self):
         """Get regex for the text following the selection and any whitespace."""
         return (r"\s*" + re.escape(self.suffix.strip())) if self.suffix else ""
+
+
+ST = TypeVar("ST")
 
 
 class TextPositionSelector(BaseModel):
@@ -687,7 +690,7 @@ class TextPositionSet(BaseModel):
 
     @field_validator("positions", mode="before")
     @classmethod
-    def is_sequence(cls, v: list[TextPositionSelector]):
+    def is_sequence(cls, v: ST | Sequence[ST]) -> Sequence[ST]:
         """Ensure that selectors are in a sequence."""
         if not isinstance(v, Sequence):
             v = [v]
@@ -920,7 +923,7 @@ class TextPositionSetFactory:
         if isinstance(selection, TextQuoteSelector):
             selection = [selection]
         elif isinstance(selection, TextPositionSelector):
-            return TextPositionSet(positions=selection)
+            return TextPositionSet(positions=[selection])
         if isinstance(selection, bool):
             return self.from_bool(selection)
         return self.from_selection_sequence(selection)
