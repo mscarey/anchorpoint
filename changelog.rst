@@ -1,5 +1,10 @@
 Changelog
 =========
+0.8.2 (2023-11-06)
+------------------
+- bugfix: TextPositionSet init wouldn't accept serialized position selector
+- pass selection to TextPositionSet init in list
+
 0.8.1 (2023-11-05)
 ------------------
 - fix error in specifying Pydantic version in setup.py

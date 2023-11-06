@@ -5,7 +5,7 @@ with open("README.rst", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="anchorpoint",
-    version="0.8.1",
+    version="0.8.2",
     author="Matt Carey",
     author_email="matt@authorityspoke.com",
     description="Text substring selectors for anchoring annotations",
