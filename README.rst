@@ -11,7 +11,7 @@ A Python library for anchoring annotations with text substring selectors.
     :target: https://coveralls.io/github/mscarey/anchorpoint?branch=master
     :alt: Test Coverage Percentage
 
-.. image:: https://github.com/mscarey/anchorpoint/actions/workflows/python-package.yml/badge.svg
+.. image:: https://github.com/mscarey/anchorpoint/actions/workflows/python_package.yml/badge.svg
     :target: https://github.com/mscarey/anchorpoint/actions
     :alt: GitHub Actions Workflow
 
