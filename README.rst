@@ -39,7 +39,7 @@ In Javascript, try the `Text Quote Anchor`_ and `Text Position Anchor`_ packages
 In Python try python-ranges_, which is the basis for much of the TextPositionSelector class's behavior.
 
 .. _W3C Recommendation: https://www.w3.org/TR/annotation-model/
-.. _pydantic: https://pydantic-docs.helpmanual.io/
+.. _pydantic: https://docs.pydantic.dev/latest/
 .. _Legislice: https://github.com/mscarey/legislice
 .. _AuthoritySpoke: https://authorityspoke.readthedocs.io
 .. _API Documentation: https://anchorpoint.readthedocs.io/en/latest/
