@@ -41,7 +41,7 @@ class TestCreateTextSequence:
         assert str(sequence) == "A short passage."
 
     def test_blank_text_sequence_string(self):
-        sequence = TextSequence()
+        sequence = TextSequence([])
         assert str(sequence) == ""
 
     def test_select_from_no_content(self):
@@ -238,13 +238,13 @@ class TestAddTextSequence:
             == "This is a full section. This is the full immediately following section."
         )
 
-    def test_add_tempty_TextSequences(self):
+    def test_add_empty_TextSequences(self):
         left = TextSequence(passages=[TextPassage("Some Text.")])
         right = TextSequence([])
         assert left + right == left
 
     def test_add_to_empty_TextSequences(self):
-        left = TextSequence()
+        left = TextSequence([])
         right = TextSequence(passages=[TextPassage("Some Text.")])
         assert left + right == right
 

@@ -71,7 +71,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
     of the quoted document.
     """
 
-    def __init__(self, passages: List[Optional[TextPassage]] = None):
+    def __init__(self, passages: List[Optional[TextPassage]]):
         """
         Make new TextSequence from :class:`.TextPassage` list.
 
