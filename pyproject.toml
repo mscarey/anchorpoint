@@ -3,7 +3,7 @@ name = "anchorpoint"
 version = "0.9.0"
 description = "text substring selectors for anchoring annotations"
 readme = "README.rst"
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 dependencies = [
     "pydantic>=2.12.0",
     "python-ranges>=1.2.2",
