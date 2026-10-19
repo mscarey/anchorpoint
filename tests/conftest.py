@@ -1,10 +1,9 @@
-from typing import Dict
 
 import pytest
 
 
 @pytest.fixture(scope="module")
-def make_text() -> Dict[str, str]:
+def make_text() -> dict[str, str]:
     """
     Text passages to practice quoting from.
     """

@@ -1,9 +1,9 @@
 import pytest
 
 from anchorpoint.textselectors import (
-    TextQuoteSelector,
     TextPositionSelector,
     TextPositionSet,
+    TextQuoteSelector,
     TextSelectionError,
 )
 

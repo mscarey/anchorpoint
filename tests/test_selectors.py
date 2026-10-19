@@ -1,15 +1,15 @@
 import re
 
 import pytest
+from pydantic import ValidationError
 
 from anchorpoint.textselectors import (
+    Range,
+    TextPositionSelector,
     TextPositionSet,
     TextQuoteSelector,
-    TextPositionSelector,
     TextSelectionError,
-    Range,
 )
-from pydantic import ValidationError
 
 
 class TestTextQuoteSelectors:

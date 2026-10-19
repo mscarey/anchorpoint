@@ -1,12 +1,12 @@
+import pytest
+
 from anchorpoint.textselectors import (
+    Range,
     TextPositionSelector,
     TextPositionSet,
-    TextQuoteSelector,
     TextPositionSetFactory,
-    Range,
+    TextQuoteSelector,
 )
-
-import pytest
 
 
 class TestMakeSelectorSet:

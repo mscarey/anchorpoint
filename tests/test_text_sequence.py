@@ -1,11 +1,11 @@
 import pytest
 
 from anchorpoint.textselectors import (
-    TextPositionSet,
-    TextQuoteSelector,
     TextPositionSelector,
+    TextPositionSet,
+    TextPositionSetFactory,
+    TextQuoteSelector,
 )
-from anchorpoint.textselectors import TextPositionSetFactory
 from anchorpoint.textsequences import TextPassage, TextSequence
 
 
