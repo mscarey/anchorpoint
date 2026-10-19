@@ -24,6 +24,8 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/mscarey/anchorpoint"
 Documentation = "https://anchorpoint.readthedocs.io/en/latest/"
+Changes = "https://github.com/mscarey/anchorpoint/blob/master/changelog.rst"
+Issues = "https://github.com/mscarey/anchorpoint/issues"
 
 [dependency-groups]
 build = [
