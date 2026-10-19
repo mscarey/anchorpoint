@@ -22,7 +22,6 @@ class TextSelectionError(Exception):
     """Exception for failing to select text as described by user."""
 
 
-
 class TextQuoteSelector(BaseModel):
     """
     Describes a textual segment by quoting it, or passages before or after it.
@@ -63,7 +62,7 @@ class TextQuoteSelector(BaseModel):
         if text.count("|") == 0:
             return ("", text, "")
         elif text.count("|") == 2:
-            return tuple([*text.split("|")])
+            return (*text.split("|"),)
         raise TextSelectionError(
             "If the 'text' field includes | pipe separators, it must contain exactly "
             "two, separating the string into 'prefix', 'exact', and 'suffix'."
@@ -276,9 +275,7 @@ class TextPositionSelector(BaseModel):
     end: int | None = None
 
     @classmethod
-    def from_range(
-        cls, range: Range | TextPositionSelector
-    ) -> TextPositionSelector:
+    def from_range(cls, range: Range | TextPositionSelector) -> TextPositionSelector:
         """Make TextPositionSelector with same extent as a Range object from python-ranges."""
         if isinstance(range.end, _InfiniteValue):
             end = None
@@ -641,16 +638,12 @@ class TextPositionSet(BaseModel):
             return True
         return self > other
 
-    def __or__(
-        self, other: TextPositionSet | TextPositionSelector
-    ) -> TextPositionSet:
+    def __or__(self, other: TextPositionSet | TextPositionSelector) -> TextPositionSet:
         if isinstance(other, TextPositionSelector):
             other = TextPositionSet(positions=[other])
         return self.merge_rangeset(other.rangeset())
 
-    def __and__(
-        self, other: TextPositionSet | TextPositionSelector
-    ) -> TextPositionSet:
+    def __and__(self, other: TextPositionSet | TextPositionSelector) -> TextPositionSet:
         if isinstance(other, TextPositionSelector):
             other = TextPositionSet(positions=[other])
         new_rangeset: RangeSet = self.rangeset() & other.rangeset()
@@ -845,14 +838,13 @@ class TextPositionSet(BaseModel):
                 if (
                     left.end is not None
                     and left.end < right.start <= left.end + margin_width
+                ) and all(
+                    letter in margin_characters
+                    for letter in text[left.end : right.start]
                 ):
-                    if all(
-                        letter in margin_characters
-                        for letter in text[left.end : right.start]
-                    ):
-                        margin_selectors += TextPositionSelector(
-                            start=left.end, end=right.start
-                        )
+                    margin_selectors += TextPositionSelector(
+                        start=left.end, end=right.start
+                    )
         with_margin = new_rangeset + margin_selectors.rangeset()
         return TextPositionSet.from_ranges(with_margin)
 
@@ -909,7 +901,11 @@ class TextPositionSetFactory:
 
     def from_selection(
         self,
-        selection: bool | str | TextPositionSelector | TextQuoteSelector | Sequence[str | TextQuoteSelector | TextPositionSelector],
+        selection: bool
+        | str
+        | TextPositionSelector
+        | TextQuoteSelector
+        | Sequence[str | TextQuoteSelector | TextPositionSelector],
     ) -> TextPositionSet:
         """Construct TextPositionSet for a provided text passage, from any type of selector."""
         if isinstance(selection, str):
