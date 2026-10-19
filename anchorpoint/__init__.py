@@ -8,3 +8,9 @@ from anchorpoint.textselectors import (
 )
 
 __version__ = "0.9.0"
+__all__ = [
+    "TextPositionSelector",
+    "TextPositionSet",
+    "TextPositionSetFactory",
+    "TextQuoteSelector",
+]
