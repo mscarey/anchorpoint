@@ -22,12 +22,12 @@ class TestCompareTextPassage:
     def test_cannot_compare_to_TextSequence(self):
         words = TextPassage("words")
         with pytest.raises(TypeError):
-            words >= TextSequence(["words", "more words"])
+            assert words >= TextSequence(["words", "more words"])
 
     def test_cannot_check_name_meaning_with_TextSequence(self):
         words = TextPassage("words")
         with pytest.raises(TypeError):
-            words.means(TextSequence(["words", "more words"]))
+            assert words.means(TextSequence(["words", "more words"]))
 
 
 class TestCreateTextSequence:
@@ -196,12 +196,12 @@ class TestCompareTextSequence:
     def test_cannot_compare_to_TextPassage(self):
         words = TextPassage("words")
         with pytest.raises(TypeError):
-            TextSequence(["words", "more words"]) >= words
+            assert TextSequence(["words", "more words"]) >= words
 
     def test_cannot_check_name_meaning_with_TextSequence(self):
         words = TextPassage("words")
         with pytest.raises(TypeError):
-            TextSequence(["words", "more words"]).means(words)
+            assert TextSequence(["words", "more words"]).means(words)
 
 
 class TestAddTextSequence:
@@ -232,7 +232,7 @@ class TestAddTextSequence:
             passages=[TextPassage("This is the full immediately following section.")]
         )
         new_sequence = sequence + second_sequence
-        len(new_sequence) == 2
+        assert len(new_sequence) == 2
         assert (
             str(new_sequence)
             == "This is a full section. This is the full immediately following section."
