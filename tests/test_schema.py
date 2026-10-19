@@ -41,7 +41,7 @@ class TestPositionSelector:
         data = {"start": 0, "end": 12}
         loaded = TextPositionSelector(**data)
         dumped = loaded.model_dump()
-        assert list(dumped.keys())[0] == "start"
+        assert next(iter(dumped.keys())) == "start"
 
 
 class TestLoadSelectorSet:
@@ -79,4 +79,4 @@ class TestDumpSelector:
         loaded = TextPositionSelector(**data)
         dumped = loaded.model_dump()
         assert dumped == {"start": 0, "end": 12}
-        assert list(dumped.keys())[0] == "start"
+        assert next(iter(dumped.keys())) == "start"
