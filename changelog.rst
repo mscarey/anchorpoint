@@ -1,5 +1,16 @@
 Changelog
 =========
+0.9.0 (2026-10-19)
+------------------
+- bump pytest to 9.0.3
+- bump sphinx to 9.1.0
+- add __all__ to __init__
+- add py.typed
+- change conf.py import to put version number in docs
+- pyproject.toml uses dependency-groups, not optional-dependencies
+- ruff autoformat
+- use only pyproject.toml, no requirements.txt
+
 0.8.2 (2023-11-06)
 ------------------
 - bugfix: TextPositionSet init wouldn't accept serialized position selector
