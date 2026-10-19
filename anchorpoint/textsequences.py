@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence, Union
+from collections.abc import Sequence
 
 
 class TextPassage:
@@ -24,7 +24,7 @@ class TextPassage:
         """
         self.text = text
 
-    def means(self, other: Optional[TextPassage]) -> bool:
+    def means(self, other: TextPassage | None) -> bool:
         """
         Test if passages have the same text, disregarding end puncutation.
 
@@ -48,7 +48,7 @@ class TextPassage:
 
         return self.text.strip(",:;. ") == other.text.strip(",:;. ")
 
-    def __ge__(self, other: Optional[TextPassage]) -> bool:
+    def __ge__(self, other: TextPassage | None) -> bool:
         if not other:
             return True
         if not isinstance(other, self.__class__):
@@ -58,11 +58,11 @@ class TextPassage:
         other_text = other.text.strip(",:;. ")
         return other_text in self.text
 
-    def __gt__(self, other: Optional[TextPassage]) -> bool:
+    def __gt__(self, other: TextPassage | None) -> bool:
         return self >= other and not self.means(other)
 
 
-class TextSequence(Sequence[Union[None, TextPassage]]):
+class TextSequence(Sequence[None | TextPassage]):
     """
     Sequential passages of text that need not be consecutive.
 
@@ -71,7 +71,7 @@ class TextSequence(Sequence[Union[None, TextPassage]]):
     of the quoted document.
     """
 
-    def __init__(self, passages: List[Optional[TextPassage]]):
+    def __init__(self, passages: list[TextPassage | None]):
         """
         Make new TextSequence from :class:`.TextPassage` list.
 

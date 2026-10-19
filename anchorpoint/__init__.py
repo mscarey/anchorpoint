@@ -1,6 +1,10 @@
 """Anchorpoint supplies text substring selectors for anchoring annotations."""
 
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from anchorpoint.textselectors import TextPositionSet, TextPositionSetFactory
+from anchorpoint.textselectors import (
+    TextPositionSelector,
+    TextPositionSet,
+    TextPositionSetFactory,
+    TextQuoteSelector,
+)
 
 __version__ = "0.9.0"
